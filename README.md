@@ -1,19 +1,27 @@
 # Qingfa.eShop
 
-Welcome to **Qingfa.eShop**! This is a modern eCommerce platform built with .NET 8 and PostgreSQL, designed to manage online stores efficiently. The application includes features for product management, user authentication, order processing, and secure payment handling through Stripe.
+**Qingfa.eShop** is a .NET 8-based eCommerce platform using Clean Architecture principles. This application allows for robust and scalable design patterns for online shopping platforms.
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Prerequisites](#prerequisites)
+- [Setup and Installation](#setup-and-installation)
+- [Project Structure](#project-structure)
+- [Testing](#testing)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Project Overview
 
-| **Feature**          | **Description**                                      |
-|----------------------|------------------------------------------------------|
-| **Product Management** | Manage product listings, categories, and details.  |
-| **User Authentication** | User registration, login, and account management.  |
-| **Order Processing**  | Track and manage customer orders and order status. |
-| **Payment Integration** | Process payments securely with Stripe.             |
+The application follows Clean Architecture principles, dividing the solution into several layers:
+
+- **`Qingfa.eShop.Api`**: The API layer that handles HTTP requests and responses.
+- **`Qingfa.eShop.Application`**: The application layer containing business logic and use cases.
+- **`Qingfa.eShop.Domain`**: The domain layer containing core business rules and entities.
+- **`Qingfa.eShop.Infrastructure`**: The infrastructure layer handling data access and external services.
 
 ## Prerequisites
-
-Ensure you have the following installed:
 
 - [.NET 8 SDK](https://dotnet.microsoft.com/download/dotnet/8.0)
 - [Docker](https://www.docker.com/products/docker-desktop)
@@ -28,115 +36,54 @@ Ensure you have the following installed:
     cd Qingfa.eShop
     ```
 
-2. **Docker Setup**
+2. **Run Docker Containers**
 
-    1. **Ensure Docker is Running**
+    ```bash
+    docker-compose up -d
+    ```
 
-        Check if Docker is running:
+3. **Restore and Build the Solution**
 
-        ```bash
-        docker --version
-        ```
-
-    2. **Run PostgreSQL Using Docker**
-
-        Create a `docker-compose.yml` file:
-
-        ```yaml
-        version: '3.8'
-
-        services:
-          postgres:
-            image: postgres:latest
-            container_name: qingfa-postgres
-            environment:
-              POSTGRES_USER: qingfa_user
-              POSTGRES_PASSWORD: qingfa_password
-              POSTGRES_DB: qingfa_db
-            ports:
-              - "5432:5432"
-            volumes:
-              - postgres_data:/var/lib/postgresql/data
-
-          # Uncomment for Stripe CLI
-          # stripe:
-          #   image: stripe/stripe-cli:latest
-          #   container_name: stripe
-          #   environment:
-          #     STRIPE_SECRET_KEY: your_stripe_secret_key
-          #   ports:
-          #     - "8000:8000"
-
-        volumes:
-          postgres_data:
-        ```
-
-        Start Docker containers:
-
-        ```bash
-        docker-compose up -d
-        ```
-
-    3. **Verify PostgreSQL Container**
-
-        Check if PostgreSQL container is running:
-
-        ```bash
-        docker ps
-        ```
-
-3. **Configure the Application**
-
-    1. **Update Connection String**
-
-        Modify `appsettings.json` with your PostgreSQL details:
-
-        ```json
-        "ConnectionStrings": {
-          "DefaultConnection": "Host=localhost;Port=5432;Database=qingfa_db;Username=qingfa_user;Password=qingfa_password;"
-        }
-        ```
-
-    2. **Configure Stripe**
-
-        Add your Stripe secret key in a `.env` file or as an environment variable:
-
-        ```env
-        STRIPE_SECRET_KEY=your_stripe_secret_key
-        ```
-
-    3. **Run Migrations**
-
-        Apply database migrations:
-
-        ```bash
-        dotnet ef database update
-        ```
+    ```bash
+    dotnet restore
+    dotnet build
+    ```
 
 4. **Run the Application**
 
-    Build and run the application:
-
     ```bash
-    dotnet run
+    dotnet run --project Qingfa.eShop.Api
     ```
 
-    Access the application at `http://localhost:5000`.
+## Project Structure
 
-## Usage
+- **`Qingfa.eShop.Api`**: Handles HTTP requests and API endpoints.
+- **`Qingfa.eShop.Application`**: Contains business logic and application services.
+- **`Qingfa.eShop.Domain`**: Defines core business entities and domain services.
+- **`Qingfa.eShop.Infrastructure`**: Manages data access and external integrations.
 
-- **Admin Dashboard:** Manage products, users, and orders at `/admin`.
-- **Customer Interface:** Browse and shop at `/shop`.
-- **Payment Processing:** Handled securely through Stripe.
-- **API Documentation:** Available at `https://localhost:5001/api/docs`.
+## Testing
+
+1. **Unit Tests**
+
+    Unit tests are located in the `Qingfa.eShop.Tests` project. To run the tests:
+
+    ```bash
+    dotnet test Qingfa.eShop.Tests
+    ```
+
+2. **Integration Tests**
+
+    Integration tests can be run similarly to unit tests but may require additional setup for external services and databases.
+
+## Contributing
+
+To contribute to this project, please fork the repository, create a new branch, and submit a pull request. Ensure your changes adhere to the project's coding standards and pass all tests.
 
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## Contact and Support
+## Contact
 
-For support or questions:
-
-- **Email:** ruanqingfa@gmail.com
-- **Issue Tracker:** [GitHub Issues](https://github.com/ngtphat-towa/Qingfa.eShop/issues)
+For any questions or support, please reach out to [support@qingfa.com](mailto:ruanqingfa@gmail.com).
