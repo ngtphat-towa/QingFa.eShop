@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\Qingfa.eShop.Domain\Qingfa.eShop.Domain.csproj" />
+    <ProjectReference Include="..\Qingfa.eShop.Infrastructure\Qingfa.eShop.Infrastructure.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
