@@ -3,12 +3,18 @@ using QingFa.eShop.Application;
 using QingFa.eShop.Infrastructure;
 
 using Serilog;
+using Serilog.Sinks.SystemConsole.Themes;
 
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
+          .MinimumLevel.Verbose()
+          .Enrich.FromLogContext()
+          .WriteTo.Console(outputTemplate:
+              "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+              theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Literate)
+          .CreateLogger();
+
 
 builder.Host.UseSerilog();
 
