@@ -1,4 +1,4 @@
-﻿namespace Qingfa.eShop.Identity;
+﻿namespace QingFa.eShop.Identity;
 
 public static class IdentityDependencies
 {
