@@ -5,19 +5,19 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{CD3A13E8-9023-4C62-8A88-FEA2E4657AE4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qingfa.EShop.Api", "src\Qingfa.eShop.Api\Qingfa.EShop.Api.csproj", "{57F5FB49-43B0-4F02-B0E7-9FCFEB97695F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.EShop.Api", "src\Qingfa.eShop.Api\QingFa.EShop.Api.csproj", "{57F5FB49-43B0-4F02-B0E7-9FCFEB97695F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qingfa.EShop.Application", "src\Qingfa.eShop.Application\Qingfa.EShop.Application.csproj", "{231FBABB-E262-4154-B351-E7765306B3F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.EShop.Application", "src\Qingfa.eShop.Application\QingFa.EShop.Application.csproj", "{231FBABB-E262-4154-B351-E7765306B3F9}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qingfa.EShop.Domain", "src\Qingfa.eShop.Domain\Qingfa.EShop.Domain.csproj", "{E55BBB5D-9C5B-4359-982A-9545B971F12B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.EShop.Domain", "src\Qingfa.eShop.Domain\QingFa.EShop.Domain.csproj", "{E55BBB5D-9C5B-4359-982A-9545B971F12B}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qingfa.EShop.Identity", "src\Qingfa.eShop.Identity\Qingfa.EShop.Identity.csproj", "{3C313A14-5E05-4409-A722-9EBC1B235DA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.EShop.Identity", "src\Qingfa.eShop.Identity\QingFa.EShop.Identity.csproj", "{3C313A14-5E05-4409-A722-9EBC1B235DA7}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qingfa.EShop.Infrastructure", "src\Qingfa.eShop.Infrastructure\Qingfa.EShop.Infrastructure.csproj", "{7C74A58E-2168-4803-8E5A-504BAC1E206F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.EShop.Infrastructure", "src\Qingfa.eShop.Infrastructure\QingFa.EShop.Infrastructure.csproj", "{7C74A58E-2168-4803-8E5A-504BAC1E206F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{71F8B2A5-9A87-4C85-A52C-55943373CAF6}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Qingfa.eShop.Tests", "test\Qingfa.eShop.Tests\Qingfa.eShop.Tests.csproj", "{9A49D991-32F1-40E1-A1B4-282F87956750}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.eShop.Tests", "test\Qingfa.eShop.Tests\QingFa.eShop.Tests.csproj", "{9A49D991-32F1-40E1-A1B4-282F87956750}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
