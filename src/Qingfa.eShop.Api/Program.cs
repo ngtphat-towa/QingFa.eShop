@@ -3,7 +3,6 @@ using QingFa.eShop.Application;
 using QingFa.eShop.Infrastructure;
 
 using Serilog;
-using Serilog.Sinks.SystemConsole.Themes;
 
 var builder = WebApplication.CreateBuilder(args);
 
