@@ -6,22 +6,25 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-var app = builder.Build();
-
 Log.Logger = new LoggerConfiguration()
-    .ReadFrom.Configuration(builder.Configuration)
-    .CreateLogger();
+          .MinimumLevel.Verbose()
+          .Enrich.FromLogContext()
+          .WriteTo.Console(outputTemplate:
+              "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+              theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Literate)
+          .CreateLogger();
+
 
 builder.Host.UseSerilog();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication()
                 .AddInfrastructure()
                 .AddPresentation();
 
-
+var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
@@ -32,4 +35,3 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.Run();
-

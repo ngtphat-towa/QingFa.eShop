@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,13 +7,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentValidation" Version="11.9.2" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.9.2" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.7" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.7.0" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Qingfa.eShop.Application\Qingfa.eShop.Application.csproj" />
-    <ProjectReference Include="..\Qingfa.eShop.Infrastructure\Qingfa.eShop.Infrastructure.csproj" />
+    <ProjectReference Include="..\Qingfa.eShop.Application\Qingfa.EShop.Application.csproj" />
+    <ProjectReference Include="..\Qingfa.eShop.Infrastructure\Qingfa.EShop.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
