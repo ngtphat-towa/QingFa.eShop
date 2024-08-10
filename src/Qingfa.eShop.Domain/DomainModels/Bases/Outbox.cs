@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace QingFa.EShop.Domain.DomainModels
+using QingFa.EShop.Domain.DomainModels;
+
+namespace Qingfa.EShop.Domain.DomainModels.Bases
 {
-    public abstract class Outbox : EntityRootBase
+    public abstract class Outbox : AggregateBase
     {
         public new Guid Id { get; set; } = Guid.NewGuid();
         public string Type { get; set; } = string.Empty;

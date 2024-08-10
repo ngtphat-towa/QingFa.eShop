@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Qingfa.eShop.Application\Qingfa.EShop.Application.csproj" />
-    <ProjectReference Include="..\Qingfa.eShop.Infrastructure\Qingfa.EShop.Infrastructure.csproj" />
+    <ProjectReference Include="..\Qingfa.eShop.Application\QingFa.EShop.Application.csproj" />
+    <ProjectReference Include="..\Qingfa.eShop.Infrastructure\QingFa.EShop.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
