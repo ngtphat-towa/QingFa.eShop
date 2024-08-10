@@ -6,7 +6,7 @@ namespace QingFa.EShop.Domain.DomainModels
     /// Represents a base class for aggregate root entities in the domain model,
     /// which includes support for domain events.
     /// </summary>
-    public abstract class EntityRootBase : EntityBase, IAggregateRoot
+    public abstract class AggregateBase : EntityBase, IAggregateRoot
     {
         /// <summary>
         /// Gets the set of domain events associated with the aggregate root.
@@ -15,9 +15,9 @@ namespace QingFa.EShop.Domain.DomainModels
         public HashSet<IDomainEvent> DomainEvents { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="EntityRootBase"/> class.
+        /// Initializes a new instance of the <see cref="AggregateBase"/> class.
         /// </summary>
-        protected EntityRootBase()
+        protected AggregateBase()
         {
             DomainEvents = new HashSet<IDomainEvent>();
         }
