@@ -1,4 +1,5 @@
 ﻿using QingFa.EShop.Domain.Catalogs.ValueObjects;
+using QingFa.EShop.Domain.DomainModels.Exceptions;
 
 namespace QingFa.EShop.Domain.Catalogs.Entities;
 
@@ -50,11 +51,11 @@ public class CatalogBrand : Entity<CatalogBrandId>
     private CatalogBrand(CatalogBrandId catalogBrandId, string name, string description, string logoURL, string websiteURL, string countryOfOrigin, int establishmentYear)
         : base(catalogBrandId)
     {
-        Name = name ?? throw new ArgumentNullException(nameof(name));
+        Name = name ?? throw CoreException.NullOrEmptyArgument(nameof(name));
         Description = description;
         LogoURL = logoURL;
         WebsiteURL = websiteURL;
-        CountryOfOrigin = countryOfOrigin ?? throw new ArgumentNullException(nameof(countryOfOrigin));
+        CountryOfOrigin = countryOfOrigin ?? throw CoreException.NullOrEmptyArgument(nameof(countryOfOrigin));
         EstablishmentYear = establishmentYear;
     }
 
@@ -73,8 +74,8 @@ public class CatalogBrand : Entity<CatalogBrandId>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="establishmentYear"/> is outside the valid range.</exception>
     public static CatalogBrand Create(CatalogBrandId catalogBrandId, string name, string description, string logoURL, string websiteURL, string countryOfOrigin, int establishmentYear)
     {
-        if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Brand name is required.", nameof(name));
-        if (string.IsNullOrWhiteSpace(countryOfOrigin)) throw new ArgumentException("Country of origin is required.", nameof(countryOfOrigin));
+        if (string.IsNullOrWhiteSpace(name)) throw CoreException.NullOrEmptyArgument( nameof(name));
+        if (string.IsNullOrWhiteSpace(countryOfOrigin)) throw CoreException.NullOrEmptyArgument(nameof(countryOfOrigin));
         if (establishmentYear < 1900 || establishmentYear > DateTime.Now.Year) throw new ArgumentOutOfRangeException(nameof(establishmentYear), "Invalid establishment year.");
 
         return new CatalogBrand(catalogBrandId, name, description, logoURL, websiteURL, countryOfOrigin, establishmentYear);
@@ -87,7 +88,7 @@ public class CatalogBrand : Entity<CatalogBrandId>
     /// <exception cref="ArgumentException">Thrown when <paramref name="description"/> is null or empty.</exception>
     public void UpdateDescription(string description)
     {
-        if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description cannot be empty.", nameof(description));
+        if (string.IsNullOrWhiteSpace(description)) throw CoreException.NullOrEmptyArgument(nameof(description));
         Description = description;
     }
 
@@ -116,7 +117,7 @@ public class CatalogBrand : Entity<CatalogBrandId>
     /// <exception cref="ArgumentException">Thrown when <paramref name="countryOfOrigin"/> is null or empty.</exception>
     public void UpdateCountryOfOrigin(string countryOfOrigin)
     {
-        if (string.IsNullOrWhiteSpace(countryOfOrigin)) throw new ArgumentException("Country of origin cannot be empty.", nameof(countryOfOrigin));
+        if (string.IsNullOrWhiteSpace(countryOfOrigin)) throw CoreException.NullOrEmptyArgument(nameof(countryOfOrigin));
         CountryOfOrigin = countryOfOrigin;
     }
 
@@ -127,7 +128,7 @@ public class CatalogBrand : Entity<CatalogBrandId>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="establishmentYear"/> is outside the valid range.</exception>
     public void UpdateEstablishmentYear(int establishmentYear)
     {
-        if (establishmentYear < 1900 || establishmentYear > DateTime.Now.Year) throw new ArgumentOutOfRangeException(nameof(establishmentYear), "Invalid establishment year.");
+        if (establishmentYear < 1900 || establishmentYear > DateTime.Now.Year) throw CoreException.NullOrEmptyArgument(nameof(establishmentYear));
         EstablishmentYear = establishmentYear;
     }
 }
