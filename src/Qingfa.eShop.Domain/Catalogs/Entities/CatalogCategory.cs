@@ -1,9 +1,6 @@
 ﻿using QingFa.EShop.Domain.Catalogs.ValueObjects;
 using QingFa.EShop.Domain.DomainModels.Exceptions;
 
-using System;
-using System.Collections.Generic;
-
 namespace QingFa.EShop.Domain.Catalogs.Entities
 {
     /// <summary>
