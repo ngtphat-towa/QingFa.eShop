@@ -1,21 +1,16 @@
 ﻿using QingFa.EShop.Domain.DomainModels.Interfaces;
 
-namespace QingFa.EShop.Domain.DomainModels.Bases;
-
-/// <summary>
-/// Represents a base class for entities in the domain model, providing common properties such as Id, Created, and Updated timestamps.
-/// </summary>
-public abstract class EntityBase : IEntity
+public abstract class Entity<TId> : IEntity<TId>
 {
     /// <summary>
     /// Gets the unique identifier of the entity.
     /// </summary>
-    public Guid Id { get; } = Guid.NewGuid();
+    public TId Id { get; }
 
     /// <summary>
     /// Gets the date and time when the entity was created.
     /// </summary>
-    public DateTime Created { get; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
+    public DateTime CreatedTime { get; } = DateTime.SpecifyKind(DateTime.UtcNow, DateTimeKind.Utc);
 
     /// <summary>
     /// Gets or sets the date and time when the entity was last updated.
@@ -23,5 +18,11 @@ public abstract class EntityBase : IEntity
     /// <remarks>
     /// This property may be <c>null</c> if the entity has not been updated since creation.
     /// </remarks>
-    public DateTime? Updated { get; protected set; }
+    public DateTime? UpdatedTime { get; protected set; }
+
+    // Constructor that requires Id to be passed
+    protected Entity(TId id)
+    {
+        Id = id;
+    }
 }

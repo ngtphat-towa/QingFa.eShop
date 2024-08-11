@@ -8,7 +8,8 @@ namespace QingFa.EShop.Domain.DomainModels.Bases;
 /// Represents a base class for aggregate root entities in the domain model,
 /// which includes support for domain events.
 /// </summary>
-public abstract class AggregateBase : EntityBase, IAggregateRoot
+/// <typeparam name="TId">The type of the unique identifier for the entity.</typeparam>
+public abstract class AggregateRoot<TId> : Entity<TId>, IAggregateRoot<TId>, IHasDomainEvents 
 {
     /// <summary>
     /// Gets the set of domain events associated with the aggregate root.
@@ -17,11 +18,11 @@ public abstract class AggregateBase : EntityBase, IAggregateRoot
     public HashSet<IDomainEvent> DomainEvents { get; private set; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="AggregateBase"/> class.
+    /// Initializes a new instance of the <see cref="AggregateRoot{TId}"/> class.
     /// </summary>
-    protected AggregateBase()
+    protected AggregateRoot(TId id) : base(id)
     {
-        DomainEvents = new HashSet<IDomainEvent>();
+        DomainEvents = [];
     }
 
     /// <summary>
@@ -30,6 +31,8 @@ public abstract class AggregateBase : EntityBase, IAggregateRoot
     /// <param name="eventItem">The domain event to add.</param>
     public void AddDomainEvent(IDomainEvent eventItem)
     {
+        if (eventItem == null)
+            throw new ArgumentNullException(nameof(eventItem));
         DomainEvents.Add(eventItem);
     }
 
@@ -39,6 +42,8 @@ public abstract class AggregateBase : EntityBase, IAggregateRoot
     /// <param name="eventItem">The domain event to remove.</param>
     public void RemoveDomainEvent(IDomainEvent eventItem)
     {
+        if (eventItem == null)
+            throw new ArgumentNullException(nameof(eventItem));
         DomainEvents.Remove(eventItem);
     }
 }

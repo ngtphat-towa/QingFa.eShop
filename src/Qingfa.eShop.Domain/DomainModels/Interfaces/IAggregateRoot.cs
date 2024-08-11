@@ -5,15 +5,7 @@
 /// An aggregate root is an entity that manages access to a cluster of related objects
 /// and ensures the consistency of changes within the aggregate.
 /// </summary>
-public interface IAggregateRoot : IEntity
+/// <typeparam name="TId">The type of the unique identifier for the entity.</typeparam>
+public interface IAggregateRoot<TId> : IEntity<TId>
 {
-    /// <summary>
-    /// Gets the collection of domain events associated with the aggregate root.
-    /// </summary>
-    /// <remarks>
-    /// Domain events are used to capture and store important state changes within the
-    /// aggregate. Implementations should ensure that domain events are handled properly
-    /// and are available for processing or persistence.
-    /// </remarks>
-    HashSet<IDomainEvent> DomainEvents { get; }
 }

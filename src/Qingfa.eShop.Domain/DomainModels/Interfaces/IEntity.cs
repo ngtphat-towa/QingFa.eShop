@@ -3,17 +3,17 @@
 /// <summary>
 /// Defines the base properties for an entity in the domain model.
 /// </summary>
-public interface IEntity
+public interface IEntity<TId>
 {
     /// <summary>
     /// Gets the unique identifier of the entity.
     /// </summary>
-    Guid Id { get; }
+    TId Id { get; }
 
     /// <summary>
     /// Gets the date and time when the entity was created.
     /// </summary>
-    DateTime Created { get; }
+    DateTime CreatedTime { get; }
 
     /// <summary>
     /// Gets the date and time when the entity was last updated.
@@ -21,5 +21,5 @@ public interface IEntity
     /// <remarks>
     /// This property may be <c>null</c> if the entity has not been updated since creation.
     /// </remarks>
-    DateTime? Updated { get; }
+    DateTime? UpdatedTime { get; }
 }

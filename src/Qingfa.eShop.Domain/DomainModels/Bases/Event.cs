@@ -5,7 +5,7 @@ namespace QingFa.EShop.Domain.DomainModels.Bases;
 /// <summary>
 /// Represents a base class for domain events with common properties and behaviors.
 /// </summary>
-public abstract class EventBase : IDomainEvent
+public abstract class Event : IDomainEvent
 {
     /// <summary>
     /// Gets the full name of the event type.
