@@ -30,13 +30,25 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         /// <param name="id">The unique identifier of the gender category.</param>
         /// <param name="name">The name of the gender category.</param>
         /// <param name="description">The description of the gender category.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> or <paramref name="description"/> is null or whitespace.</exception>
-        public Gender(GenderId id, string name, string? description)
+        /// <exception cref="ArgumentNullException">Thrown when <paramref name="name"/> is null or whitespace.</exception>
+        private Gender(GenderId id, string name, string? description)
             : base(id)
         {
             if (string.IsNullOrWhiteSpace(name)) throw CoreException.NullOrEmptyArgument(nameof(name));
             Name = name;
             Description = description;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Gender"/> instance.
+        /// </summary>
+        /// <param name="id">The unique identifier of the gender category.</param>
+        /// <param name="name">The name of the gender category. Defaults to "None".</param>
+        /// <param name="description">The description of the gender category. Defaults to null.</param>
+        /// <returns>A new <see cref="Gender"/> instance.</returns>
+        public static Gender Create(GenderId id, string name = "None", string? description = null)
+        {
+            return new Gender(id, name, description);
         }
 
         /// <summary>
@@ -55,8 +67,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         /// Updates the description of the gender category.
         /// </summary>
         /// <param name="description">The new description of the gender category.</param>
-        /// <exception cref="ArgumentException">Thrown when <paramref name="description"/> is null or whitespace.</exception>
-        public void UpdateDescription(string description)
+        public void UpdateDescription(string? description)
         {
             Description = description;
             UpdatedTime = DateTime.UtcNow;

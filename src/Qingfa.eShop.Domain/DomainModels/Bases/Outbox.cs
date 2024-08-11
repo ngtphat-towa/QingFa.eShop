@@ -2,7 +2,7 @@
 
 namespace QingFa.EShop.Domain.DomainModels.Bases;
 
-public abstract class Outbox : AggregateRoot
+public abstract class Outbox : AggregateRoot<Guid>
 {
     public new Guid Id { get; set; } = Guid.NewGuid();
     public string Type { get; set; } = string.Empty;
@@ -38,5 +38,9 @@ public abstract class Outbox : AggregateRoot
         }
 
         return true;
+    }
+
+    protected Outbox(Guid id) : base(id)
+    {
     }
 }

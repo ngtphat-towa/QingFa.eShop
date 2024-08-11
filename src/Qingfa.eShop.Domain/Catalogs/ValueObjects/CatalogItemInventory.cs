@@ -1,27 +1,76 @@
-﻿using QingFa.EShop.Domain.Catalogs.Entities;
+﻿using QingFa.EShop.Domain.Catalogs.ValueObjects;
 using QingFa.EShop.Domain.Commons.ValueObjects;
 
-namespace QingFa.EShop.Domain.Catalogs.ValueObjects
+public class CatalogItemInventory : Entity<long>
 {
-    public class CatalogItemInventory
-    {
-        public IEnumerable<Size> SizeOptions { get; }
-        public IEnumerable<Color> ColorOptions { get; }
-        public Price Price { get; }
-        public Price? DiscountPrice { get; }
-        public int StockQuantity { get; }
-        public string Sku { get; }
-        public IEnumerable<string> MainImageUrls { get; }
+    // Properties
+    public CatalogItemId CatalogItemId { get; private set; }
+    public Price? Price { get; private set; }
+    public Price? DiscountPrice { get; private set; }
+    public int StockQuantity { get; private set; }
+    public string Sku { get; private set; }
 
-        public CatalogItemInventory(IEnumerable<Size> sizeOptions, IEnumerable<Color> colorOptions, Price price, Price? discountPrice, int stockQuantity, string sku, IEnumerable<string> mainImageUrls)
-        {
-            SizeOptions = sizeOptions;
-            ColorOptions = colorOptions;
-            Price = price;
-            DiscountPrice = discountPrice;
-            StockQuantity = stockQuantity;
-            Sku = sku;
-            MainImageUrls = mainImageUrls;
-        }
+    // Private Constructor
+    private CatalogItemInventory(
+        CatalogItemId catalogItemId,
+        Price price,
+        Price? discountPrice,
+        int stockQuantity,
+        string sku)
+        : base(default(long))
+    {
+        CatalogItemId = catalogItemId;
+        Price = price ?? Price.CreateDefault();
+        DiscountPrice = discountPrice;
+        StockQuantity = stockQuantity;
+        Sku = sku ?? string.Empty;
+    }
+
+    // Static Factory Method for Full Initialization
+    public static CatalogItemInventory Create(
+        CatalogItemId catalogItemId,
+        Price price,
+        Price? discountPrice,
+        int stockQuantity,
+        string sku,
+        IEnumerable<string> mainImageUrls)
+    {
+        return new CatalogItemInventory(
+            catalogItemId,
+            price,
+            discountPrice,
+            stockQuantity,
+            sku);
+    }
+
+    // Static Factory Method for Default Initialization
+    public static CatalogItemInventory CreateWithDefaults(CatalogItemId catalogItemId)
+    {
+        return new CatalogItemInventory(
+            catalogItemId,
+            price: Price.CreateDefault(),
+            discountPrice: null,
+            stockQuantity: 0,
+            sku: string.Empty);
+    }
+
+    public void UpdatePrice(Price price)
+    {
+        Price = price ?? throw new ArgumentNullException(nameof(price));
+    }
+
+    public void UpdateDiscountPrice(Price? discountPrice)
+    {
+        DiscountPrice = discountPrice;
+    }
+
+    public void UpdateStockQuantity(int stockQuantity)
+    {
+        StockQuantity = stockQuantity;
+    }
+
+    public void UpdateSku(string sku)
+    {
+        Sku = sku ?? string.Empty;
     }
 }

@@ -2,9 +2,6 @@
 
 namespace QingFa.EShop.Domain.Commons.ValueObjects
 {
-    /// <summary>
-    /// Represents a monetary value with a specific currency.
-    /// </summary>
     public class Price : ValueObject
     {
         /// <summary>
@@ -32,6 +29,21 @@ namespace QingFa.EShop.Domain.Commons.ValueObjects
 
             Value = value;
             Currency = currency;
+        }
+
+        /// <summary>
+        /// Creates a default <see cref="Price"/> with zero value and a specified currency.
+        /// </summary>
+        /// <param name="currency">The currency of the default price.</param>
+        /// <returns>A <see cref="Price"/> instance with a value of zero and the specified currency.</returns>
+        public static Price CreateDefault(string currency ="USD")
+        {
+            if (string.IsNullOrWhiteSpace(currency))
+            {
+                throw new ArgumentException("Currency cannot be null or whitespace.", nameof(currency));
+            }
+
+            return new Price(0m, currency);
         }
 
         /// <summary>

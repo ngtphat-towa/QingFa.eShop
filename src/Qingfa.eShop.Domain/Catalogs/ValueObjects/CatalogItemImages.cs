@@ -1,80 +1,93 @@
-﻿namespace QingFa.EShop.Domain.Catalogs.Entities
+﻿using QingFa.EShop.Domain.Catalogs.ValueObjects;
+
+namespace QingFa.EShop.Domain.Catalogs.Entities
 {
-    /// <summary>
-    /// Represents the images associated with a catalog item.
-    /// </summary>
-    public class CatalogItemImages
+    public class CatalogItemImages : Entity<long>
     {
-        /// <summary>
-        /// Gets the URLs of the main images for the catalog item.
-        /// </summary>
-        public IEnumerable<string> MainImageUrls { get; private set; }
+        public CatalogItemId CatalogItemId { get; private set; }
+        public IReadOnlyList<string> MainImageUrls { get; private set; }
+        public IReadOnlyList<string> AdditionalImageUrls { get; private set; }
 
-        /// <summary>
-        /// Gets the URLs of additional images for the catalog item (e.g., close-ups, alternate views).
-        /// </summary>
-        public IEnumerable<string> AdditionalImageUrls { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CatalogItemImages"/> class.
-        /// </summary>
-        /// <param name="mainImageUrls">The URLs of the main images for the catalog item.</param>
-        /// <param name="additionalImageUrls">The URLs of additional images for the catalog item.</param>
-        /// <exception cref="ArgumentNullException">Thrown when <paramref name="mainImageUrls"/> is null.</exception>
-        public CatalogItemImages(IEnumerable<string> mainImageUrls, IEnumerable<string>? additionalImageUrls = null)
+        // Private Constructor
+        private CatalogItemImages(
+            long id,
+            CatalogItemId catalogItemId,
+            IEnumerable<string> mainImageUrls,
+            IEnumerable<string>? additionalImageUrls = null)
+            : base(id)
         {
-            MainImageUrls = mainImageUrls ?? throw new ArgumentNullException(nameof(mainImageUrls));
-            AdditionalImageUrls = additionalImageUrls ?? new List<string>(); // Default to empty list if null
+            CatalogItemId = catalogItemId ?? throw new ArgumentNullException(nameof(catalogItemId));
+            MainImageUrls = mainImageUrls.ToList().AsReadOnly();
+            AdditionalImageUrls = additionalImageUrls?.ToList().AsReadOnly() ?? new List<string>().AsReadOnly(); // Default to empty list if null
         }
 
-        /// <summary>
-        /// Adds a main image URL to the catalog item.
-        /// </summary>
-        /// <param name="imageUrl">The URL of the main image to add.</param>
+        // Static Factory Method for Full Initialization
+        public static CatalogItemImages Create(
+            long id,
+            CatalogItemId catalogItemId,
+            IEnumerable<string> mainImageUrls,
+            IEnumerable<string>? additionalImageUrls = null)
+        {
+            return new CatalogItemImages(id, catalogItemId, mainImageUrls, additionalImageUrls);
+        }
+
+        // Static Factory Method for Default Initialization
+        public static CatalogItemImages CreateDefault(long id, CatalogItemId catalogItemId)
+        {
+            return new CatalogItemImages(
+                id,
+                catalogItemId,
+                mainImageUrls: new List<string>(),
+                additionalImageUrls: new List<string>());
+        }
+
+        // Methods to Update Image URLs
         public void AddMainImageUrl(string imageUrl)
         {
             if (string.IsNullOrWhiteSpace(imageUrl)) throw new ArgumentException("Image URL cannot be null or whitespace.", nameof(imageUrl));
-
-            var imageUrls = new List<string>(MainImageUrls) { imageUrl };
-            MainImageUrls = imageUrls;
+            var mainImagesList = MainImageUrls.ToList();
+            mainImagesList.Add(imageUrl);
+            MainImageUrls = mainImagesList.AsReadOnly();
         }
 
-        /// <summary>
-        /// Adds an additional image URL to the catalog item.
-        /// </summary>
-        /// <param name="imageUrl">The URL of the additional image to add.</param>
         public void AddAdditionalImageUrl(string imageUrl)
         {
             if (string.IsNullOrWhiteSpace(imageUrl)) throw new ArgumentException("Image URL cannot be null or whitespace.", nameof(imageUrl));
-
-            var imageUrls = new List<string>(AdditionalImageUrls) { imageUrl };
-            AdditionalImageUrls = imageUrls;
+            var additionalImagesList = AdditionalImageUrls.ToList();
+            additionalImagesList.Add(imageUrl);
+            AdditionalImageUrls = additionalImagesList.AsReadOnly();
         }
 
-        /// <summary>
-        /// Removes a main image URL from the catalog item.
-        /// </summary>
-        /// <param name="imageUrl">The URL of the main image to remove.</param>
         public void RemoveMainImageUrl(string imageUrl)
         {
             if (string.IsNullOrWhiteSpace(imageUrl)) throw new ArgumentException("Image URL cannot be null or whitespace.", nameof(imageUrl));
-
-            var imageUrls = new List<string>(MainImageUrls);
-            imageUrls.Remove(imageUrl);
-            MainImageUrls = imageUrls;
+            var mainImagesList = MainImageUrls.ToList();
+            if (!mainImagesList.Remove(imageUrl))
+            {
+                throw new InvalidOperationException("Image URL not found in the main images.");
+            }
+            MainImageUrls = mainImagesList.AsReadOnly();
         }
 
-        /// <summary>
-        /// Removes an additional image URL from the catalog item.
-        /// </summary>
-        /// <param name="imageUrl">The URL of the additional image to remove.</param>
         public void RemoveAdditionalImageUrl(string imageUrl)
         {
             if (string.IsNullOrWhiteSpace(imageUrl)) throw new ArgumentException("Image URL cannot be null or whitespace.", nameof(imageUrl));
+            var additionalImagesList = AdditionalImageUrls.ToList();
+            if (!additionalImagesList.Remove(imageUrl))
+            {
+                throw new InvalidOperationException("Image URL not found in the additional images.");
+            }
+            AdditionalImageUrls = additionalImagesList.AsReadOnly();
+        }
 
-            var imageUrls = new List<string>(AdditionalImageUrls);
-            imageUrls.Remove(imageUrl);
-            AdditionalImageUrls = imageUrls;
+        public void ClearMainImageUrls()
+        {
+            MainImageUrls = new List<string>().AsReadOnly();
+        }
+
+        public void ClearAdditionalImageUrls()
+        {
+            AdditionalImageUrls = new List<string>().AsReadOnly();
         }
     }
 }
