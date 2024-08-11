@@ -2,8 +2,6 @@ using QingFa.eShop.Api;
 using QingFa.eShop.Application;
 using QingFa.eShop.Infrastructure;
 
-using Serilog;
-
 var builder = WebApplication.CreateBuilder(args);
 
 Log.Logger = new LoggerConfiguration()

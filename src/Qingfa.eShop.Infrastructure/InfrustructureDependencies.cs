@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace QingFa.eShop.Infrastructure;
 
 public static class InfrastructureDependencies

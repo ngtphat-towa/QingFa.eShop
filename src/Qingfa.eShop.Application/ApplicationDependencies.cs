@@ -1,7 +1,3 @@
-using FluentValidation;
-
-using Microsoft.Extensions.DependencyInjection;
-
 namespace QingFa.eShop.Application;
 
 public static class ApplicationDependencies
