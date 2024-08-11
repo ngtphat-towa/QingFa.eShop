@@ -63,5 +63,7 @@ namespace QingFa.EShop.Domain.Commons.ValueObjects
         {
             return $"Rating({Value})";
         }
+
+        public static Rating Default=> new Rating(0);
     }
 }
