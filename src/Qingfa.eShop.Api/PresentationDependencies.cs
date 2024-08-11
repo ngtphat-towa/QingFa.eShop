@@ -1,14 +1,13 @@
-﻿namespace QingFa.eShop.Api
+﻿namespace QingFa.eShop.Api;
+
+public static class PresentationDependencies
 {
-    public static class PresentationDependencies
+    public static IServiceCollection AddPresentation(this IServiceCollection services)
     {
-        public static IServiceCollection AddPresentation(this IServiceCollection services)
-        {
 
-            // TODO(PresentationDependencies): better to manual injection
-            // TODO(PresentationDependencies): add logging to monitor add services
+        // TODO(PresentationDependencies): better to manual injection
+        // TODO(PresentationDependencies): add logging to monitor add services
 
-            return services;
-        }
+        return services;
     }
 }
