@@ -1,4 +1,6 @@
-﻿namespace QingFa.EShop.Domain.DomainModels
+﻿using QingFa.EShop.Domain.DomainModels.Interfaces;
+
+namespace QingFa.EShop.Domain.DomainModels
 {
     public abstract class Event : IDomainEvent
     {

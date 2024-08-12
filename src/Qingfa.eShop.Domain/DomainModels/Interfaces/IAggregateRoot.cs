@@ -1,6 +1,6 @@
-﻿namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels.Interfaces
 {
-    public interface IAggregateRoot 
+    public interface IAggregateRoot
     {
     }
 }

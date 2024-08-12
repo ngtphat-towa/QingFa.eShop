@@ -7,17 +7,17 @@ namespace QingFa.EShop.Domain.DomainModels
     /// <summary>
     /// Represents a base class for entities in the domain model, providing common properties such as Id, Created, and Updated timestamps.
     /// </summary>
-    public abstract class Entity : IEntity, IAuditable, IHasDomainEvent
+    public abstract class Entity<TId> : IEntity, IHasDomainEvent
     {
         /// <summary>
         /// Gets the unique identifier for the entity.
         /// </summary>
-        public Guid Id { get; } = Guid.NewGuid();
+        public TId Id { get; }
 
         /// <summary>
         /// Gets the date and time when the entity was created.
         /// </summary>
-        public DateTime CreatedAt { get; } = DateTime.UtcNow;
+        public DateTime CreatedAt { get; protected set; } = DateTime.UtcNow;
 
         /// <summary>
         /// Gets or sets the date and time when the entity was last updated.
@@ -78,12 +78,17 @@ namespace QingFa.EShop.Domain.DomainModels
         {
             return _domainEvents.Count;
         }
+        protected Entity(TId id = default!)
+        {
+            Id = id;
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Entity"/> class.
+        /// Initializes a new instance of the <see cref="Entity{TId}"/> class.
         /// </summary>
         protected Entity()
         {
+            Id = default!;
         }
     }
 }

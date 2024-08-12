@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace QingFa.EShop.Domain.DomainModels
+namespace QingFa.EShop.Domain.DomainModels.Interfaces
 {
     public interface IDomainEvent : INotification
     {
