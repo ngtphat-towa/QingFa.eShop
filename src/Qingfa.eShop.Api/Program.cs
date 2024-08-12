@@ -1,19 +1,18 @@
+using Serilog;
 using QingFa.eShop.Api;
 using QingFa.eShop.Application;
 using QingFa.eShop.Infrastructure;
 
-using Serilog;
-
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure Serilog
 Log.Logger = new LoggerConfiguration()
-          .MinimumLevel.Verbose()
-          .Enrich.FromLogContext()
-          .WriteTo.Console(outputTemplate:
-              "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
-              theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Literate)
-          .CreateLogger();
-
+    .MinimumLevel.Verbose()
+    .Enrich.FromLogContext()
+    .WriteTo.Console(outputTemplate:
+        "[{Timestamp:HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}",
+        theme: Serilog.Sinks.SystemConsole.Themes.AnsiConsoleTheme.Literate)
+    .CreateLogger();
 
 builder.Host.UseSerilog();
 
@@ -21,7 +20,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication()
-                .AddInfrastructure()
+                .AddInfrastructure(builder.Configuration)
                 .AddPresentation();
 
 var app = builder.Build();
