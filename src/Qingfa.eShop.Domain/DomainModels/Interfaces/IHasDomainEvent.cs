@@ -8,18 +8,20 @@
         /// <summary>
         /// Gets a read-only list of domain events associated with the entity.
         /// </summary>
-        protected IReadOnlyList<IDomainEvent> DomainEvents { get; }
+        IReadOnlyList<IDomainEvent> DomainEvents { get; }
 
         /// <summary>
         /// Adds a domain event to the entity.
         /// </summary>
         /// <param name="eventItem">The domain event to add.</param>
-        protected void AddDomainEvent(IDomainEvent eventItem);
+        void AddDomainEvent(IDomainEvent eventItem);
 
         /// <summary>
         /// Removes a domain event from the entity.
         /// </summary>
         /// <param name="eventItem">The domain event to remove.</param>
-        protected void RemoveDomainEvent(IDomainEvent eventItem);
+        void RemoveDomainEvent(IDomainEvent eventItem);
+
+        void ClearDomainEvents();
     }
 }

@@ -1,21 +1,26 @@
 ﻿using MediatR;
 
 using QingFa.EShop.Domain.DomainModels;
+using QingFa.EShop.Domain.DomainModels.Interfaces;
 
 namespace Qingfa.EShop.Domain.DomainModels.Extensions
 {
     public static class AggregateRootExtensions
     {
-        public static async Task RelayAndPublishEvents(this IAggregateRoot aggregateRoot, IPublisher publisher, CancellationToken cancellationToken = default)
+        public static async Task RelayAndPublishEvents(this IHasDomainEvent aggregateRoot, IPublisher publisher, CancellationToken cancellationToken = default)
         {
-            var @events = new IDomainEvent[aggregateRoot.DomainEvents.Count];
-            aggregateRoot.DomainEvents.CopyTo(@events);
-            aggregateRoot.DomainEvents.Clear();
+            // Create a mutable copy of the domain events
+            var events = new List<IDomainEvent>(aggregateRoot.DomainEvents);
 
-            foreach (var @event in @events)
+            // Clear the domain events from the aggregate root
+            aggregateRoot.ClearDomainEvents();
+
+            // Publish each domain event
+            foreach (var domainEvent in events)
             {
-                await publisher.Publish(new EventWrapper(@event), cancellationToken);
+                await publisher.Publish(new EventWrapper(domainEvent), cancellationToken);
             }
         }
+
     }
 }
