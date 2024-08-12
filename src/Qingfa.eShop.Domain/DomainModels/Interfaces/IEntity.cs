@@ -1,6 +1,4 @@
-﻿using QingFa.EShop.Domain.DomainModels.Interfaces;
-
-namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels
 {
     /// <summary>
     /// Defines the base properties for an entity in the domain model.

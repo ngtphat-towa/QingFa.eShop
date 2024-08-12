@@ -6,24 +6,24 @@
         {
         }
 
-        public static CoreException Exception(string message)
+        public static CoreException NullArgument(string argName)
         {
-            return new(message);
+            return new CoreException($"{argName} cannot be null or empty.");
         }
 
-        public static CoreException NullArgument(string arg)
+        public static CoreException InvalidArgument(string argName)
         {
-            return new($"{arg} cannot be null");
+            return new CoreException($"{argName} is invalid.");
         }
 
-        public static CoreException InvalidArgument(string arg)
+        public static CoreException NotFound(string entityName)
         {
-            return new($"{arg} is invalid");
+            return new CoreException($"{entityName} was not found.");
         }
 
-        public static CoreException NotFound(string arg)
+        public static CoreException ArgumentOutOfRange(string argName, string message)
         {
-            return new($"{arg} was not found");
+            return new CoreException($"{argName} is out of range: {message}");
         }
     }
 }

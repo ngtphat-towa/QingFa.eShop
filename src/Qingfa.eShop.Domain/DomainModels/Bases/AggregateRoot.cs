@@ -17,6 +17,10 @@ namespace QingFa.EShop.Domain.DomainModels
         {
             _domainEvents = new HashSet<IDomainEvent>();
         }
+        protected AggregateRoot(TEntityId id  =default!) :base(id)
+        {
+            _domainEvents = new HashSet<IDomainEvent>();
+        }
 
         // Method to add a domain event
         public void AddDomainEvent(IDomainEvent eventItem)

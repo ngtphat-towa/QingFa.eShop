@@ -1,6 +1,6 @@
 using QingFa.eShop.Api;
 using QingFa.eShop.Application;
-using QingFa.eShop.Infrastructure;
+
 
 using Serilog;
 
@@ -21,7 +21,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddApplication()
-                .AddInfrastructure()
+                .AddInfrastructure(builder.Configuration)
                 .AddPresentation();
 
 var app = builder.Build();

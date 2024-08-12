@@ -6,39 +6,8 @@
     /// rather than their identities. Equality is based on the values of 
     /// their components.
     /// </summary>
-    public abstract class ValueObject
+    public abstract class ValueObject : IEquatable<ValueObject>
     {
-        /// <summary>
-        /// Compares two value objects for equality based on their values.
-        /// </summary>
-        /// <param name="left">The first value object to compare.</param>
-        /// <param name="right">The second value object to compare.</param>
-        /// <returns>
-        /// <c>true</c> if the value objects are equal; otherwise, <c>false</c>.
-        /// </returns>
-        protected static bool EqualOperator(ValueObject left, ValueObject right)
-        {
-            if (left is null ^ right is null)
-            {
-                return false;
-            }
-
-            return left?.Equals(right) != false;
-        }
-
-        /// <summary>
-        /// Compares two value objects for inequality based on their values.
-        /// </summary>
-        /// <param name="left">The first value object to compare.</param>
-        /// <param name="right">The second value object to compare.</param>
-        /// <returns>
-        /// <c>true</c> if the value objects are not equal; otherwise, <c>false</c>.
-        /// </returns>
-        protected static bool NotEqualOperator(ValueObject left, ValueObject right)
-        {
-            return !EqualOperator(left, right);
-        }
-
         /// <summary>
         /// Gets the components that are used to determine equality for this value object.
         /// </summary>
@@ -54,15 +23,31 @@
         /// <returns>
         /// <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(object? obj)
+        public bool Equals(ValueObject? other)
         {
-            if (obj is null || obj.GetType() != GetType())
+            if (other is null)
             {
                 return false;
             }
 
-            var other = (ValueObject)obj;
             return GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current object.</param>
+        /// <returns>
+        /// <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
+        /// </returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj is ValueObject other)
+            {
+                return Equals(other);
+            }
+
+            return false;
         }
 
         /// <summary>

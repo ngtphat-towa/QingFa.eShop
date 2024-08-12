@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-
-namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels
 {
     /// <summary>
     /// Represents a base class for domain events with common properties and behaviors.
