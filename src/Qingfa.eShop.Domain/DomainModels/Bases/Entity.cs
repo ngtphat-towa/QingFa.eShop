@@ -40,7 +40,7 @@ namespace QingFa.EShop.Domain.DomainModels
         /// Gets the set of domain events associated with the entity.
         /// </summary>
         [JsonIgnore]
-        IReadOnlyList<IDomainEvent> IHasDomainEvent.DomainEvents => _domainEvents.AsReadOnly();
+        public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
         /// <summary>
         /// Adds a domain event to the entity's event collection.
