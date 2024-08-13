@@ -1,26 +1,26 @@
 ﻿using QingFa.EShop.Domain.DomainModels;
 
-namespace QingFa.EShop.Domain.Catalogs.ValueObjects
+namespace QingFa.EShop.Domain.Catalogs.ValueObjects.Identities
 {
-    public sealed class CatalogTypeId : ValueObject
+    public sealed class ArticleTypeId : ValueObject
     {
-        public int Value { get; }
+        public long Value { get; }
 
-        private CatalogTypeId(int value)
+        private ArticleTypeId(long value)
         {
             if (value <= 0) throw CoreException.InvalidArgument(nameof(value));
             Value = value;
         }
 
 #pragma warning disable CS0628
-        private CatalogTypeId()
+        private ArticleTypeId()
 #pragma warning restore CS0628
         {
         }
 
-        public static CatalogTypeId Create(int value)
+        public static ArticleTypeId Create(long value)
         {
-            return new CatalogTypeId(value);
+            return new ArticleTypeId(value);
         }
 
         protected override IEnumerable<object> GetAtomicValues()

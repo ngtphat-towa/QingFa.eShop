@@ -2,13 +2,13 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.ValueObjects;
+using QingFa.EShop.Domain.Catalogs.ValueObjects.Identities;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 {
-    internal class CatalogBrandConfiguration : IEntityTypeConfiguration<CatalogBrand>
+    internal class CatalogBrandConfiguration : IEntityTypeConfiguration<Brand>
     {
-        public void Configure(EntityTypeBuilder<CatalogBrand> builder)
+        public void Configure(EntityTypeBuilder<Brand> builder)
         {
             // Define the table name
             builder.ToTable("CatalogBrands");
@@ -20,14 +20,14 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
             builder.Property(cb => cb.Id)
                 .HasConversion(
                     id => id.Value,
-                    value => new CatalogBrandId(value))
+                    value => CatalogBrandId.Create(value))
                 .IsRequired();
 
             builder.Property(cb => cb.Name)
                 .IsRequired()
                 .HasMaxLength(100);
 
-            builder.Property(cb => cb.Description)
+            builder.Property(cb => cb.Bio)
                 .HasMaxLength(500);
 
             builder.Property(cb => cb.LogoURL)

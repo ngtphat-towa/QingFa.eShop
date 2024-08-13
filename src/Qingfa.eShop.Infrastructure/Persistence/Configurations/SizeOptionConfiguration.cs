@@ -2,24 +2,24 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.ValueObjects;
+using QingFa.EShop.Domain.Catalogs.ValueObjects.Identities;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 {
-    internal class CatalogSizeConfiguration : IEntityTypeConfiguration<CatalogSize>
+    internal class SizeOptionConfiguration : IEntityTypeConfiguration<SizeOption>
     {
-        public void Configure(EntityTypeBuilder<CatalogSize> builder)
+        public void Configure(EntityTypeBuilder<SizeOption> builder)
         {
-            builder.ToTable("CatalogSizes");
-
+            builder.ToTable("SizeOptions");
 
             builder.HasKey(cs => cs.Id);
+
             // Configure value object conversion
             builder.Property(cs => cs.Id)
                 .ValueGeneratedNever()
                 .HasConversion(
                     id => id.Value,
-                    value => CatalogSizeId.Create(value));
+                    value => SizeOptionId.Create(value));
 
             // Configure properties
             builder.Property(cs => cs.SizeLabel)
@@ -35,6 +35,11 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
             builder.Property(cs => cs.Unit)
                 .IsRequired()
                 .HasMaxLength(50);
+
+            // Configure InventoryCount property
+            builder.Property(cs => cs.InventoryCount)
+                .IsRequired()
+                .HasColumnType("int");
 
         }
     }

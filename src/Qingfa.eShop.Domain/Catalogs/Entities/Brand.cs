@@ -1,25 +1,25 @@
-﻿using QingFa.EShop.Domain.Catalogs.ValueObjects;
+﻿using QingFa.EShop.Domain.Catalogs.ValueObjects.Identities;
 using QingFa.EShop.Domain.DomainModels;
 
 namespace QingFa.EShop.Domain.Catalogs.Entities
 {
-    public class CatalogBrand : Entity<CatalogBrandId>
+    public class Brand : Entity<CatalogBrandId>
     {
         public new CatalogBrandId Id { get; private set; }
         public string Name { get; private set; }
-        public string? Description { get; private set; }
+        public string? Bio { get; private set; }
         public string? LogoURL { get; private set; }
         public string? WebsiteURL { get; private set; }
         public string? CountryOfOrigin { get; private set; }
         public int EstablishmentYear { get; private set; }
 
         // Private constructor to enforce use of the static factory method
-        private CatalogBrand(CatalogBrandId id, string name, string? description, string? logoURL, string? websiteURL, string? countryOfOrigin, int establishmentYear)
+        private Brand(CatalogBrandId id, string name, string? description, string? logoURL, string? websiteURL, string? countryOfOrigin, int establishmentYear)
             : base(id)
         {
-            Id = id ?? new CatalogBrandId(Guid.NewGuid());
+            Id = id ?? CatalogBrandId.Create(0);
             Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("Name cannot be null or empty.", nameof(name)) : name;
-            Description = description;
+            Bio = description;
             LogoURL = logoURL;
             WebsiteURL = websiteURL;
             CountryOfOrigin = countryOfOrigin;
@@ -29,9 +29,9 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         }
 
         // Static factory method for creating instances
-        public static CatalogBrand Create(CatalogBrandId id, string name, string? description, string? logoURL, string? websiteURL, string? countryOfOrigin, int establishmentYear)
+        public static Brand Create(CatalogBrandId id, string name, string? description, string? logoURL, string? websiteURL, string? countryOfOrigin, int establishmentYear)
         {
-            return new CatalogBrand(id, name, description, logoURL, websiteURL, countryOfOrigin, establishmentYear);
+            return new Brand(id, name, description, logoURL, websiteURL, countryOfOrigin, establishmentYear);
         }
 
         // Methods for updating properties
@@ -43,7 +43,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
 
         public void UpdateDescription(string? description)
         {
-            Description = description;
+            Bio = description;
         }
 
         public void UpdateLogoURL(string? logoURL)
@@ -70,7 +70,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
 
         // Protected constructor for EF Core
 #pragma warning disable CS8618
-        protected CatalogBrand()
+        protected Brand()
 #pragma warning restore CS8618
         {
         }
