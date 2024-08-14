@@ -2,7 +2,7 @@
 
 using QingFa.EShop.Domain.DomainModels.Interfaces;
 
-namespace Qingfa.EShop.Domain.DomainModels.Extensions
+namespace QingFa.EShop.Domain.DomainModels.Extensions
 {
     public static class AggregateRootExtensions
     {

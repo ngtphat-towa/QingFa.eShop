@@ -26,6 +26,6 @@ namespace QingFa.EShop.Domain.DomainModels
         /// <remarks>
         /// Derived classes should implement this method to transform the event into a format suitable for storage or transport.
         /// </remarks>
-        void Flatten();
+        string Flatten();
     }
 }
