@@ -1,26 +1,34 @@
-﻿namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels.Interfaces
 {
     /// <summary>
-    /// Defines the base properties for an entity in the domain model.
+    /// Represents a base entity with common properties for tracking creation and updates.
     /// </summary>
-    public interface IEntity
+    /// <typeparam name="TId">The type of the entity's identifier.</typeparam>
+    public interface IEntity<TId> where TId : notnull
     {
         /// <summary>
-        /// Gets the unique identifier of the entity.
+        /// Gets or sets the unique identifier of the entity.
         /// </summary>
-        Guid Id { get; }
+        TId Id { get; set; }
 
         /// <summary>
         /// Gets the date and time when the entity was created.
         /// </summary>
-        DateTime Created { get; }
+        DateTime CreatedAt { get; }
 
         /// <summary>
-        /// Gets the date and time when the entity was last updated.
+        /// Gets the date and time when the entity was last updated, or <c>null</c> if it has not been updated.
         /// </summary>
-        /// <remarks>
-        /// This property may be <c>null</c> if the entity has not been updated since creation.
-        /// </remarks>
-        DateTime? Updated { get; }
+        DateTime? UpdatedAt { get; }
+
+        /// <summary>
+        /// Gets the identifier of the user who created the entity, or <c>null</c> if unknown.
+        /// </summary>
+        int? CreatedBy { get; }
+
+        /// <summary>
+        /// Gets the identifier of the user who last updated the entity, or <c>null</c> if unknown.
+        /// </summary>
+        int? UpdatedBy { get; }
     }
 }
