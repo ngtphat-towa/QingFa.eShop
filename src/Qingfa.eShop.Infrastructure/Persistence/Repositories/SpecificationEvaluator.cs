@@ -4,6 +4,12 @@ using QingFa.EShop.Domain.Specifications;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Repositories
 {
+    /// <summary>
+    /// This function applies a given specification to an input query to retrieve a filtered, ordered, and paginated set of entities.
+    /// </summary>
+    /// <param name="inputQuery">The initial query to which the specification will be applied.</param>
+    /// <param name="specification">The specification defining the filtering, ordering, grouping, and pagination criteria.</param>
+    /// <returns>An IQueryable of T, representing the result of applying the specification to the input query.</returns>
     public class SpecificationEvaluator<T>
      where T : class
     {

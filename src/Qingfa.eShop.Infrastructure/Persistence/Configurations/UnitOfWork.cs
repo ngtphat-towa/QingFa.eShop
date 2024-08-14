@@ -5,11 +5,6 @@ using QingFa.EShop.Domain.DomainModels.Interfaces;
 using QingFa.EShop.Domain.DomainModels.Repositories;
 using QingFa.EShop.Domain.DomainModels;
 
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
-
 namespace QingFa.EShop.Infrastructure.Persistence.Repositories
 {
     public class UnitOfWork : IUnitOfWork

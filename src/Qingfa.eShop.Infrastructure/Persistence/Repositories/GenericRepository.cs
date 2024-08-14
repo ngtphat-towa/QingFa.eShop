@@ -47,7 +47,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Repositories
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             _dbSet.Update(entity);
-            return Task.CompletedTask; 
+            return Task.CompletedTask;
         }
 
         public Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
