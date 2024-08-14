@@ -2,7 +2,7 @@ using FluentValidation;
 
 using Microsoft.Extensions.DependencyInjection;
 
-namespace QingFa.eShop.Application;
+namespace QingFa.EShop.Application;
 
 public static class ApplicationDependencies
 {

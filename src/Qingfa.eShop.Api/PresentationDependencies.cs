@@ -1,4 +1,4 @@
-﻿namespace QingFa.eShop.Api
+﻿namespace QingFa.EShop.Api
 {
     public static class PresentationDependencies
     {

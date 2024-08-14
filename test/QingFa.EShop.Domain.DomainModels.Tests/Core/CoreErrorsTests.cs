@@ -1,6 +1,8 @@
 ﻿using FluentAssertions;
 
-namespace QingFa.EShop.Domain.DomainModels.Tests
+using QingFa.EShop.Domain.DomainModels;
+
+namespace QingFa.EShop.Domain.Tests.DomainModels
 {
     public class CoreErrorsTests
     {

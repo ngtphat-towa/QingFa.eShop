@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
-using Xunit;
+
 using QingFa.EShop.Domain.DomainModels;
 
-namespace QingFa.eShop.Domain.Tests.DomainModels
+namespace QingFa.EShop.Domain.Tests.DomainModels
 {
     public class ValueObjectTests
     {
