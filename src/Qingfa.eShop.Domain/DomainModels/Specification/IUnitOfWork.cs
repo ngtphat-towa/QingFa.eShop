@@ -14,5 +14,6 @@ namespace QingFa.EShop.Domain.DomainModels.Interfaces
 
         // Rollback the transaction (if needed, typically managed manually in EF Core)
         Task RollbackAsync(CancellationToken cancellationToken = default);
+        Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     }
 }
