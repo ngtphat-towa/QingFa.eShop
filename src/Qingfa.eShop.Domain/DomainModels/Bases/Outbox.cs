@@ -1,24 +1,23 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-using QingFa.EShop.Domain.DomainModels;
-
-namespace Qingfa.EShop.Domain.DomainModels.Bases
+namespace QingFa.EShop.Domain.DomainModels.Bases
 {
     public abstract class Outbox : AggregateRoot<Guid>
     {
         protected Outbox(Guid id) : base(id)
         {
+            Id = id;
         }
 
-        public new Guid Id { get; set; } = Guid.NewGuid();
+        public new Guid Id { get; set; }
         public string Type { get; set; } = string.Empty;
         public string AggregateType { get; set; } = string.Empty;
-        public Guid AggregateId { get; set; } = Guid.NewGuid();
+        public Guid AggregateId { get; set; }
         public byte[] Payload { get; set; } = Array.Empty<byte>();
 
         public bool Validate()
         {
-            if (Guid.Empty == Id)
+            if (Id == Guid.Empty)
             {
                 throw new ValidationException("Id of the Outbox entity couldn't be null.");
             }

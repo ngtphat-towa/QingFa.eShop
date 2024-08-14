@@ -5,10 +5,12 @@ using QingFa.EShop.Domain.Specifications;
 namespace QingFa.EShop.Infrastructure.Persistence.Repositories
 {
     public class SpecificationEvaluator<T>
-        where T : class
+     where T : class
     {
         public static IQueryable<T> GetQuery(IQueryable<T> inputQuery, ISpecification<T> specification)
         {
+            if (specification == null) throw new ArgumentNullException(nameof(specification));
+
             var query = inputQuery;
 
             // Apply criteria for filtering entities
