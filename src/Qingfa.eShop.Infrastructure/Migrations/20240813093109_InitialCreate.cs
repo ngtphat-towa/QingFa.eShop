@@ -1,10 +1,10 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Qingfa.eShop.Infrastructure.Migrations
+namespace QingFa.eShop.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
