@@ -49,6 +49,19 @@ namespace QingFa.EShop.Domain.Tests.DomainModels
             // Assert
             metaData.Should().BeEmpty();
         }
+
+        [Fact]
+        public void EventType_ShouldReturnFullName()
+        {
+            // Arrange
+            var @event = new TestEvent();
+
+            // Act
+            var eventType = @event.EventType;
+
+            // Assert
+            eventType.Should().Be(typeof(TestEvent).FullName);
+        }
     }
 
     public class CustomEventTests
@@ -85,7 +98,10 @@ namespace QingFa.EShop.Domain.Tests.DomainModels
             // Assert
             // Assuming that Flatten does not throw, otherwise add specific validation
         }
+
     }
+
+
     public class EdgeCaseEventTests
     {
         private class EdgeCaseEvent : Event
@@ -182,4 +198,3 @@ namespace QingFa.EShop.Domain.Tests.DomainModels
         }
     }
 }
-

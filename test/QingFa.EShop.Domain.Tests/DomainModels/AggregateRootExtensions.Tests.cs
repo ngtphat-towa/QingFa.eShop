@@ -24,12 +24,29 @@ namespace QingFa.EShop.Domain.Tests.DomainModels.Extensions
             var publisherMock = new Mock<IPublisher>();
 
             // Act
-            await aggregateRootMock.Object.RelayAndPublishEvents(publisherMock.Object, CancellationToken.None);
+            await aggregateRootMock.Object.RelayAndPublishEvents(
+                publisherMock.Object,
+                CancellationToken.None
+            );
 
             // Assert
             aggregateRootMock.Verify(x => x.ClearDomainEvents(), Times.Once);
-            publisherMock.Verify(p => p.Publish(It.Is<EventWrapper>(ew => ew.Event == domainEvent1.Object), CancellationToken.None), Times.Once);
-            publisherMock.Verify(p => p.Publish(It.Is<EventWrapper>(ew => ew.Event == domainEvent2.Object), CancellationToken.None), Times.Once);
+            publisherMock.Verify(
+                p =>
+                    p.Publish(
+                        It.Is<EventWrapper>(ew => ew.Event == domainEvent1.Object),
+                        CancellationToken.None
+                    ),
+                Times.Once
+            );
+            publisherMock.Verify(
+                p =>
+                    p.Publish(
+                        It.Is<EventWrapper>(ew => ew.Event == domainEvent2.Object),
+                        CancellationToken.None
+                    ),
+                Times.Once
+            );
         }
     }
 }
