@@ -18,7 +18,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
             : base(id)
         {
             Id = id ?? CatalogBrandId.Create(0);
-            Name = string.IsNullOrWhiteSpace(name) ? throw new ArgumentException("Name cannot be null or empty.", nameof(name)) : name;
+            Name = string.IsNullOrWhiteSpace(name) ? throw CoreExceptionFactory.CreateNullArgumentException(nameof(name)) : name;
             Bio = description;
             LogoURL = logoURL;
             WebsiteURL = websiteURL;
@@ -37,7 +37,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         // Methods for updating properties
         public void UpdateName(string name)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name cannot be null or empty.", nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) CoreExceptionFactory.CreateNullArgumentException(nameof(name));
             Name = name;
         }
 

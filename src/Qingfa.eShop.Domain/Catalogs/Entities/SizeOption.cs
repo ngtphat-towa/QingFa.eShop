@@ -25,7 +25,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
 
         public static SizeOption Create(SizeOptionId id, string sizeLabel, int? minimumValue, int? maximumValue, string unit, int inventoryCount)
         {
-            if (id == null) throw new ArgumentNullException(nameof(id), "StyleOptionId cannot be null.");
+            if (id == null) throw CoreExceptionFactory.CreateNullArgumentException(nameof(id), "StyleOptionId cannot be null.");
             return new SizeOption(id, sizeLabel, minimumValue, maximumValue, unit, inventoryCount);
         }
 

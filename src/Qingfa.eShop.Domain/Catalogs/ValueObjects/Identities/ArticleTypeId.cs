@@ -8,13 +8,14 @@ namespace QingFa.EShop.Domain.Catalogs.ValueObjects.Identities
 
         private ArticleTypeId(long value)
         {
-            if (value <= 0) throw CoreException.InvalidArgument(nameof(value));
+            // Validate the value and throw an appropriate exception if invalid
+            if (value <= 0)
+                throw CoreExceptionFactory.CreateInvalidArgumentException(nameof(value));
+
             Value = value;
         }
 
-#pragma warning disable CS0628
         private ArticleTypeId()
-#pragma warning restore CS0628
         {
         }
 

@@ -9,7 +9,8 @@ namespace QingFa.EShop.Domain.Catalogs.ValueObjects.Identities
         private ImageDetailId(long value)
         {
             if (value <= 0) // Ensure positive ID values
-                throw new ArgumentException("ID must be greater than zero.", nameof(value));
+                throw CoreExceptionFactory.CreateInvalidArgumentException(nameof(value));
+
 
             Value = value;
         }

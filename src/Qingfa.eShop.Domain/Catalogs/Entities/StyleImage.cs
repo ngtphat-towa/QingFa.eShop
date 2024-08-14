@@ -14,12 +14,12 @@ public class StyleImage : Entity<int>
     public StyleImage(int id, string sizeRepresentationUrl, ImageData defaultImage, ImageData searchImage, ImageData backImage, ImageData frontImage, ImageData rightImage)
         : base(id)
     {
-        SizeRepresentationUrl = sizeRepresentationUrl ?? throw new ArgumentNullException(nameof(sizeRepresentationUrl));
-        DefaultImage = defaultImage ?? throw new ArgumentNullException(nameof(defaultImage));
-        SearchImage = searchImage ?? throw new ArgumentNullException(nameof(searchImage));
-        BackImage = backImage ?? throw new ArgumentNullException(nameof(backImage));
-        FrontImage = frontImage ?? throw new ArgumentNullException(nameof(frontImage));
-        RightImage = rightImage ?? throw new ArgumentNullException(nameof(rightImage));
+        SizeRepresentationUrl = sizeRepresentationUrl ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(sizeRepresentationUrl));
+        DefaultImage = defaultImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(defaultImage));
+        SearchImage = searchImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(searchImage));
+        BackImage = backImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(backImage));
+        FrontImage = frontImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(frontImage));
+        RightImage = rightImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(rightImage));
     }
 
 #pragma warning disable CS8618 
@@ -30,15 +30,15 @@ public class StyleImage : Entity<int>
 
     public void UpdateSizeRepresentationUrl(string sizeRepresentationUrl)
     {
-        SizeRepresentationUrl = sizeRepresentationUrl ?? throw new ArgumentNullException(nameof(sizeRepresentationUrl));
+        SizeRepresentationUrl = sizeRepresentationUrl ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(sizeRepresentationUrl));
     }
 
     public void UpdateImages(ImageData defaultImage, ImageData searchImage, ImageData backImage, ImageData frontImage, ImageData rightImage)
     {
-        DefaultImage = defaultImage ?? throw new ArgumentNullException(nameof(defaultImage));
-        SearchImage = searchImage ?? throw new ArgumentNullException(nameof(searchImage));
-        BackImage = backImage ?? throw new ArgumentNullException(nameof(backImage));
-        FrontImage = frontImage ?? throw new ArgumentNullException(nameof(frontImage));
-        RightImage = rightImage ?? throw new ArgumentNullException(nameof(rightImage));
+        DefaultImage = defaultImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(defaultImage));
+        SearchImage = searchImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(searchImage));
+        BackImage = backImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(backImage));
+        FrontImage = frontImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(frontImage));
+        RightImage = rightImage ?? throw CoreExceptionFactory.CreateNullArgumentException(nameof(rightImage));
     }
 }

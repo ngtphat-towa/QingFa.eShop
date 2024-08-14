@@ -8,7 +8,7 @@ namespace QingFa.EShop.Domain.Catalogs.ValueObjects.Identities
 
         private CategoryId(int value)
         {
-            if (value <= 0) throw CoreException.InvalidArgument(nameof(value));
+            if (value <= 0) throw CoreExceptionFactory.CreateNullArgumentException(nameof(value));
             Value = value;
         }
 

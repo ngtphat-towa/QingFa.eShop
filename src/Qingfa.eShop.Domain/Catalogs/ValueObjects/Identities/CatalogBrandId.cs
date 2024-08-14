@@ -8,7 +8,7 @@ namespace QingFa.EShop.Domain.Catalogs.ValueObjects.Identities
 
         private CatalogBrandId(long value)
         {
-            if (value <= 0) throw CoreException.InvalidArgument(nameof(value));
+            if (value <= 0) throw CoreExceptionFactory.CreateInvalidArgumentException(nameof(value));
             Value = value;
         }
 
