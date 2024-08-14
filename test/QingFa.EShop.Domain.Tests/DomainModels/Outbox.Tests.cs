@@ -1,84 +1,195 @@
 using System.ComponentModel.DataAnnotations;
 
-using Qingfa.EShop.Domain.DomainModels.Bases;
+using FluentAssertions;
 
-namespace Qingfa.EShop.Domain.Tests.DomainModels;
-public class OutboxTests
+using QingFa.EShop.Domain.DomainModels.Bases;
+
+namespace QingFa.eShop.Domain.Tests.DomainModels
 {
-    private class TestOutbox : Outbox
+    public class OutboxTests
     {
-        public TestOutbox(Guid id) : base(id) { }
-    }
-
-    [Fact]
-    public void Validate_ShouldPass_WhenValidData()
-    {
-        var outbox = new TestOutbox(Guid.NewGuid())
+        private class TestOutbox : Outbox
         {
-            Type = "Order",
-            AggregateType = "OrderAggregate",
-            AggregateId = Guid.NewGuid(),
-            Payload = new byte[] { 1, 2, 3 }
-        };
+            public TestOutbox(Guid id) : base(id) { }
+        }
 
-        bool isValid = outbox.Validate();
-
-        Assert.True(isValid);
-    }
-
-    [Fact]
-    public void Validate_ShouldThrowException_WhenTypeIsNull()
-    {
-        var outbox = new TestOutbox(Guid.NewGuid())
+        [Fact]
+        public void Validate_ShouldPass_WhenValidData()
         {
-            Type = null!,
-            AggregateType = "OrderAggregate",
-            AggregateId = Guid.NewGuid(),
-            Payload = new byte[] { 1, 2, 3 }
-        };
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = "Order",
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3 }
+            };
 
-        Assert.Throws<ValidationException>(() => outbox.Validate());
-    }
+            // Act
+            Action validateAction = () => outbox.Validate();
 
-    [Fact]
-    public void Validate_ShouldThrowException_WhenAggregateTypeIsNull()
-    {
-        var outbox = new TestOutbox(Guid.NewGuid())
+            // Assert
+            validateAction.Should().NotThrow();
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenTypeIsNull()
         {
-            Type = "Order",
-            AggregateType = null!,
-            AggregateId = Guid.NewGuid(),
-            Payload = new byte[] { 1, 2, 3 }
-        };
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = null!,
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3 }
+            };
 
-        Assert.Throws<ValidationException>(() => outbox.Validate());
-    }
+            // Act
+            Action validateAction = () => outbox.Validate();
 
-    [Fact]
-    public void Validate_ShouldThrowException_WhenAggregateIdIsEmpty()
-    {
-        var outbox = new TestOutbox(Guid.NewGuid())
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("Type of the Outbox entity couldn't be null or empty.");
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenAggregateTypeIsNull()
         {
-            Type = "Order",
-            AggregateType = "OrderAggregate",
-            AggregateId = Guid.Empty,
-            Payload = new byte[] { 1, 2, 3 }
-        };
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = "Order",
+                AggregateType = null!,
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3 }
+            };
 
-        Assert.Throws<ValidationException>(() => outbox.Validate());
-    }
+            // Act
+            Action validateAction = () => outbox.Validate();
 
-    [Fact]
-    public void Validate_ShouldThrowException_WhenPayloadIsNullOrEmpty()
-    {
-        var outbox = new TestOutbox(Guid.NewGuid())
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("AggregateType of the Outbox entity couldn't be null or empty.");
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenAggregateIdIsEmpty()
         {
-            Type = "Order",
-            AggregateType = "OrderAggregate",
-            AggregateId = Guid.NewGuid(),
-            Payload = Array.Empty<byte>()
-        };
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = "Order",
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.Empty,
+                Payload = new byte[] { 1, 2, 3 }
+            };
 
-        Assert.Throws<ValidationException>(() => outbox.Validate());
+            // Act
+            Action validateAction = () => outbox.Validate();
+
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("AggregateId of the Outbox entity couldn't be null.");
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenPayloadIsNullOrEmpty()
+        {
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = "Order",
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.NewGuid(),
+                Payload = Array.Empty<byte>()
+            };
+
+            // Act
+            Action validateAction = () => outbox.Validate();
+
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("Payload of the Outbox entity couldn't be null or empty (should be an Avro format).");
+        }
+
+        [Fact]
+        public void Validate_ShouldPass_WhenPayloadIsNonEmpty()
+        {
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = "Order",
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3, 4, 5 }
+            };
+
+            // Act
+            Action validateAction = () => outbox.Validate();
+
+            // Assert
+            validateAction.Should().NotThrow();
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenTypeIsEmpty()
+        {
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = string.Empty,
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3 }
+            };
+
+            // Act
+            Action validateAction = () => outbox.Validate();
+
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("Type of the Outbox entity couldn't be null or empty.");
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenAggregateTypeIsEmpty()
+        {
+            // Arrange
+            var outbox = new TestOutbox(Guid.NewGuid())
+            {
+                Type = "Order",
+                AggregateType = string.Empty,
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3 }
+            };
+
+            // Act
+            Action validateAction = () => outbox.Validate();
+
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("AggregateType of the Outbox entity couldn't be null or empty.");
+        }
+
+        [Fact]
+        public void Validate_ShouldThrowException_WhenIdIsEmpty()
+        {
+            // Arrange
+            var outbox = new TestOutbox(Guid.Empty)
+            {
+                Type = "Order",
+                AggregateType = "OrderAggregate",
+                AggregateId = Guid.NewGuid(),
+                Payload = new byte[] { 1, 2, 3 }
+            };
+
+            // Act
+            Action validateAction = () => outbox.Validate();
+
+            // Assert
+            validateAction.Should().Throw<ValidationException>()
+                .WithMessage("Id of the Outbox entity couldn't be null.");
+        }
+
     }
 }
