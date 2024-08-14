@@ -1,6 +1,6 @@
-using QingFa.eShop.Api;
-using QingFa.eShop.Application;
-using QingFa.eShop.Infrastructure;
+using QingFa.EShop.Api;
+using QingFa.EShop.Application;
+using QingFa.EShop.Infrastructure;
 
 using Serilog;
 

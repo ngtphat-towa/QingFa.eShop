@@ -1,8 +1,6 @@
 ﻿using MediatR;
 
-using QingFa.EShop.Domain.DomainModels;
-
-namespace Qingfa.EShop.Domain.DomainModels.Extensions
+namespace QingFa.EShop.Domain.DomainModels.Extensions
 {
 
     public class EventWrapper : INotification

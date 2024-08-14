@@ -1,6 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 
-namespace QingFa.eShop.Infrastructure;
+namespace QingFa.EShop.Infrastructure;
 
 public static class InfrastructureDependencies
 {
