@@ -2,7 +2,7 @@
 
 namespace QingFa.EShop.Domain.Catalogs.Attributes
 {
-    public sealed class AttributeId(int value) : IdValueObject(value)
+    public sealed class ProductAttributeId(int value) : IdValueObject(value)
     {
     }
 }

@@ -15,7 +15,7 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         /// <summary>
         /// Gets the ID of the attribute this option belongs to.
         /// </summary>
-        public AttributeId AttributeId { get; private set; }
+        public ProductAttributeId AttributeId { get; private set; }
 
         /// <summary>
         /// Gets the value of the option.
@@ -52,7 +52,7 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         /// <param name="sortOrder">The sort order of the option.</param>
         protected AttributeOption(
             AttributeOptionId id,
-            AttributeId attributeId,
+            ProductAttributeId attributeId,
             string optionValue,
             string description,
             bool isDefault,
@@ -89,7 +89,7 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         /// <returns>An <see cref="ErrorOr{AttributeOption}"/> containing either the new instance or a validation error.</returns>
         public static ErrorOr<AttributeOption> Create(
             AttributeOptionId id,
-            AttributeId attributeId,
+            ProductAttributeId attributeId,
             string optionValue,
             string description,
             bool isDefault,
