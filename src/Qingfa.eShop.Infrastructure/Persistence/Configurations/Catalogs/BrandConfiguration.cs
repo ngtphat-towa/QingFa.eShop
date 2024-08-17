@@ -5,7 +5,7 @@ using QingFa.EShop.Domain.Catalogs.Brands;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
 {
-    internal class BrandConfiguration : IEntityTypeConfiguration<Brand>
+    public class BrandConfiguration : IEntityTypeConfiguration<Brand>
     {
         public void Configure(EntityTypeBuilder<Brand> builder)
         {
