@@ -10,10 +10,21 @@ namespace QingFa.EShop.Infrastructure
     {
         public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
-            // Add DbContext with connection string from configuration
-            services.AddDbContext<EShopDbContext>(options =>
-                options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
-                    .EnableSensitiveDataLogging());
+            var useSqliteString = configuration.GetSection("UseSqlite").Value;
+            bool useSqlite = bool.TryParse(useSqliteString, out var result) ? result : false;
+
+            if (useSqlite)
+            {
+                services.AddDbContext<EShopDbContext>(options =>
+                    options.UseSqlite(configuration.GetConnectionString("SqliteConnection"))
+                           .EnableSensitiveDataLogging());
+            }
+            else
+            {
+                services.AddDbContext<EShopDbContext>(options =>
+                    options.UseNpgsql(configuration.GetConnectionString("DefaultConnection"))
+                           .EnableSensitiveDataLogging());
+            }
 
             return services;
         }

@@ -106,6 +106,54 @@ namespace QingFa.EShop.Domain.Tests.DomainModels
             json.Should().Contain("\"TestProperty\":\"TestValue\"");
         }
 
+        [Fact]
+        public void Flatten_WhenMetadataContainsComplexObjects_ShouldSerializeCorrectly()
+        {
+            var metaData = new Dictionary<string, object>
+    {
+        { "key1", new { NestedKey = "NestedValue" } },
+        { "key2", new List<int> { 1, 2, 3 } }
+    };
+            var testEvent = new TestEvent("correlation-id", metaData);
+
+            var expectedJson = JsonSerializer.Serialize(new
+            {
+                EventType = testEvent.EventType,
+                CreatedAt = testEvent.CreatedAt.ToString("o"),
+                CorrelationId = testEvent.CorrelationId,
+                MetaData = metaData
+            }, new JsonSerializerOptions
+            {
+                WriteIndented = false,
+                DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
+                Converters = { new JsonStringEnumConverter() }
+            });
+
+            var actualJson = testEvent.Flatten();
+
+            actualJson.Should().Be(expectedJson);
+        }
+
+        [Fact]
+        public void EventInitialization_ShouldInitializeAdditionalProperties()
+        {
+            var testEvent = new TestEvent("correlation-id");
+
+            testEvent.TestProperty.Should().Be("TestValue");
+        }
+
+        [Fact]
+        public void Flatten_ShouldHandleDifferentCreationTimes()
+        {
+            var testEvent1 = new TestEvent("correlation-id");
+            System.Threading.Thread.Sleep(1000); // Ensure a different time
+            var testEvent2 = new TestEvent("correlation-id");
+
+            var json1 = testEvent1.Flatten();
+            var json2 = testEvent2.Flatten();
+
+            json1.Should().NotBe(json2); // Ensures different timestamps
+        }
 
     }
 }

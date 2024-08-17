@@ -3,29 +3,32 @@
 namespace QingFa.EShop.Domain.DomainModels
 {
     /// <summary>
-    /// Represents a domain event within the domain model. Domain events are used to signal changes or important actions.
+    /// Represents a domain event within the domain model. Domain events are used to signal changes or important actions within the system.
     /// </summary>
     public interface IDomainEvent : INotification
     {
         /// <summary>
         /// Gets the date and time when the domain event was created.
         /// </summary>
+        /// <remarks>
+        /// This property provides a timestamp indicating when the event occurred, useful for ordering and tracking events.
+        /// </remarks>
         DateTime CreatedAt { get; }
 
         /// <summary>
         /// Gets the metadata associated with the domain event.
         /// </summary>
         /// <remarks>
-        /// Metadata is a collection of key-value pairs that can provide additional information about the event, such as source, version, or other context.
+        /// Metadata provides additional contextual information about the event, which can be useful for handling or processing the event.
         /// </remarks>
         IReadOnlyDictionary<string, object> MetaData { get; }
 
         /// <summary>
-        /// Flattens the event to a simplified or serializable format.
+        /// Flattens the domain event into a simplified or serializable format.
         /// </summary>
-        /// <remarks>
-        /// Derived classes should implement this method to transform the event into a format suitable for storage or transport.
-        /// </remarks>
+        /// <returns>
+        /// A string representation of the event, useful for serialization, logging, or communication purposes.
+        /// </returns>
         string Flatten();
     }
 }
