@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-using ErrorOr;
+﻿using ErrorOr;
 
 using QingFa.EShop.Domain.Catalogs.Products;
 using QingFa.EShop.Domain.DomainModels.Core;

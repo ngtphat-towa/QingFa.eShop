@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using QingFa.EShop.Domain.Catalogs.Variants;
-using QingFa.EShop.Domain.Catalogs.Products;
 using QingFa.EShop.Domain.Catalogs.Attributes;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs

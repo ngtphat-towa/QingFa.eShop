@@ -1,7 +1,6 @@
 ﻿using ErrorOr;
 
 using QingFa.EShop.Domain.Catalogs.Attributes;
-using QingFa.EShop.Domain.Catalogs.Products;
 using QingFa.EShop.Domain.DomainModels.Core;
 using QingFa.EShop.Domain.DomainModels.Errors;
 

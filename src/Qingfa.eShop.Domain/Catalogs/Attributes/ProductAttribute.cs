@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-
-using ErrorOr;
+﻿using ErrorOr;
 
 using QingFa.EShop.Domain.DomainModels.Core;
 using QingFa.EShop.Domain.DomainModels.Errors;
