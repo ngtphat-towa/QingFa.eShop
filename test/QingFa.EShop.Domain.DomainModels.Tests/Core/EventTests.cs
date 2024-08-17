@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Text.Json;
+﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using FluentAssertions;
 
 using QingFa.EShop.Domain.DomainModels.Core;
-
-using Xunit;
 
 namespace QingFa.EShop.Domain.Tests.Cores
 {
