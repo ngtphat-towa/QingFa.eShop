@@ -1,7 +1,9 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace QingFa.EShop.Domain.DomainModels
+using QingFa.EShop.Domain.DomainModels.Interfaces;
+
+namespace QingFa.EShop.Domain.DomainModels.Core
 {
     /// <summary>
     /// Base class for domain events with common properties and behaviors.

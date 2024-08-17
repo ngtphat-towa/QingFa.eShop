@@ -19,7 +19,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{71F8B2A5-9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.eShop.Tests", "test\Qingfa.eShop.Tests\QingFa.eShop.Tests.csproj", "{9A49D991-32F1-40E1-A1B4-282F87956750}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "QingFa.EShop.Domain.DomainModels.Tests", "test\QingFa.EShop.Domain.DomainModels.Tests\QingFa.EShop.Domain.DomainModels.Tests.csproj", "{7A4E5235-71DB-4F50-9486-C37A72FBE62E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QingFa.EShop.Domain.Tests", "test\QingFa.EShop.Domain.DomainModels.Tests\QingFa.EShop.Domain.Tests.csproj", "{7A4E5235-71DB-4F50-9486-C37A72FBE62E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

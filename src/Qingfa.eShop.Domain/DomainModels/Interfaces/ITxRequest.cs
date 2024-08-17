@@ -1,4 +1,4 @@
-﻿namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels.Interfaces
 {
     /// <summary>
     /// Marker interface for transaction requests.

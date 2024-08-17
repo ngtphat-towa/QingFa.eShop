@@ -1,4 +1,4 @@
-﻿namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels.Interfaces
 {
     /// <summary>
     /// Represents a context for managing domain events within a given scope.

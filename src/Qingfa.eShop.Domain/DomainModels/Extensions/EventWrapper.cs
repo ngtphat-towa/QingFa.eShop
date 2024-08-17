@@ -1,5 +1,7 @@
 ﻿using MediatR;
 
+using QingFa.EShop.Domain.DomainModels.Interfaces;
+
 namespace QingFa.EShop.Domain.DomainModels.Extensions
 {
 

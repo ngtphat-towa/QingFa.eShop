@@ -1,6 +1,8 @@
 ﻿using ErrorOr;
 
-namespace QingFa.EShop.Domain.DomainModels.Bases
+using QingFa.EShop.Domain.DomainModels.Errors;
+
+namespace QingFa.EShop.Domain.DomainModels.Core
 {
     public abstract class Outbox : AggregateRoot<Guid> // Assuming Guid is the identifier
     {
