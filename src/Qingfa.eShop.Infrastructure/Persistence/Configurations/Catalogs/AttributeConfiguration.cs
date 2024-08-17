@@ -2,17 +2,16 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Attributes;
-using QingFa.EShop.Domain.DomainModels.Core;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
 {
-    public class VariantAttributeConfiguration : IEntityTypeConfiguration<VariantAttribute>
+    public class AttributeConfiguration : IEntityTypeConfiguration<ProductAttribute>
     {
-        public void Configure(EntityTypeBuilder<VariantAttribute> builder)
+        public void Configure(EntityTypeBuilder<ProductAttribute> builder)
         {
             #region Table Configuration
 
-            builder.ToTable("VariantAttributes");
+            builder.ToTable("Attributes");
 
             #endregion
 
@@ -24,12 +23,11 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
 
             #region Properties
 
-            // Configure the property as a GUID column for strong typing
             builder.Property(a => a.Id)
                 .HasColumnName("Id")
                 .HasConversion(
-                    id => id.Value,  // Convert from AttributeId to GUID
-                    value => new AttributeId(value)  // Convert from GUID to AttributeId
+                    id => id.Value,
+                    value => new ProductAttributeId(value)
                 );
 
             builder.Property(a => a.Name)
@@ -55,7 +53,13 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
             builder.Property(a => a.SortOrder)
                 .IsRequired();
 
-            // Add a timestamp for concurrency control
+            builder.Property(a => a.AttributeGroupId)
+                .IsRequired()
+                .HasConversion(
+                    id => id.Value,
+                    value => new AttributeGroupId(value)
+                );
+
             builder.Property<byte[]>("RowVersion")
                 .IsRowVersion()
                 .IsConcurrencyToken();
@@ -64,18 +68,22 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
 
             #region Relationships
 
-            // Configure the relationship to AttributeOption
             builder.HasMany(a => a.Options)
-                .WithOne()
-                .HasForeignKey("AttributeId")  
+                .WithOne() 
+                .HasForeignKey("AttributeId")
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne<AttributeGroup>()
+                .WithMany() 
+                .HasForeignKey(a => a.AttributeGroupId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             #endregion
 
             #region Indexes
 
             builder.HasIndex(a => a.AttributeCode)
-                .HasDatabaseName("IX_VariantAttributes_AttributeCode");
+                .HasDatabaseName("IX_Attributes_AttributeCode");
 
             #endregion
         }

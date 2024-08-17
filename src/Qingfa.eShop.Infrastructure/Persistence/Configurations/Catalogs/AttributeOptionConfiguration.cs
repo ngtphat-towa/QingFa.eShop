@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Attributes;
-using QingFa.EShop.Domain.DomainModels.Core;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
 {
@@ -37,7 +36,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
                 .HasColumnName("AttributeId")
                 .HasConversion(
                     id => id.Value, 
-                    value => new AttributeId(value)  
+                    value => new ProductAttributeId(value)  
                 );
 
             builder.Property(o => o.OptionValue)
