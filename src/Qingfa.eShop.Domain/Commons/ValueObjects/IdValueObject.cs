@@ -2,7 +2,7 @@
 
 namespace QingFa.EShop.Domain.Commons.ValueObjects
 {
-    public abstract class IdValueObject(int value) : ValueObject
+    public class IdValueObject(int value) : ValueObject
     {
         public int Value { get; } = value;
 
@@ -11,4 +11,5 @@ namespace QingFa.EShop.Domain.Commons.ValueObjects
             yield return Value;
         }
     }
+
 }
