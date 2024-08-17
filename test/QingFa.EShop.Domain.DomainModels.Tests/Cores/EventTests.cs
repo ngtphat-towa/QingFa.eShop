@@ -3,9 +3,9 @@ using System.Text.Json.Serialization;
 
 using FluentAssertions;
 
-using QingFa.EShop.Domain.DomainModels;
+using QingFa.EShop.Domain.DomainModels.Core;
 
-namespace QingFa.EShop.Domain.Tests.DomainModels
+namespace QingFa.EShop.Domain.DomainModels.Tests.Cores
 {
     public class EventTests
     {
@@ -67,10 +67,10 @@ namespace QingFa.EShop.Domain.Tests.DomainModels
             // Manually serialize the expected JSON
             string expectedJson = JsonSerializer.Serialize(new
             {
-                EventType = testEvent.EventType,
+                testEvent.EventType,
                 CreatedAt = testEvent.CreatedAt.ToString("o"), // Use the "o" format specifier for ISO 8601
-                CorrelationId = testEvent.CorrelationId,
-                MetaData = testEvent.MetaData
+                testEvent.CorrelationId,
+                testEvent.MetaData
             }, new JsonSerializerOptions
             {
                 WriteIndented = false,

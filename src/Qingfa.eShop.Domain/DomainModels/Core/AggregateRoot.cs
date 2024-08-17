@@ -1,6 +1,6 @@
 ﻿using QingFa.EShop.Domain.DomainModels.Interfaces;
 
-namespace QingFa.EShop.Domain.DomainModels
+namespace QingFa.EShop.Domain.DomainModels.Core
 {
     /// <summary>
     /// Represents a base class for aggregate root entities in the domain model,

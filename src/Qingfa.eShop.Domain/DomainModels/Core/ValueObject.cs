@@ -1,4 +1,4 @@
-﻿namespace QingFa.EShop.Domain.DomainModels
+﻿namespace QingFa.EShop.Domain.DomainModels.Core
 {
     public abstract class ValueObject : IEquatable<ValueObject>
     {
@@ -27,7 +27,7 @@
         public override bool Equals(object? obj) =>
             obj is ValueObject valueObject && ValuesAreEqual(valueObject);
 
-       
+
         public override int GetHashCode()
         {
             // Initialize hash code

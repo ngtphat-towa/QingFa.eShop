@@ -1,6 +1,6 @@
 ﻿using MediatR;
 
-namespace QingFa.EShop.Domain.DomainModels
+namespace QingFa.EShop.Domain.DomainModels.Interfaces
 {
     /// <summary>
     /// Represents a domain event within the domain model. Domain events are used to signal changes or important actions.

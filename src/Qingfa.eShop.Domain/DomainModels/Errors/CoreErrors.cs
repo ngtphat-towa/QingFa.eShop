@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 
-namespace QingFa.EShop.Domain.DomainModels
+namespace QingFa.EShop.Domain.DomainModels.Errors
 {
     /// <summary>
     /// Defines a set of error codes used across the application.
