@@ -20,7 +20,6 @@ namespace QingFa.EShop.Domain.Catalogs.Brands
 
         #region Constructors
 
-        // Fully parameterized constructor - protected to restrict access
         protected Brand(
             BrandId id,
             string name,
@@ -48,13 +47,12 @@ namespace QingFa.EShop.Domain.Catalogs.Brands
 
         #region Factory Methods
 
-        // Factory method to create a Brand with error handling
         public static ErrorOr<Brand> Create(
             BrandId id,
             string name,
             string description,
             string logoUrl,
-            SeoInfo seo,
+            SeoInfo? seo,
             BrandStatus status
         )
         {
@@ -73,34 +71,20 @@ namespace QingFa.EShop.Domain.Catalogs.Brands
                 return CoreErrors.ValidationError(nameof(logoUrl), "LogoUrl cannot be empty.");
             }
 
-            if (seo == null)
-            {
-                return CoreErrors.ValidationError(nameof(seo), "SeoInfo cannot be null.");
-            }
+            seo = seo ?? SeoInfo.CreateDefault();
 
-            // Create the brand with the specified status
-            Brand brand = new(
-                id,
-                name,
-                description,
-                logoUrl,
-                seo,
-                status
-            );
-
-            return brand;
+            return new Brand(id, name, description, logoUrl, seo, status);
         }
 
         #endregion
 
         #region Methods
 
-        // Method to update the Brand details
         public ErrorOr<Brand> UpdateDetails(
             string name,
             string description,
             string logoUrl,
-            SeoInfo seo,
+            SeoInfo? seo,
             BrandStatus status
         )
         {
@@ -119,10 +103,7 @@ namespace QingFa.EShop.Domain.Catalogs.Brands
                 return CoreErrors.ValidationError(nameof(logoUrl), "LogoUrl cannot be empty.");
             }
 
-            if (seo == null)
-            {
-                return CoreErrors.ValidationError(nameof(seo), "SeoInfo cannot be null.");
-            }
+            seo = seo ?? SeoInfo.CreateDefault();
 
             Name = name;
             Description = description;
@@ -133,10 +114,29 @@ namespace QingFa.EShop.Domain.Catalogs.Brands
             return this;
         }
 
-        // Method to provide a summary of the Brand
         public string GetSummary()
         {
             return $"Brand: {Name}, Description: {Description}, LogoUrl: {LogoUrl}, Seo: {Seo.MetaTitle}, Status: {Status}";
+        }
+
+        #endregion
+
+        #region Equality Members
+
+        public override bool Equals(object? obj)
+        {
+            return obj is Brand brand &&
+                   EqualityComparer<BrandId>.Default.Equals(Id, brand.Id) &&
+                   Name == brand.Name &&
+                   Description == brand.Description &&
+                   LogoUrl == brand.LogoUrl &&
+                   EqualityComparer<SeoInfo>.Default.Equals(Seo, brand.Seo) &&
+                   Status == brand.Status;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, Name, Description, LogoUrl, Seo, Status);
         }
 
         #endregion

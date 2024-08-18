@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Attributes;
-using QingFa.EShop.Domain.DomainModels.Core;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Catalogs
 {

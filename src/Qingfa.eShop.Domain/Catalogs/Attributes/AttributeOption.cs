@@ -1,5 +1,7 @@
 ﻿using ErrorOr;
 
+using MediatR;
+
 using QingFa.EShop.Domain.DomainModels.Core;
 using QingFa.EShop.Domain.DomainModels.Errors;
 
@@ -8,7 +10,7 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
     /// <summary>
     /// Represents an option for a specific attribute.
     /// </summary>
-    public class AttributeOption : Entity<AttributeOptionId>
+    public class AttributeOption : Entity<AttributeOptionId>, IEquatable<AttributeOption>
     {
         #region Properties
 
@@ -59,11 +61,11 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
             int sortOrder
         ) : base(id)
         {
-            AttributeId = attributeId;
             OptionValue = optionValue;
             Description = description;
             IsDefault = isDefault;
             SortOrder = sortOrder;
+            AttributeId = attributeId;
         }
 
         /// <summary>
@@ -71,7 +73,7 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         /// </summary>
 #pragma warning disable CS8618
         protected AttributeOption() : base(default!) { }
-#pragma warning restore CS8618 
+#pragma warning restore CS8618
 
         #endregion
 
@@ -96,14 +98,19 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
             int sortOrder
         )
         {
+            var errors = new List<Error>();
+
             if (string.IsNullOrWhiteSpace(optionValue))
-                return CoreErrors.ValidationError(nameof(optionValue), "OptionValue cannot be empty.");
+                errors.Add(CoreErrors.ValidationError(nameof(optionValue), "OptionValue cannot be empty."));
 
             if (string.IsNullOrWhiteSpace(description))
-                return CoreErrors.ValidationError(nameof(description), "Description cannot be empty.");
+                errors.Add(CoreErrors.ValidationError(nameof(description), "Description cannot be empty."));
 
             if (sortOrder < 0)
-                return CoreErrors.ValidationError(nameof(sortOrder), "SortOrder cannot be negative.");
+                errors.Add(CoreErrors.ValidationError(nameof(sortOrder), "SortOrder cannot be negative."));
+
+            if (errors.Any())
+                return errors;
 
             var attributeOption = new AttributeOption(
                 id,
@@ -128,26 +135,63 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         /// <param name="description">The new description of the option.</param>
         /// <param name="isDefault">Indicates whether this option is the default option.</param>
         /// <param name="sortOrder">The new sort order of the option.</param>
-        public void UpdateDetails(
+        /// <returns>An <see cref="ErrorOr{Unit}"/> indicating the result of the operation.</returns>
+        public ErrorOr<Unit> UpdateDetails(
             string optionValue,
             string description,
             bool isDefault,
             int sortOrder
         )
         {
+            var errors = new List<Error>();
+
             if (string.IsNullOrWhiteSpace(optionValue))
-                throw new ArgumentException("OptionValue cannot be empty.", nameof(optionValue));
+                errors.Add(CoreErrors.ValidationError(nameof(optionValue), "OptionValue cannot be empty."));
 
             if (string.IsNullOrWhiteSpace(description))
-                throw new ArgumentException("Description cannot be empty.", nameof(description));
+                errors.Add(CoreErrors.ValidationError(nameof(description), "Description cannot be empty."));
 
             if (sortOrder < 0)
-                throw new ArgumentException("SortOrder cannot be negative.", nameof(sortOrder));
+                errors.Add(CoreErrors.ValidationError(nameof(sortOrder), "SortOrder cannot be negative."));
+
+            if (errors.Any())
+                return errors;
 
             OptionValue = optionValue;
             Description = description;
             IsDefault = isDefault;
             SortOrder = sortOrder;
+
+            return Unit.Value; // Indicating success
+        }
+
+        #endregion
+
+        #region Equality
+
+        public bool Equals(AttributeOption? other)
+        {
+            if (other is null) return false;
+            if (ReferenceEquals(this, other)) return true;
+
+            // Compare all relevant properties for equality
+            return Id.Equals(other.Id)
+                && AttributeId.Equals(other.AttributeId)
+                && OptionValue == other.OptionValue
+                && Description == other.Description
+                && IsDefault == other.IsDefault
+                && SortOrder == other.SortOrder;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as AttributeOption);
+        }
+
+        public override int GetHashCode()
+        {
+            // Combine properties into hash codes
+            return HashCode.Combine(Id, AttributeId, OptionValue, Description, IsDefault, SortOrder);
         }
 
         #endregion

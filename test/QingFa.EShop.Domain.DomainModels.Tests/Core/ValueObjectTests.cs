@@ -2,7 +2,7 @@
 
 using QingFa.EShop.Domain.DomainModels.Core;
 
-namespace QingFa.EShop.Domain.Tests.Cores
+namespace QingFa.EShop.Domain.Tests.Core
 {
     public class ValueObjectTests
     {

@@ -31,33 +31,21 @@ namespace QingFa.EShop.Domain.DomainModels.Core
         /// <summary>
         /// Gets the date and time when the entity was created.
         /// </summary>
-        /// <remarks>
-        /// This property is set during entity initialization and is immutable to reflect the creation time accurately.
-        /// </remarks>
         public DateTime CreatedAt { get; protected set; }
 
         /// <summary>
         /// Gets or sets the date and time when the entity was last updated.
         /// </summary>
-        /// <remarks>
-        /// This property is initially null and is updated whenever the entity is modified.
-        /// </remarks>
         public DateTime? UpdatedAt { get; protected set; }
 
         /// <summary>
         /// Gets or sets the identifier of the user who created the entity.
         /// </summary>
-        /// <remarks>
-        /// Useful for auditing to track who initially created the entity.
-        /// </remarks>
         public int? CreatedBy { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the user who last updated the entity.
         /// </summary>
-        /// <remarks>
-        /// Useful for auditing to track who last modified the entity.
-        /// </remarks>
         public int? UpdatedBy { get; set; }
 
         /// <summary>
@@ -95,9 +83,6 @@ namespace QingFa.EShop.Domain.DomainModels.Core
         /// <summary>
         /// Updates the timestamp indicating when the entity was last modified.
         /// </summary>
-        /// <remarks>
-        /// Sets the <see cref="UpdatedAt"/> property to the current UTC time. This method should be called whenever the entity is modified.
-        /// </remarks>
         public void UpdateTimestamp()
         {
             UpdatedAt = DateTime.UtcNow;
@@ -109,12 +94,9 @@ namespace QingFa.EShop.Domain.DomainModels.Core
         /// Determines whether the specified <see cref="Entity{TId}"/> is equal to the current <see cref="Entity{TId}"/>.
         /// </summary>
         /// <param name="other">The <see cref="Entity{TId}"/> to compare with the current <see cref="Entity{TId}"/>.</param>
-        /// <returns>
-        /// <c>true</c> if the specified <see cref="Entity{TId}"/> is equal to the current <see cref="Entity{TId}"/>; otherwise, <c>false</c>.
-        /// </returns>
+        /// <returns><c>true</c> if the specified <see cref="Entity{TId}"/> is equal to the current <see cref="Entity{TId}"/>; otherwise, <c>false</c>.</returns>
         public bool Equals(Entity<TId>? other)
         {
-            // Check for null and compare reference equality
             if (other == null) return false;
             return EqualityComparer<TId>.Default.Equals(Id, other.Id);
         }
@@ -123,9 +105,7 @@ namespace QingFa.EShop.Domain.DomainModels.Core
         /// Determines whether the specified object is equal to the current <see cref="Entity{TId}"/>.
         /// </summary>
         /// <param name="obj">The object to compare with the current <see cref="Entity{TId}"/>.</param>
-        /// <returns>
-        /// <c>true</c> if the specified object is equal to the current <see cref="Entity{TId}"/>; otherwise, <c>false</c>.
-        /// </returns>
+        /// <returns><c>true</c> if the specified object is equal to the current <see cref="Entity{TId}"/>; otherwise, <c>false</c>.</returns>
         public override bool Equals(object? obj)
         {
             return Equals(obj as Entity<TId>);
@@ -134,12 +114,9 @@ namespace QingFa.EShop.Domain.DomainModels.Core
         /// <summary>
         /// Serves as the default hash function.
         /// </summary>
-        /// <returns>
-        /// A hash code for the current <see cref="Entity{TId}"/>.
-        /// </returns>
+        /// <returns>A hash code for the current <see cref="Entity{TId}"/>.</returns>
         public override int GetHashCode()
         {
-            // Use the hash code of the Id for equality comparison
             return EqualityComparer<TId>.Default.GetHashCode(Id);
         }
 

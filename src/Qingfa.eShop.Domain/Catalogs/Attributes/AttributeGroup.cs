@@ -26,7 +26,7 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         /// </summary>
         /// <param name="id">The unique identifier of the attribute group.</param>
         /// <param name="groupName">The name of the attribute group.</param>
-        protected AttributeGroup(
+        private AttributeGroup(
             AttributeGroupId id,
             string groupName
         ) : base(id)
@@ -57,7 +57,9 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         )
         {
             if (string.IsNullOrWhiteSpace(groupName))
+            {
                 return CoreErrors.ValidationError(nameof(groupName), "GroupName cannot be empty.");
+            }
 
             var attributeGroup = new AttributeGroup(
                 id,
@@ -72,17 +74,47 @@ namespace QingFa.EShop.Domain.Catalogs.Attributes
         #region Methods
 
         /// <summary>
-        /// Updates the details of the attribute group.
+        /// Updates the name of the attribute group.
         /// </summary>
         /// <param name="groupName">The new name of the attribute group.</param>
+        /// <exception cref="ArgumentException">Thrown when <paramref name="groupName"/> is empty or whitespace.</exception>
         public void UpdateDetails(
             string groupName
         )
         {
             if (string.IsNullOrWhiteSpace(groupName))
+            {
                 throw new ArgumentException("GroupName cannot be empty.", nameof(groupName));
+            }
 
             GroupName = groupName;
+        }
+
+        #endregion
+
+        #region Equality and Hashing
+
+        /// <summary>
+        /// Determines whether the specified <see cref="AttributeGroup"/> is equal to the current <see cref="AttributeGroup"/>.
+        /// </summary>
+        /// <param name="obj">The <see cref="AttributeGroup"/> to compare with the current <see cref="AttributeGroup"/>.</param>
+        /// <returns>true if the specified <see cref="AttributeGroup"/> is equal to the current <see cref="AttributeGroup"/>; otherwise, false.</returns>
+        public override bool Equals(object? obj)
+        {
+            if (obj is AttributeGroup other)
+            {
+                return Id.Equals(other.Id) && GroupName == other.GroupName;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Serves as a hash function for a particular type.
+        /// </summary>
+        /// <returns>A hash code for the current <see cref="AttributeGroup"/>.</returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Id, GroupName);
         }
 
         #endregion

@@ -2,7 +2,7 @@
 
 using QingFa.EShop.Domain.DomainModels.Errors;
 
-namespace QingFa.EShop.Domain.Tests.Cores
+namespace QingFa.EShop.Domain.Tests.Core
 {
     public class CoreErrorsTests
     {
