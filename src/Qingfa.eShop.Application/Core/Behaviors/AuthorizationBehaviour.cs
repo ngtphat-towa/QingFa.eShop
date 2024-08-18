@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Linq;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Ardalis.GuardClauses;
@@ -33,15 +34,17 @@ namespace QingFa.EShop.Application.Core.Behaviors
                 if (authorizeAttributes.Any())
                 {
                     _logger.LogInformation("Authorizing user with request of type {RequestType}.", typeof(TRequest).Name);
-                    await AuthorizeUserAsync(authorizeAttributes);
 
-                    // User is authorized / authorization not required
+                    // Concurrently handle authorization checks
+                    await AuthorizeUserAsync(authorizeAttributes, cancellationToken);
+
                     _logger.LogInformation("User authorized successfully.");
-                    return await next();
+                }
+                else
+                {
+                    _logger.LogInformation("No authorization attributes found. Proceeding to the next handler.");
                 }
 
-                // No authorization attributes - continue with the next handler
-                _logger.LogInformation("No authorization attributes found. Proceeding to the next handler.");
                 return await next();
             }
             catch (Exception ex)
@@ -51,37 +54,31 @@ namespace QingFa.EShop.Application.Core.Behaviors
             }
         }
 
-        private async Task AuthorizeUserAsync(IEnumerable<AuthorizeAttribute> authorizeAttributes)
+        private async Task AuthorizeUserAsync(IEnumerable<AuthorizeAttribute> authorizeAttributes, CancellationToken cancellationToken)
         {
             try
             {
                 // Ensure _user.Id is not null or empty
-                Guard.Against.NullOrWhiteSpace(_user.Id, nameof(_user.Id));
+                var userId = Guard.Against.NullOrWhiteSpace(_user.Id, nameof(_user.Id));
 
-                // Role-based authorization
-                var rolesAttributes = authorizeAttributes
+                // Concurrent role-based and policy-based authorization
+                var roleAttributes = authorizeAttributes
                     .Where(a => !string.IsNullOrWhiteSpace(a.Roles))
                     .ToList();
 
-                if (rolesAttributes.Any())
-                {
-                    var isAuthorized = await IsUserInAnyRoleAsync(rolesAttributes);
-                    if (!isAuthorized)
-                    {
-                        _logger.LogWarning("User is not authorized for role-based access.");
-                        throw PermissionException.Denied("role-based authorization");
-                    }
-                }
-
-                // Policy-based authorization
-                var policiesAttributes = authorizeAttributes
+                var policyAttributes = authorizeAttributes
                     .Where(a => !string.IsNullOrWhiteSpace(a.Policy))
                     .ToList();
 
-                if (policiesAttributes.Any())
-                {
-                    await AuthorizeUserWithPoliciesAsync(policiesAttributes);
-                }
+                var roleCheckTask = roleAttributes.Any()
+                    ? CheckUserRolesAsync(userId, roleAttributes, cancellationToken)
+                    : Task.CompletedTask;
+
+                var policyCheckTask = policyAttributes.Any()
+                    ? CheckUserPoliciesAsync(userId, policyAttributes, cancellationToken)
+                    : Task.CompletedTask;
+
+                await Task.WhenAll(roleCheckTask, policyCheckTask);
             }
             catch (Exception ex)
             {
@@ -90,56 +87,35 @@ namespace QingFa.EShop.Application.Core.Behaviors
             }
         }
 
-        private async Task<bool> IsUserInAnyRoleAsync(IEnumerable<AuthorizeAttribute> roleAttributes)
+        private async Task CheckUserRolesAsync(string userId, IEnumerable<AuthorizeAttribute> roleAttributes, CancellationToken cancellationToken)
         {
-            try
+            foreach (var role in roleAttributes
+                .SelectMany(a => a.Roles!.Split(',').Select(r => r.Trim())))
             {
-                // Ensure _user.Id is not null or empty
-                Guard.Against.NullOrWhiteSpace(_user.Id, nameof(_user.Id));
+                Guard.Against.NullOrWhiteSpace(role, nameof(role));
 
-                foreach (var role in roleAttributes
-                    .SelectMany(a => a.Roles!.Split(',').Select(r => r.Trim())))
+                // Check if user is in role
+                if (await _identityService.IsInRoleAsync(userId, role))
                 {
-                    Guard.Against.NullOrWhiteSpace(role, nameof(role));
-
-                    // Check if user is in role
-                    if (await _identityService.IsInRoleAsync(_user.Id, role))
-                    {
-                        return true;
-                    }
+                    return;
                 }
-                return false;
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while checking user roles.");
-                throw new AuthorizationException("An error occurred while checking user roles.", "An error occurred while checking user roles.", ex);
-            }
+            _logger.LogWarning("User is not authorized for role-based access.");
+            throw PermissionException.Denied("role-based authorization");
         }
 
-        private async Task AuthorizeUserWithPoliciesAsync(IEnumerable<AuthorizeAttribute> policyAttributes)
+        private async Task CheckUserPoliciesAsync(string userId, IEnumerable<AuthorizeAttribute> policyAttributes, CancellationToken cancellationToken)
         {
-            try
+            foreach (var policy in policyAttributes.Select(a => a.Policy))
             {
-                foreach (var policy in policyAttributes.Select(a => a.Policy))
+                Guard.Against.NullOrWhiteSpace(policy, nameof(policy));
+
+                // Check if user is authorized with policy
+                if (!await _identityService.AuthorizeAsync(userId, policy))
                 {
-                    Guard.Against.NullOrWhiteSpace(policy, nameof(policy));
-
-                    // Ensure _user.Id is not null or empty
-                    Guard.Against.NullOrWhiteSpace(_user.Id, nameof(_user.Id));
-
-                    // Check if user is authorized with policy
-                    if (!await _identityService.AuthorizeAsync(_user.Id, policy))
-                    {
-                        _logger.LogWarning("User is not authorized for policy-based access with policy: {Policy}.", policy);
-                        throw PermissionException.Denied($"policy-based authorization with policy: {policy}");
-                    }
+                    _logger.LogWarning("User is not authorized for policy-based access with policy: {Policy}.", policy);
+                    throw PermissionException.Denied($"policy-based authorization with policy: {policy}");
                 }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while authorizing user with policies.");
-                throw new AuthorizationException("An error occurred while authorizing user with policies.", "An error occurred while authorizing user with policies.", ex);
             }
         }
     }
