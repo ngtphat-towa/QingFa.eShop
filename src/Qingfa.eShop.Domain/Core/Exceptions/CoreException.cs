@@ -118,35 +118,5 @@
             return new CoreException($"Entity '{entityName}' was not found.", statusCode, errorCode, details, innerException);
         }
     }
-
-    /// <summary>
-    /// Represents an exception that is thrown when a user does not have the required permissions.
-    /// </summary>
-    /// <remarks>
-    /// Initializes a new instance of the <see cref="PermissionException"/> class with a specified error message and details.
-    /// </remarks>
-    /// <param name="message">The message that describes the error.</param>
-    /// <param name="details">Additional details about the error.</param>
-    /// <param name="innerException">The inner exception to be wrapped.</param>
-    public class PermissionException(string message, string? details = null, Exception? innerException = null) : CoreException(message, 403, "PERMISSION_DENIED", details, innerException)
-    {
-
-        /// <summary>
-        /// Creates a new instance of <see cref="PermissionException"/> with the specified message indicating insufficient permissions.
-        /// </summary>
-        /// <param name="resource">The resource for which permission was denied.</param>
-        /// <param name="details">Additional details about the error.</param>
-        /// <param name="innerException">The inner exception to be wrapped.</param>
-        /// <returns>A new <see cref="PermissionException"/> instance.</returns>
-        public static PermissionException Denied(string resource, string? details = null, Exception? innerException = null)
-        {
-            if (string.IsNullOrWhiteSpace(resource))
-            {
-                throw new ArgumentException("Resource name cannot be null or empty.", nameof(resource));
-            }
-
-            return new PermissionException($"Access to the resource '{resource}' is denied.", details, innerException);
-        }
-    }
 }
 
