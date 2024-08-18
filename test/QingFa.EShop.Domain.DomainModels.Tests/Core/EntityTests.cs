@@ -3,7 +3,7 @@
 using QingFa.EShop.Domain.DomainModels.Core;
 using QingFa.EShop.Domain.DomainModels.Interfaces;
 
-namespace QingFa.EShop.Domain.Tests.Cores
+namespace QingFa.EShop.Domain.Tests.Core
 {
     // Define a concrete implementation of Entity for testing purposes
     public class TestEntity : Entity<int>

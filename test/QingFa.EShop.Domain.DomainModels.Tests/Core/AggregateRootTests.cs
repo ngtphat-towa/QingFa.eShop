@@ -2,7 +2,7 @@
 
 using QingFa.EShop.Domain.DomainModels.Core;
 
-namespace QingFa.EShop.Domain.Tests.Catalogs
+namespace QingFa.EShop.Domain.Tests.Core
 {
     // Concrete implementation of AggregateRoot for testing purposes
     public class TestAggregateRoot : AggregateRoot<int>
