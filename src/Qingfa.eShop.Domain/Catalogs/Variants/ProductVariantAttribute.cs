@@ -1,5 +1,7 @@
 ﻿using ErrorOr;
 
+using MediatR;
+
 using QingFa.EShop.Domain.Catalogs.Attributes;
 using QingFa.EShop.Domain.DomainModels.Core;
 using QingFa.EShop.Domain.DomainModels.Errors;
@@ -54,55 +56,57 @@ namespace QingFa.EShop.Domain.Catalogs.Variants
 
         public static ErrorOr<ProductVariantAttribute> Create(
             ProductVariantAttributeId id,
-            ProductVariantId productVariantId,
-            ProductAttributeId attributeId,
+            ProductVariantId? productVariantId,
+            ProductAttributeId? attributeId,
             AttributeOptionId? attributeOptionId,
             string? customValue,
             bool isRequired,
-            bool isVisibleToCustomer
-        )
+            bool isVisibleToCustomer)
         {
             if (productVariantId == null)
-                return CoreErrors.ValidationError(nameof(productVariantId), "ProductVariantId cannot be null.");
+            {
+                return CoreErrors.NullArgument(nameof(productVariantId));
+            }
 
             if (attributeId == null)
-                return CoreErrors.ValidationError(nameof(attributeId), "AttributeId cannot be null.");
+            {
+                return CoreErrors.NullArgument(nameof(attributeId));
+            }
 
             if (attributeOptionId == null && string.IsNullOrEmpty(customValue))
+            {
                 return CoreErrors.ValidationError(nameof(attributeOptionId), "Either AttributeOptionId or CustomValue must be provided.");
+            }
 
-            var productVariantAttribute = new ProductVariantAttribute(
-                id,
-                productVariantId,
-                attributeId,
-                attributeOptionId,
-                customValue,
-                isRequired,
-                isVisibleToCustomer
-            );
-
-            return productVariantAttribute;
+            // Create the ProductVariantAttribute instance if all validations pass
+            return new ProductVariantAttribute(id, productVariantId, attributeId, attributeOptionId, customValue, isRequired, isVisibleToCustomer);
         }
+
 
         #endregion
 
         #region Methods
 
-        public void UpdateDetails(
-            ProductAttributeId attributeId,
+        public ErrorOr<Unit> UpdateDetails(
+            ProductAttributeId? attributeId,
             AttributeOptionId? attributeOptionId,
-            string? customValue
-        )
+            string? customValue)
         {
             if (attributeId == null)
-                throw new ArgumentException("AttributeId cannot be null.", nameof(attributeId));
+            {
+                return CoreErrors.NullArgument(nameof(attributeId));
+            }
 
             if (attributeOptionId == null && string.IsNullOrEmpty(customValue))
-                throw new ArgumentException("Either AttributeOptionId or CustomValue must be provided.", nameof(attributeOptionId));
+            {
+                return CoreErrors.ValidationError(nameof(attributeOptionId), "Either AttributeOptionId or CustomValue must be provided.");
+            }
 
             AttributeId = attributeId;
             AttributeOptionId = attributeOptionId;
             CustomValue = customValue;
+
+            return Unit.Value;
         }
 
         #endregion
