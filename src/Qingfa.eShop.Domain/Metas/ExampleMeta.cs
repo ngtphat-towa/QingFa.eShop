@@ -2,15 +2,15 @@
 
 namespace QingFa.EShop.Domain.Metas
 {
-    public sealed class Meta : BaseEntity<Guid>, IAuditable
+    public sealed class ExampleMeta : BaseEntity<Guid>, IAuditable
     {
-        public string Name { get; private set; }
-        public DateTimeOffset Created { get;  set; }
-        public string? CreatedBy { get;  set; }
-        public DateTimeOffset LastModified { get;  set; }
-        public string? LastModifiedBy { get;  set; }
+        public string Name { get; private set; } = default!;
+        public DateTimeOffset Created { get; set; }
+        public string? CreatedBy { get; set; }
+        public DateTimeOffset LastModified { get; set; }
+        public string? LastModifiedBy { get; set; }
 
-        public Meta(Guid id, string name, DateTimeOffset created, string? createdBy)
+        public ExampleMeta(Guid id, string name, DateTimeOffset created, string? createdBy)
         {
             Id = id;
             Name = name;
