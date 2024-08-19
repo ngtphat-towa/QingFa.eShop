@@ -1,6 +1,6 @@
 ﻿namespace QingFa.EShop.Domain.Core.ValueObjects
 {
-    public abstract class ValueObject
+    public abstract class ValueObject : IEquatable<ValueObject>
     {
         protected static bool EqualOperator(ValueObject? left, ValueObject? right)
         {
@@ -17,17 +17,21 @@
             return !EqualOperator(left, right);
         }
 
-        protected abstract IEnumerable<object> GetEqualityComponents();
+        protected abstract IEnumerable<object?> GetEqualityComponents();
 
-        public override bool Equals(object? obj)
+        public bool Equals(ValueObject? other)
         {
-            if (obj is null || GetType() != obj.GetType())
+            if (other is null || GetType() != other.GetType())
             {
                 return false;
             }
 
-            var other = (ValueObject)obj;
             return GetEqualityComponents().SequenceEqual(other.GetEqualityComponents());
+        }
+
+        public override bool Equals(object? obj)
+        {
+            return obj is ValueObject other && Equals(other);
         }
 
         public override int GetHashCode()
