@@ -16,12 +16,12 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <summary>
         /// Gets the list of expressions to include related entities.
         /// </summary>
-        List<Expression<Func<T, object>>> Includes { get; }
+        IReadOnlyList<Expression<Func<T, object>>> Includes { get; }
 
         /// <summary>
         /// Gets the list of related entities to include by string.
         /// </summary>
-        List<string> IncludeStrings { get; }
+        IReadOnlyList<string> IncludeStrings { get; }
 
         /// <summary>
         /// Gets the expression for sorting entities in ascending order.

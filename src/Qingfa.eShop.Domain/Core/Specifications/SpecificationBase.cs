@@ -11,10 +11,13 @@ namespace QingFa.EShop.Domain.Core.Specifications
     /// <typeparam name="T">The type of entity.</typeparam>
     public abstract class SpecificationBase<T> : ISpecification<T>
     {
+        private readonly List<Expression<Func<T, object>>> _includes;
+        private readonly List<string> _includeStrings;
+
         protected SpecificationBase()
         {
-            Includes = new List<Expression<Func<T, object>>>();
-            IncludeStrings = new List<string>();
+            _includes = new List<Expression<Func<T, object>>>();
+            _includeStrings = new List<string>();
         }
 
         /// <summary>
@@ -25,12 +28,12 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <summary>
         /// Gets the list of expressions to include related entities.
         /// </summary>
-        public List<Expression<Func<T, object>>> Includes { get; }
+        public IReadOnlyList<Expression<Func<T, object>>> Includes => _includes.AsReadOnly();
 
         /// <summary>
         /// Gets the list of related entities to include by string.
         /// </summary>
-        public List<string> IncludeStrings { get; }
+        public IReadOnlyList<string> IncludeStrings => _includeStrings.AsReadOnly();
 
         /// <summary>
         /// Gets or sets the expression for sorting entities in ascending order.
@@ -68,7 +71,7 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <param name="includeExpression">The include expression.</param>
         public void AddInclude(Expression<Func<T, object>> includeExpression)
         {
-            Includes.Add(includeExpression);
+            _includes.Add(includeExpression);
         }
 
         /// <summary>
@@ -77,7 +80,7 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <param name="includeString">The include string.</param>
         public void AddInclude(string includeString)
         {
-            IncludeStrings.Add(includeString);
+            _includeStrings.Add(includeString);
         }
 
         /// <summary>
@@ -86,8 +89,8 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <param name="propertyName">The name of the property to sort by.</param>
         public void ApplyOrderBy(string propertyName)
         {
-            OrderBy = CreateSortExpression(ResolvePropertyName(propertyName)
-                ?? throw CoreException.InvalidArgument(propertyName, details: "Property does not exist on entity type."));
+            var resolvedPropertyName = ResolvePropertyName(propertyName);
+            OrderBy = CreateSortExpression(resolvedPropertyName);
         }
 
         /// <summary>
@@ -96,8 +99,8 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <param name="propertyName">The name of the property to sort by.</param>
         public void ApplyOrderByDescending(string propertyName)
         {
-            OrderByDescending = CreateSortExpression(ResolvePropertyName(propertyName)
-                ?? throw CoreException.InvalidArgument(propertyName, details: "Property does not exist on entity type."));
+            var resolvedPropertyName = ResolvePropertyName(propertyName);
+            OrderByDescending = CreateSortExpression(resolvedPropertyName);
         }
 
         /// <summary>
@@ -107,6 +110,9 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// <param name="take">The number of entities to take.</param>
         public void ApplyPaging(int skip, int take)
         {
+            if (skip < 0) throw new ArgumentOutOfRangeException(nameof(skip), "Skip cannot be negative.");
+            if (take <= 0) throw new ArgumentOutOfRangeException(nameof(take), "Take must be greater than zero.");
+
             Skip = skip;
             Take = take;
         }
@@ -124,10 +130,15 @@ namespace QingFa.EShop.Domain.Core.Specifications
         /// Resolves the property name to ensure it exists in the entity type.
         /// </summary>
         /// <param name="propertyName">The name of the property.</param>
-        /// <returns>The resolved property name if it exists, otherwise null.</returns>
-        protected string? ResolvePropertyName(string propertyName)
+        /// <returns>The resolved property name if it exists, otherwise throws an exception.</returns>
+        protected string ResolvePropertyName(string propertyName)
         {
-            return typeof(T).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase)?.Name;
+            var property = typeof(T).GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
+            if (property == null)
+            {
+                throw CoreException.InvalidArgument(propertyName);
+            }
+            return property.Name;
         }
 
         /// <summary>

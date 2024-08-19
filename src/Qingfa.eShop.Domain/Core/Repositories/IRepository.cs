@@ -5,16 +5,56 @@ namespace QingFa.EShop.Domain.Core.Repositories
 {
     public interface IGenericRepository<TEntity, TId> where TEntity : BaseEntity<TId> where TId : notnull
     {
+        /// <summary>
+        /// Retrieves an entity by its identifier.
+        /// </summary>
+        /// <param name="id">The identifier of the entity.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>The entity with the specified identifier, or null if not found.</returns>
         Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<TEntity>> ListAllAsync(CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Retrieves all entities.
+        /// </summary>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>A read-only list of all entities.</returns>
+        Task<IReadOnlyList<TEntity>> ListAllAsync(CancellationToken cancellationToken = default);
 
-        Task<IEnumerable<TEntity>> ListAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
+        /// <summary>
+        /// Retrieves entities that match the specified criteria.
+        /// </summary>
+        /// <param name="specification">The specification to filter entities.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>A read-only list of entities that match the criteria.</returns>
+        Task<IReadOnlyList<TEntity>> FindBySpecificationAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Gets the count of entities that match the specified criteria.
+        /// </summary>
+        /// <param name="specification">The specification to filter entities.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>The count of entities that match the criteria.</returns>
+        Task<int> CountBySpecificationAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Adds a new entity.
+        /// </summary>
+        /// <param name="entity">The entity to add.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Updates an existing entity.
+        /// </summary>
+        /// <param name="entity">The entity to update.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
 
+        /// <summary>
+        /// Deletes an entity.
+        /// </summary>
+        /// <param name="entity">The entity to delete.</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
     }
 }
