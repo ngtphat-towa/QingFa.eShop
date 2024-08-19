@@ -8,11 +8,11 @@ namespace QingFa.EShop.Application.Core.Behaviors
 {
     public class LoggingBehavior<TRequest>(
         ILogger<LoggingBehavior<TRequest>> logger,
-        IUser user,
+        ICurrentUser user,
         IIdentityService identityService) : IRequestPreProcessor<TRequest> where TRequest : notnull
     {
         private readonly ILogger<LoggingBehavior<TRequest>> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        private readonly IUser _user = user ?? throw new ArgumentNullException(nameof(user));
+        private readonly ICurrentUser _user = user ?? throw new ArgumentNullException(nameof(user));
         private readonly IIdentityService _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
 
         public async Task Process(TRequest request, CancellationToken cancellationToken)

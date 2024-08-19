@@ -8,7 +8,7 @@ namespace QingFa.EShop.Application.Core.Exceptions
         /// Initializes a new instance of the <see cref="AuthorizationException"/> class with a default message.
         /// </summary>
         public AuthorizationException()
-            : base("Authorization failed.", 403, "AUTHORIZATION_FAILED")
+            : base("Authorization failed.", 403, "AUTHORIZATION_FAILED", "Authorization Failed")
         {
         }
 
@@ -19,7 +19,7 @@ namespace QingFa.EShop.Application.Core.Exceptions
         /// <param name="details">Additional details about the error.</param>
         /// <param name="innerException">The inner exception to be wrapped.</param>
         public AuthorizationException(string message, string? details = null, Exception? innerException = null)
-            : base(message, 403, "AUTHORIZATION_FAILED", details, innerException)
+            : base(message, 403, "AUTHORIZATION_FAILED", "Authorization Failed", details, innerException)
         {
         }
     }

@@ -38,5 +38,13 @@ namespace QingFa.EShop.Application.Core.Models
 
             return new PaginatedList<T>(items, count, pageNumber, pageSize);
         }
+
+        public static PaginatedList<T> Create(List<T> source, int pageNumber, int pageSize)
+        {
+            var count = source.Count();
+            var items = source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToList();
+
+            return new PaginatedList<T>(items, count, pageNumber, pageSize);
+        }
     }
 }

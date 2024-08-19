@@ -12,12 +12,12 @@ namespace QingFa.EShop.Application.Core.Behaviors
         where TRequest : notnull
     {
         private readonly ILogger<TRequest> _logger;
-        private readonly IUser _user;
+        private readonly ICurrentUser _user;
         private readonly IIdentityService _identityService;
 
         public PerformanceBehavior(
             ILogger<TRequest> logger,
-            IUser user,
+            ICurrentUser user,
             IIdentityService identityService)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

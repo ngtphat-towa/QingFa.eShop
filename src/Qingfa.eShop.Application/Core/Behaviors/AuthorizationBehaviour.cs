@@ -1,5 +1,4 @@
 ﻿using System.Reflection;
-using System.Linq;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Ardalis.GuardClauses;
@@ -12,11 +11,11 @@ namespace QingFa.EShop.Application.Core.Behaviors
     public class AuthorizationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : notnull
     {
-        private readonly IUser _user;
+        private readonly ICurrentUser _user;
         private readonly IIdentityService _identityService;
         private readonly ILogger<AuthorizationBehavior<TRequest, TResponse>> _logger;
 
-        public AuthorizationBehavior(IUser user, IIdentityService identityService, ILogger<AuthorizationBehavior<TRequest, TResponse>> logger)
+        public AuthorizationBehavior(ICurrentUser user, IIdentityService identityService, ILogger<AuthorizationBehavior<TRequest, TResponse>> logger)
         {
             _user = Guard.Against.Null(user, nameof(user));
             _identityService = Guard.Against.Null(identityService, nameof(identityService));

@@ -1,6 +1,6 @@
 ﻿namespace QingFa.EShop.Application.Core.Interfaces
 {
-    public interface IUser
+    public interface ICurrentUser
     {
         string? Id { get; }
     }
