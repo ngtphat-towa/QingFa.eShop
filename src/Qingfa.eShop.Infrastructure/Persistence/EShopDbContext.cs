@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
+using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Metas;
+using QingFa.EShop.Infrastructure.Persistence.Configurations;
 
 namespace QingFa.EShop.Infrastructure.Persistence
 {
@@ -14,12 +16,17 @@ namespace QingFa.EShop.Infrastructure.Persistence
 
         // Define DbSet properties for your entities
         public DbSet<ExampleMeta> ExampleMetas { get; set; }
+        public DbSet<Brand> Brands { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configure your entities here
-            // Example: modelBuilder.Entity<ExampleMeta>().ToTable("ExampleMetas");
+
+            // Apply configurations
+            modelBuilder.ApplyConfiguration(new ExampleMetaConfiguration());
+            modelBuilder.ApplyConfiguration(new BrandConfiguration());
+            // Apply configuration for ExampleMeta if applicable
+
         }
 
         // IUnitOfWork implementation
@@ -28,6 +35,5 @@ namespace QingFa.EShop.Infrastructure.Persistence
             // Optional: Add any additional logic here if needed
             return await base.SaveChangesAsync(cancellationToken);
         }
-
     }
 }
