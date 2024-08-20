@@ -23,9 +23,10 @@ namespace QingFa.EShop.Infrastructure.Persistence
             base.OnModelCreating(modelBuilder);
 
             // Apply configurations
-            modelBuilder.ApplyConfiguration(new ExampleMetaConfiguration());
+            modelBuilder.ApplyConfiguration(new ProductConfiguration());
+            modelBuilder.ApplyConfiguration(new CategoryConfiguration());
+            modelBuilder.ApplyConfiguration(new CategoryProductConfiguration());
             modelBuilder.ApplyConfiguration(new BrandConfiguration());
-            // Apply configuration for ExampleMeta if applicable
 
         }
 

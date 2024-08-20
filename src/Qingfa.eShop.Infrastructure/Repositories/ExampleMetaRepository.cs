@@ -1,13 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
+﻿using Microsoft.EntityFrameworkCore;
 
-using Microsoft.EntityFrameworkCore;
-
-using QingFa.EShop.Domain.Core.Entities;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Core.Specifications;
 using QingFa.EShop.Domain.Metas;
 using QingFa.EShop.Infrastructure.Persistence;

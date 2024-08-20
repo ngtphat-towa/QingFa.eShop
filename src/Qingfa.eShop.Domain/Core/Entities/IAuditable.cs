@@ -1,9 +1,10 @@
-﻿namespace QingFa.EShop.Domain.Core.Entities;
-
-public interface IAuditable
+﻿namespace QingFa.EShop.Domain.Core.Entities
 {
-    public DateTimeOffset Created { get; protected set; }
-    public string? CreatedBy { get; protected set; }
-    public DateTimeOffset LastModified { get; protected set; }
-    public string? LastModifiedBy { get; protected set; }
+    public interface IAuditable
+    {
+        DateTimeOffset Created { get; set; }
+        string? CreatedBy { get; set; }
+        DateTimeOffset LastModified { get; set; }
+        string? LastModifiedBy { get; set; }
+    }
 }
