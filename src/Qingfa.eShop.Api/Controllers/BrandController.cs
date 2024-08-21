@@ -1,45 +1,52 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using QingFa.EShop.Application.ExampleMetas.Create;
-using QingFa.EShop.Application.ExampleMetas.Delete;
-using QingFa.EShop.Application.ExampleMetas.Update;
-using QingFa.EShop.Application.ExampleMetas.Gets;
-using QingFa.EShop.Application.ExampleMetas.Models;
-using Swashbuckle.AspNetCore.Annotations;
+using QingFa.EShop.Application.Features.BrandManagements.Create;
+using QingFa.EShop.Application.Features.BrandManagements.Delete;
+using QingFa.EShop.Application.Features.BrandManagements.Get;
+using QingFa.EShop.Application.Features.BrandManagements.Models;
 using QingFa.EShop.Application.Core.Models;
-using QingFa.EShop.Api.Models;
+using Swashbuckle.AspNetCore.Annotations;
+using System;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using QingFa.EShop.Application.Features.BrandManagements.Update;
+using QingFa.EShop.Application.Features.Common.SeoInfo;
 
 namespace QingFa.EShop.API.Controllers
 {
-    public class ExampleMetasController : BaseController
+    public class BrandController : BaseController
     {
         private readonly IMediator _mediator;
 
-        public ExampleMetasController(IMediator mediator)
+        public BrandController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
         [HttpGet]
-        [SwaggerOperation(Summary = "Gets a paginated list of ExampleMetas with optional filtering and sorting.")]
-        [ProducesResponseType(typeof(PaginatedList<ExampleMetaResponse>), StatusCodes.Status200OK)]
+        [SwaggerOperation(Summary = "Gets a paginated list of Brands with optional filtering and sorting.")]
+        [ProducesResponseType(typeof(PaginatedList<BrandResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 10,
             [FromQuery] string? name = null,
             [FromQuery] string? createdBy = null,
-            [FromQuery] string sortField = "Created",
-            [FromQuery] bool sortDescending = false)
+            [FromQuery] string? sortField = null,
+            [FromQuery] bool sortDescending = false,
+            [FromQuery] SeoMetaTransfer? seoMeta = null,
+            [FromQuery] Guid? id = null)
         {
-            var query = new ListExampleMetasQuery
+            var query = new ListBrandsQuery
             {
                 PageNumber = pageNumber,
                 PageSize = pageSize,
                 Name = name,
                 CreatedBy = createdBy,
                 SortField = sortField,
-                SortDescending = sortDescending
+                SortDescending = sortDescending,
+                SeoMeta = seoMeta,
+                Id = id
             };
 
             var result = await _mediator.Send(query);
@@ -48,12 +55,12 @@ namespace QingFa.EShop.API.Controllers
         }
 
         [HttpGet("{id}")]
-        [SwaggerOperation(Summary = "Gets an ExampleMeta by its unique identifier.")]
-        [ProducesResponseType(typeof(ExampleMetaResponse), StatusCodes.Status200OK)]
+        [SwaggerOperation(Summary = "Gets a Brand by its unique identifier.")]
+        [ProducesResponseType(typeof(BrandResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var query = new GetExampleMetaByIdQuery { Id = id };
+            var query = new GetBrandByIdQuery { Id = id };
             var result = await _mediator.Send(query);
 
             if (result.Succeeded)
@@ -65,15 +72,17 @@ namespace QingFa.EShop.API.Controllers
         }
 
         [HttpPost]
-        [SwaggerOperation(Summary = "Creates a new ExampleMeta.")]
+        [SwaggerOperation(Summary = "Creates a new Brand.")]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
-        [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create([FromBody] CreateExampleMetaRequest request)
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> Create([FromBody] CreateBrandRequest request)
         {
-            var command = new CreateExampleMetaCommand
+            var command = new CreateBrandCommand
             {
                 Name = request.Name,
-                CreatedBy = request.CreatedBy ?? "Unknown"
+                Description = request.Description ?? string.Empty,
+                SeoMeta = request.SeoMeta,
+                LogoUrl = request.LogoUrl
             };
 
             var result = await _mediator.Send(command);
@@ -91,17 +100,19 @@ namespace QingFa.EShop.API.Controllers
         }
 
         [HttpPut("{id}")]
-        [SwaggerOperation(Summary = "Updates an existing ExampleMeta.")]
+        [SwaggerOperation(Summary = "Updates an existing Brand.")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateExampleMetaRequest request)
+        public async Task<IActionResult> Update(Guid id, [FromBody] CreateBrandRequest request)
         {
-            var command = new UpdateExampleMetaCommand
+            var command = new UpdateBrandCommand // Assume you have an UpdateBrandCommand similar to CreateBrandCommand
             {
                 Id = id,
                 Name = request.Name,
-                LastModifiedBy = request.LastModifiedBy ?? "Unknown"
+                Description = request.Description ?? string.Empty,
+                SeoMeta = request.SeoMeta,
+                LogoUrl = request.LogoUrl
             };
 
             var result = await _mediator.Send(command);
@@ -112,12 +123,12 @@ namespace QingFa.EShop.API.Controllers
         }
 
         [HttpDelete("{id}")]
-        [SwaggerOperation(Summary = "Deletes an ExampleMeta by its unique identifier.")]
+        [SwaggerOperation(Summary = "Deletes a Brand by its unique identifier.")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var command = new DeleteExampleMetaCommand { Id = id };
+            var command = new DeleteBrandCommand { Id = id };
             var result = await _mediator.Send(command);
 
             if (result.Succeeded) return NoContent();

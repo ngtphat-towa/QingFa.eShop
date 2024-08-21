@@ -7,16 +7,15 @@ using MediatR;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.ExampleMetas.Gets;
 using QingFa.EShop.Application.ExampleMetas.Models;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Metas;
 
 namespace QingFa.EShop.Application.ExampleMetas.Queries
 {
     public class ListExampleMetasQueryHandler : IRequestHandler<ListExampleMetasQuery, PaginatedList<ExampleMetaResponse>>
     {
-        private readonly IGenericRepository<ExampleMeta, Guid> _repository;
+        private readonly IExampleMetaRepository _repository;
 
-        public ListExampleMetasQueryHandler(IGenericRepository<ExampleMeta, Guid> repository)
+        public ListExampleMetasQueryHandler(IExampleMetaRepository repository)
         {
             _repository = repository;
         }

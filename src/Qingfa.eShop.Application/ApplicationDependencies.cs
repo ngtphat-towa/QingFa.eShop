@@ -7,34 +7,31 @@ using Microsoft.Extensions.DependencyInjection;
 using QingFa.EShop.Application.Core.Behaviors;
 using QingFa.EShop.Application.Mappings;
 
-namespace QingFa.EShop.Application;
-
-public static class ApplicationDependencies
+namespace QingFa.EShop.Application
 {
-    public static IServiceCollection AddApplication(this IServiceCollection services)
+    public static class ApplicationDependencies
     {
-        var assembly = typeof(ApplicationDependencies).Assembly;
-
-        // Register MediatR services from the assembly
-        services.AddMediatR(config =>
+        public static IServiceCollection AddApplication(this IServiceCollection services)
         {
-            config.RegisterServicesFromAssemblies(assembly);
-            // Register pipeline behaviors
-            //config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-            //config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
-            config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
-            config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-            //config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(AuthorizationBehavior<,>));
-        });
+            var assembly = typeof(ApplicationDependencies).Assembly;
 
-        // Register FluentValidation validators from the assembly
-        services.AddValidatorsFromAssembly(assembly);
+            // Register MediatR services from the assembly
+            services.AddMediatR(config =>
+            {
+                config.RegisterServicesFromAssemblies(assembly);
+                // Register pipeline behaviors
+                config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
+                config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+                // Add other behaviors if needed
+            });
 
-        //services.AddScoped<IIdentityService, IdentityService>(); // Adjust with your concrete implementation
+            // Register FluentValidation validators from the assembly
+            services.AddValidatorsFromAssembly(assembly);
 
-        // Configure Mapster mappings
-        MappingConfig.ConfigureMappings();
+            // Configure Mapster mappings
+            MappingConfig.ConfigureMappings();
 
-        return services;
+            return services;
+        }
     }
 }

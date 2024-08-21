@@ -98,7 +98,7 @@ namespace QingFa.EShop.Api.Middleware
 
             if (_isDevelopment)
             {
-                problemDetails.Extensions["stackTrace"] = ErrorHandlingMiddlewareHelpers.FormatStackTrace(ex.StackTrace);
+                problemDetails.Extensions["stackTrace"] = ErrorHandlingMiddlewareHelpers.FormatStackTrace(ex.StackTrace ?? "An unexpected error occurred.");
             }
 
             await ErrorHandlingMiddlewareHelpers.WriteResponseAsync(context, problemDetails, HttpStatusCode.InternalServerError);

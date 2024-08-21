@@ -15,6 +15,10 @@
     <ProjectReference Include="..\Qingfa.eShop.Domain\QingFa.EShop.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Features\CategoryMangement\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>

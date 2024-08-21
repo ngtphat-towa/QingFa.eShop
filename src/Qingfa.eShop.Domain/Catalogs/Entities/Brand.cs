@@ -49,5 +49,28 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         {
             return new Brand(Guid.NewGuid(), "Default Name", "Default Description", SeoMeta.CreateDefault(), null);
         }
+        public void UpdateName(string name)
+        {
+            Name = name ?? throw CoreException.NullArgument(nameof(name));
+            LastModified = DateTimeOffset.UtcNow;
+        }
+
+        public void UpdateDescription(string description)
+        {
+            Description = description;
+            LastModified = DateTimeOffset.UtcNow;
+        }
+
+        public void UpdateSeoMeta(SeoMeta seoMeta)
+        {
+            SeoMeta = seoMeta ?? throw CoreException.NullArgument(nameof(seoMeta));
+            LastModified = DateTimeOffset.UtcNow;
+        }
+
+        public void UpdateLogoUrl(string? logoUrl)
+        {
+            LogoUrl = logoUrl;
+            LastModified = DateTimeOffset.UtcNow;
+        }
     }
 }

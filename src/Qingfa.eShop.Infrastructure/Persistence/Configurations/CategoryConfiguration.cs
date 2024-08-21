@@ -40,20 +40,6 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
                 .WithOne(cp => cp.Category)
                 .HasForeignKey(cp => cp.CategoryId);
 
-            // Configure the SEO metadata as a complex type
-            builder.OwnsOne(b => b.SeoMeta, seo =>
-            {
-                seo.Property(s => s.Title).HasMaxLength(100).IsRequired();
-                seo.Property(s => s.Description).HasMaxLength(300).IsRequired();
-                seo.Property(s => s.Keywords).HasMaxLength(500).IsRequired();
-                seo.Property(s => s.CanonicalUrl).HasMaxLength(1000);
-                seo.Property(s => s.Robots).HasMaxLength(100);
-
-                seo.HasIndex(s => s.Title);
-                seo.HasIndex(s => s.Description);
-                seo.HasIndex(s => s.Keywords);
-            });
-
             // Add index on Name for faster lookups
             builder.HasIndex(c => c.Name);
             builder.HasIndex(c => c.ParentCategoryId);

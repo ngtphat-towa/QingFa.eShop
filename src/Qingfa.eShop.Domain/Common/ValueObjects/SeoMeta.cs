@@ -59,10 +59,6 @@ namespace QingFa.EShop.Domain.Common.ValueObjects
         /// <returns>A new instance of <see cref="SeoMeta"/>.</returns>
         public static SeoMeta Create(string title, string description, string keywords, string? canonicalUrl = null, string? robots = null)
         {
-            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("Title cannot be null or empty.", nameof(title));
-            if (string.IsNullOrWhiteSpace(description)) throw new ArgumentException("Description cannot be null or empty.", nameof(description));
-            if (string.IsNullOrWhiteSpace(keywords)) throw new ArgumentException("Keywords cannot be null or empty.", nameof(keywords));
-
             return new SeoMeta(title, description, keywords, canonicalUrl, robots);
         }
 

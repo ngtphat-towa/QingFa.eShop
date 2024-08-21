@@ -5,6 +5,7 @@ using QingFa.EShop.Infrastructure.Repositories;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Infrastructure.Persistence;
 using QingFa.EShop.Domain.Metas;
+using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Infrastructure
 {
@@ -19,8 +20,11 @@ namespace QingFa.EShop.Infrastructure
             services.AddDbContext<EShopDbContext>(options =>
                 options.UseSqlite(connectionString));
 
-            // Register repositories
-            services.AddScoped<IGenericRepository<ExampleMeta, Guid>, ExampleMetaRepository>();
+            // Register generic repository
+            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            services.AddScoped<IExampleMetaRepository, ExampleMetaRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+
 
             // Register unit of work
             services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<EShopDbContext>());
