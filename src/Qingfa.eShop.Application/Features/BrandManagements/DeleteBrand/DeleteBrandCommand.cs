@@ -1,11 +1,12 @@
 ﻿using MediatR;
+
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Repositories;
 
-namespace QingFa.EShop.Application.Features.BrandManagements.Delete
+namespace QingFa.EShop.Application.Features.BrandManagements.DeleteBrand
 {
     public sealed record DeleteBrandCommand : RequestType<Guid>, IRequest<Result>;
 

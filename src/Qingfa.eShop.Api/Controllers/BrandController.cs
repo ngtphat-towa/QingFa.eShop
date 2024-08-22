@@ -1,13 +1,14 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using QingFa.EShop.Application.Features.BrandManagements.Create;
-using QingFa.EShop.Application.Features.BrandManagements.Delete;
-using QingFa.EShop.Application.Features.BrandManagements.Get;
 using QingFa.EShop.Application.Features.BrandManagements.Models;
 using QingFa.EShop.Application.Core.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using QingFa.EShop.Application.Features.BrandManagements.Update;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
+using QingFa.EShop.Application.Features.BrandManagements.CreateBrand;
+using QingFa.EShop.Application.Features.BrandManagements.ListBrands;
+using QingFa.EShop.Application.Features.BrandManagements.GetBrandById;
+using QingFa.EShop.Application.Features.BrandManagements.DeleteBrand;
 
 namespace QingFa.EShop.API.Controllers
 {

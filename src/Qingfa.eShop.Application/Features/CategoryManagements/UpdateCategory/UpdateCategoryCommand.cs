@@ -3,9 +3,10 @@
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
+using QingFa.EShop.Domain.Core.Enums;
 using QingFa.EShop.Domain.Core.Repositories;
 
-namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories
+namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
 {
     public record UpdateCategoryCommand : IRequest<Result>
     {
@@ -14,6 +15,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
         public Guid? ParentCategoryId { get; set; }
+        public EntityStatus? Status { get; set; }
     }
 
     public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result>
@@ -62,6 +64,9 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories
                     request.ImageUrl,
                     request.ParentCategoryId
                 );
+
+                // TODO: check if the status is valid or not 
+                category.SetStatus(request.Status);
 
                 // Commit the transaction
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

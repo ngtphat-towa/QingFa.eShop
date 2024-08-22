@@ -4,9 +4,10 @@ using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Exceptions;
 using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Domain.Core.Enums;
+using QingFa.EShop.Domain.Common.ValueObjects;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
 {
@@ -17,6 +18,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
         public string? ImageUrl { get; set; }
         public SeoMetaTransfer SeoMeta { get; set; } = default!;
         public Guid? ParentCategoryId { get; set; }
+        public EntityStatus? Status { get; set; }
     }
 
     public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, ResultValue<Guid>>
@@ -66,6 +68,8 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
                     request.ImageUrl,
                     request.ParentCategoryId,
                     seoMeta);
+
+                category.SetStatus(request.Status);
 
                 // Add the category to the repository
                 await _categoryRepository.AddAsync(category, cancellationToken);

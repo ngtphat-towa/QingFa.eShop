@@ -2,7 +2,7 @@
 using Microsoft.OpenApi.Any;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace QingFa.EShop.Api.Extensions
+namespace QingFa.EShop.Api.Filters
 {
     /// <summary>
     /// A document filter that enhances Swagger documentation by adding descriptions to enum values.

@@ -6,7 +6,7 @@ using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.BrandManagements.Models;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 
-namespace QingFa.EShop.Application.Features.BrandManagements.Get
+namespace QingFa.EShop.Application.Features.BrandManagements.GetBrandById
 {
     public class GetBrandByIdQuery : IRequest<ResultValue<BrandResponse>>
     {

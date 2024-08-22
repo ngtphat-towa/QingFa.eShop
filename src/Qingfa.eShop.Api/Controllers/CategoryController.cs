@@ -14,8 +14,9 @@ using QingFa.EShop.Application.Features.CategoryManagements.GetCategoryTree;
 using QingFa.EShop.Application.Features.CategoryManagements.GetSubcategories;
 using QingFa.EShop.Application.Features.CategoryManagements.ListCategories;
 using QingFa.EShop.Application.Features.CategoryManagements.Models;
-using QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories;
+using QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
+using QingFa.EShop.Domain.Core.Enums;
 
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -35,15 +36,17 @@ namespace QingFa.EShop.Api.Controllers
         [ProducesResponseType(typeof(PaginatedList<CategoryResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Get(
-            [FromQuery] int pageNumber = 1,
-            [FromQuery] int pageSize = 10,
-            [FromQuery] string? name = null,
-            [FromQuery] string? createdBy = null,
-            [FromQuery] Guid? parentCategoryId = null,
-            [FromQuery] string? sortField = "Name",
-            [FromQuery] bool sortDescending = false,
-            [FromQuery] SeoMetaTransfer? seoMeta = null,
-            [FromQuery] Guid? id = null)
+          [FromQuery] int pageNumber = 1,
+          [FromQuery] int pageSize = 10,
+          [FromQuery] string? name = null,
+          [FromQuery] string? createdBy = null,
+          [FromQuery] string? description = null,
+          [FromQuery] Guid? parentCategoryId = null,
+          [FromQuery] SeoMetaTransfer? seoMeta = null,
+          [FromQuery] List<EntityStatus>? statuses = null,
+          [FromQuery] string sortField = "Name",
+          [FromQuery] bool sortDescending = false,
+          [FromQuery] List<Guid>? ids = null)
         {
             var query = new ListCategoriesQuery
             {
@@ -51,15 +54,20 @@ namespace QingFa.EShop.Api.Controllers
                 PageSize = pageSize,
                 Name = name,
                 CreatedBy = createdBy,
-                SeoMeta = seoMeta,
+                Description = description,
                 ParentCategoryId = parentCategoryId,
-                SortField = sortField ?? "Name",
+                SeoMeta = seoMeta,
+                Statuses = statuses,
+                SortField = sortField,
                 SortDescending = sortDescending,
+                Ids = ids
             };
 
             var result = await _mediator.Send(query);
             return Ok(result);
         }
+
+
 
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Gets a Category by its unique identifier.")]
@@ -107,7 +115,7 @@ namespace QingFa.EShop.Api.Controllers
         public async Task<IActionResult> Update(Guid id, [FromBody] CreateCategoryRequest request)
         {
             var command = request.Adapt<UpdateCategoryCommand>();
-            command.Id = id; // Ensure the command has the correct ID
+            command.Id = id;
 
             var result = await _mediator.Send(command);
 

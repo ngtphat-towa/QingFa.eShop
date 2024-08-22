@@ -1,8 +1,8 @@
 ﻿using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Specifications;
 
 using System.Linq.Expressions;
+using QingFa.EShop.Domain.Common.ValueObjects;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.Models
 {

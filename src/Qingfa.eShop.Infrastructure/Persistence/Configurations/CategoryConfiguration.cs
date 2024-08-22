@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Entities;
+using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 {
@@ -33,15 +34,22 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
             builder.HasOne(c => c.ParentCategory)
                 .WithMany(p => p.ChildCategories)
                 .HasForeignKey(c => c.ParentCategoryId)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
 
             // Configure the many-to-many relationship with CategoryProduct
             builder.HasMany(c => c.CategoryProducts)
                 .WithOne(cp => cp.Category)
                 .HasForeignKey(cp => cp.CategoryId);
 
+            builder.Property(b => b.Status)
+            .HasConversion(
+                v => (int)v,
+                v => (EntityStatus)v)
+            .IsRequired();
+
             // Add indexes for faster lookups
             builder.HasIndex(c => c.Name);
+            builder.HasIndex(c => c.Status);
             builder.HasIndex(c => c.ParentCategoryId);
             builder.HasIndex(a => a.Created);
             builder.HasIndex(a => a.CreatedBy);

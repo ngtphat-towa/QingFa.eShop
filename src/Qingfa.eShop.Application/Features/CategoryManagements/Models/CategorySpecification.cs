@@ -2,6 +2,7 @@
 
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
+using QingFa.EShop.Domain.Core.Enums;
 using QingFa.EShop.Domain.Core.Specifications;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.Models
@@ -11,28 +12,23 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.Models
         public CategorySpecification(
             IEnumerable<Guid>? ids = null,
             string? name = null,
-            Guid? id = null,
             Guid? parentCategoryId = null,
             string? description = null,
-            string? imageUrl = null,
-            SeoMetaTransfer? seoMetaTransfer = null,
+            IEnumerable<EntityStatus>? statuses = null,
+            SeoMetaTransfer? seoMeta = null,
             bool includeChildCategories = false,
             bool includeParentCategory = false)
         {
-            // Build the base criteria expression
+            // Start with a base criteria that always evaluates to true
             Expression<Func<Category, bool>> baseCriteria = e => true;
 
-            // Create a list of conditions to combine
+            // Collect conditions to apply
             var conditions = new List<Expression<Func<Category, bool>>>();
 
+            // Add conditions based on provided parameters
             if (ids != null && ids.Any())
             {
                 conditions.Add(e => ids.Contains(e.Id));
-            }
-
-            if (id.HasValue)
-            {
-                conditions.Add(e => e.Id == id.Value);
             }
 
             if (!string.IsNullOrEmpty(name))
@@ -50,9 +46,38 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.Models
                 conditions.Add(e => e.Description != null && e.Description.Contains(description));
             }
 
-            if (!string.IsNullOrEmpty(imageUrl))
+            if (seoMeta != null)
             {
-                conditions.Add(e => e.ImageUrl != null && e.ImageUrl.Contains(imageUrl));
+                if (!string.IsNullOrEmpty(seoMeta.Title))
+                {
+                    conditions.Add(e => e.SeoMeta.Title.Contains(seoMeta.Title));
+                }
+
+                if (!string.IsNullOrEmpty(seoMeta.Description))
+                {
+                    conditions.Add(e => e.SeoMeta.Description.Contains(seoMeta.Description));
+                }
+
+                if (!string.IsNullOrEmpty(seoMeta.Keywords))
+                {
+                    conditions.Add(e => e.SeoMeta.Keywords.Contains(seoMeta.Keywords));
+                }
+
+                if (!string.IsNullOrEmpty(seoMeta.CanonicalUrl))
+                {
+                    conditions.Add(e => e.SeoMeta.CanonicalUrl!.Contains(seoMeta.CanonicalUrl));
+                }
+
+                if (!string.IsNullOrEmpty(seoMeta.Robots))
+                {
+                    conditions.Add(e => e.SeoMeta.Robots!.Contains(seoMeta.Robots));
+                }
+            }
+
+            // Add status condition if any statuses are provided
+            if (statuses != null && statuses.Any())
+            {
+                conditions.Add(e => statuses.Contains(e.Status));
             }
 
             // Combine all conditions using logical AND
@@ -64,7 +89,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.Models
 
             Criteria = baseCriteria;
 
-            // Conditionally include related entities
+            // Conditionally include related entities based on flags
             if (includeChildCategories)
             {
                 AddInclude(c => c.ChildCategories);

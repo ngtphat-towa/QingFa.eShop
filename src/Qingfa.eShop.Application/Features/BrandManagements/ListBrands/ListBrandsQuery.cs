@@ -8,7 +8,7 @@ using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Common.ValueObjects;
 
-namespace QingFa.EShop.Application.Features.BrandManagements.Get
+namespace QingFa.EShop.Application.Features.BrandManagements.ListBrands
 {
     public class ListBrandsQuery
         : IRequest<PaginatedList<BrandResponse>>

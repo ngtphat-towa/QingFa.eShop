@@ -23,6 +23,9 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Update
                 .NotNull().WithMessage("SEO Meta information is required.")
                 .SetValidator(seoMetaValidator);
 
+            RuleFor(x => x.Status)
+                .IsInEnum().When(x => x.Status.HasValue).WithMessage("Invalid status value.");
+
             RuleFor(x => x.LogoUrl)
                 .MaximumLength(2000)
                 .WithMessage("Logo URL cannot be longer than 2000 characters.")

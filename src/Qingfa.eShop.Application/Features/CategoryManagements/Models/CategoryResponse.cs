@@ -1,4 +1,5 @@
 ﻿using QingFa.EShop.Application.Features.Common.SeoInfo;
+using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.Models
 {
@@ -16,5 +17,6 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.Models
         public string? CreatedBy { get; set; }
         public DateTimeOffset LastModified { get; set; }
         public string? LastModifiedBy { get; set; }
+        public EntityStatus Status { get; set; }
     }
 }

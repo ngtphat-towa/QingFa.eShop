@@ -1,6 +1,6 @@
-﻿using QingFa.EShop.Domain.Common.ValueObjects;
-using QingFa.EShop.Domain.Core.Entities;
+﻿using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Domain.Core.Exceptions;
+using QingFa.EShop.Domain.Common.ValueObjects;
 
 namespace QingFa.EShop.Domain.Catalogs.Entities
 {

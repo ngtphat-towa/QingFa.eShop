@@ -2,7 +2,7 @@
 
 using QingFa.EShop.Application.Features.Common.Extensions;
 
-namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories
+namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
 {
     public class UpdateCategoryCommandValidator : AbstractValidator<UpdateCategoryCommand>
     {
@@ -21,6 +21,9 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories
             RuleFor(x => x.ImageUrl)
                 .MaximumLength(200).WithMessage("Category image URL cannot exceed 200 characters.")
                 .When(x => !string.IsNullOrEmpty(x.ImageUrl));
+
+            RuleFor(x => x.Status)
+                .IsInEnum().When(x => x.Status.HasValue).WithMessage("Invalid status value.");
 
             RuleFor(x => x.ParentCategoryId)
                 .Must(ValidatorExtension.IsValidGuid)

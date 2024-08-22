@@ -5,7 +5,7 @@
         public string? Title { get; set; } = default!;
         public string? Description { get; set; } = default!;
         public string? Keywords { get; set; } = default!;
-        public string? CanonicalUrl { get; set; }
-        public string? Robots { get; set; }
+        public string? CanonicalUrl { get; set; } = default!;
+        public string? Robots { get; set; } = default!;
     }
 }

@@ -45,6 +45,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 
             // Add index on Name for faster lookups
             builder.HasIndex(b => b.Name);
+            builder.HasIndex(b => b.Status);
             builder.HasIndex(a => a.Created);
             builder.HasIndex(a => a.CreatedBy);
             builder.HasIndex(a => a.LastModified);

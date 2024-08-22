@@ -1,6 +1,7 @@
-﻿using QingFa.EShop.Domain.Common.ValueObjects;
-using QingFa.EShop.Domain.Core.Entities;
+﻿using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Domain.Core.Exceptions;
+using QingFa.EShop.Domain.Core.Enums;
+using QingFa.EShop.Domain.Common.ValueObjects;
 
 namespace QingFa.EShop.Domain.Catalogs.Entities
 {
@@ -15,14 +16,15 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         public virtual ICollection<Category> ChildCategories { get; private set; } = new HashSet<Category>();
         public virtual ICollection<CategoryProduct> CategoryProducts { get; private set; } = new HashSet<CategoryProduct>();
 
-        private Category(Guid id, string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null, SeoMeta? seoMeta = null)
+        private Category(Guid id, string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null, SeoMeta? seoMeta = null, EntityStatus status = EntityStatus.Active)
             : base(id)
         {
             Name = name ?? throw CoreException.NullOrEmptyArgument(nameof(name));
             Description = description;
             ImageUrl = imageUrl;
             ParentCategoryId = parentCategoryId;
-            SeoMeta = seoMeta ?? SeoMeta.CreateDefault(); // Ensure SeoMeta is initialized
+            SeoMeta = seoMeta ?? SeoMeta.CreateDefault();
+            Status = status;
         }
 
         private Category(): base(default!)

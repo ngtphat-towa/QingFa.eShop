@@ -24,6 +24,9 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
                 .Must(ValidatorExtension.IsValidGuid).WithMessage("ParentCategoryId must be a valid GUID.")
                 .When(x => x.ParentCategoryId.HasValue);
 
+            RuleFor(x => x.Status)
+                .IsInEnum().When(x => x.Status.HasValue).WithMessage("Invalid status value.");
+
             RuleFor(x => x.SeoMeta)
                 .SetValidator(seoMetaValidator)
                 .When(x => x.SeoMeta != null);

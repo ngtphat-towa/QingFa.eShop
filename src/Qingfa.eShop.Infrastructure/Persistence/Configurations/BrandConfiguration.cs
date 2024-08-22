@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Entities;
+using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 {
@@ -39,7 +40,14 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
             builder.Property(b => b.LogoUrl)
                 .HasMaxLength(1000);
 
+            builder.Property(b => b.Status)
+            .HasConversion(
+                v => (int)v, 
+                v => (EntityStatus)v)
+            .IsRequired();
+
             // Add index on Name for faster lookups
+            builder.HasIndex(a => a.Status);
             builder.HasIndex(b => b.Name);
             builder.HasIndex(a => a.Created);
             builder.HasIndex(a => a.CreatedBy);

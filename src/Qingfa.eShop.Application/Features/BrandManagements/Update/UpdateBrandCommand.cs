@@ -4,8 +4,9 @@ using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Domain.Common.ValueObjects;
+using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.Update
 {
@@ -16,6 +17,8 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Update
         public string? Description { get; set; }
         public SeoMetaTransfer SeoMeta { get; set; } = default!;
         public string? LogoUrl { get; set; }
+        public EntityStatus? Status { get; set; }
+
     }
 
     public class UpdateBrandCommandHandler : IRequestHandler<UpdateBrandCommand, Result>
@@ -55,6 +58,12 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Update
                     request.SeoMeta.CanonicalUrl,
                     request.SeoMeta.Robots
                 ));
+
+                if (brand.Status != request.Status)
+                {
+                    brand.SetStatus(request.Status);
+                }
+
                 brand.UpdateLogoUrl(request.LogoUrl);
 
                 await _brandRepository.UpdateAsync(brand, cancellationToken);

@@ -4,10 +4,11 @@ using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Domain.Common.ValueObjects;
+using QingFa.EShop.Domain.Core.Enums;
 
-namespace QingFa.EShop.Application.Features.BrandManagements.Create
+namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
 {
     public class CreateBrandCommand : IRequest<ResultValue<Guid>>
     {
@@ -15,6 +16,7 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Create
         public string Description { get; set; } = default!;
         public SeoMetaTransfer SeoMeta { get; set; } = default!;
         public string? LogoUrl { get; set; }
+        public EntityStatus? Status { get; set; }
     }
 
     public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, ResultValue<Guid>>
@@ -46,6 +48,8 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Create
                     request.SeoMeta.Robots);
 
                 var brand = Brand.Create(request.Name, request.Description, seoMeta, request.LogoUrl);
+
+                brand.SetStatus(request.Status);
 
                 await _brandRepository.AddAsync(brand, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

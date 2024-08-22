@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Core.Entities;
+using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 {
@@ -21,6 +22,13 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 
             builder.Property(a => a.LastModifiedBy)
                 .HasMaxLength(100);
+
+
+            builder.Property(b => b.Status)
+                    .HasConversion(
+                        v => (int)v,
+                        v => (EntityStatus)v)
+                    .IsRequired();
 
             builder.HasIndex(a => a.Id);
             builder.HasIndex(a => a.Created);

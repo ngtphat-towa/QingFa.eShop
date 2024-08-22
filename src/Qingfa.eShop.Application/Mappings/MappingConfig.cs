@@ -1,12 +1,12 @@
 ﻿using Mapster;
 
 using QingFa.EShop.Application.ExampleMetas.Models;
-using QingFa.EShop.Application.Features.BrandManagements.Create;
+using QingFa.EShop.Application.Features.BrandManagements.CreateBrand;
 using QingFa.EShop.Application.Features.BrandManagements.Models;
 using QingFa.EShop.Application.Features.BrandManagements.Update;
 using QingFa.EShop.Application.Features.CategoryManagements.CreateCategory;
 using QingFa.EShop.Application.Features.CategoryManagements.Models;
-using QingFa.EShop.Application.Features.CategoryManagements.UpdateCategories;
+using QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Common.ValueObjects;
@@ -145,11 +145,12 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.Description, src => src.Description)
                 .Map(dest => dest.ImageUrl, src => src.ImageUrl)
                 .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId)
-                .Map(dest => dest.ParentCategoryName, src => src.ParentCategory!=null ? src.ParentCategory.Name : default)
+                .Map(dest => dest.ParentCategoryName, src => src.ParentCategory != null ? src.ParentCategory.Name : default)
                 .Map(dest => dest.Created, src => src.Created)
                 .Map(dest => dest.CreatedBy, src => src.CreatedBy)
                 .Map(dest => dest.LastModified, src => src.LastModified)
-                .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy);
+                .Map(dest => dest.LastModifiedBy, src => src.LastModifiedBy)
+                .Map(dest => dest.Status, src => src.Status);
 
             TypeAdapterConfig<Category, SubCategoryResponse>
                 .NewConfig()
@@ -163,7 +164,8 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.Name, src => src.Name)
                 .Map(dest => dest.Description, src => src.Description)
                 .Map(dest => dest.ImageUrl, src => src.ImageUrl)
-                .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId);
+                .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId)
+                .Map(dest => dest.Status, src => src.Status);
 
             // Mapping from UpdateCategoryRequest DTO to UpdateCategoryCommand
             TypeAdapterConfig<UpdateCategoryRequest, UpdateCategoryCommand>
@@ -172,7 +174,8 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.Name, src => src.Name)
                 .Map(dest => dest.Description, src => src.Description)
                 .Map(dest => dest.ImageUrl, src => src.ImageUrl)
-                .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId);
+                .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId)
+                .Map(dest => dest.Status, src => src.Status);
             #endregion
 
         }
