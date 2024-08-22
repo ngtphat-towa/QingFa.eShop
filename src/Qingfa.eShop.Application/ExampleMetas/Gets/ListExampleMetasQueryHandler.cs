@@ -5,11 +5,10 @@ using Mapster;
 using MediatR;
 
 using QingFa.EShop.Application.Core.Models;
-using QingFa.EShop.Application.ExampleMetas.Gets;
 using QingFa.EShop.Application.ExampleMetas.Models;
 using QingFa.EShop.Domain.Metas;
 
-namespace QingFa.EShop.Application.ExampleMetas.Queries
+namespace QingFa.EShop.Application.ExampleMetas.Gets
 {
     public class ListExampleMetasQueryHandler : IRequestHandler<ListExampleMetasQuery, PaginatedList<ExampleMetaResponse>>
     {
@@ -37,8 +36,7 @@ namespace QingFa.EShop.Application.ExampleMetas.Queries
             var totalCount = await _repository.CountBySpecificationAsync(specification, cancellationToken);
 
             // Apply paging parameters to the specification
-            specification.Skip = (request.PageNumber - 1) * request.PageSize;
-            specification.Take = request.PageSize;
+            specification.ApplyPaging(request.PageNumber, request.PageSize);
 
             if (request.SortDescending)
             {

@@ -52,6 +52,14 @@ namespace Qingfa.eShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Created");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("LastModified");
+
+                    b.HasIndex("LastModifiedBy");
+
                     b.HasIndex("Name");
 
                     b.ToTable("Brands");
@@ -93,11 +101,19 @@ namespace Qingfa.eShop.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Created");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("LastModified");
+
+                    b.HasIndex("LastModifiedBy");
+
                     b.HasIndex("Name");
 
                     b.HasIndex("ParentCategoryId");
 
-                    b.ToTable("Category");
+                    b.ToTable("Categories");
                 });
 
             modelBuilder.Entity("QingFa.EShop.Domain.Catalogs.Entities.CategoryProduct", b =>
@@ -127,8 +143,20 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                     b.Property<Guid?>("BrandId")
                         .HasColumnType("TEXT");
 
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
                     b.Property<string>("Description")
                         .HasMaxLength(1000)
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTimeOffset>("LastModified")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("LastModifiedBy")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
@@ -153,9 +181,17 @@ namespace Qingfa.eShop.Infrastructure.Migrations
 
                     b.HasIndex("BrandId");
 
+                    b.HasIndex("Created");
+
+                    b.HasIndex("CreatedBy");
+
+                    b.HasIndex("LastModified");
+
+                    b.HasIndex("LastModifiedBy");
+
                     b.HasIndex("Name");
 
-                    b.ToTable("Product");
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("QingFa.EShop.Domain.Metas.ExampleMeta", b =>
@@ -240,7 +276,52 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                         .HasForeignKey("ParentCategoryId")
                         .OnDelete(DeleteBehavior.Restrict);
 
+                    b.OwnsOne("QingFa.EShop.Domain.Common.ValueObjects.SeoMeta", "SeoMeta", b1 =>
+                        {
+                            b1.Property<Guid>("CategoryId")
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("CanonicalUrl")
+                                .HasMaxLength(1000)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Description")
+                                .IsRequired()
+                                .HasMaxLength(300)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Keywords")
+                                .IsRequired()
+                                .HasMaxLength(500)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Robots")
+                                .HasMaxLength(100)
+                                .HasColumnType("TEXT");
+
+                            b1.Property<string>("Title")
+                                .IsRequired()
+                                .HasMaxLength(100)
+                                .HasColumnType("TEXT");
+
+                            b1.HasKey("CategoryId");
+
+                            b1.HasIndex("Description");
+
+                            b1.HasIndex("Keywords");
+
+                            b1.HasIndex("Title");
+
+                            b1.ToTable("Categories");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CategoryId");
+                        });
+
                     b.Navigation("ParentCategory");
+
+                    b.Navigation("SeoMeta")
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("QingFa.EShop.Domain.Catalogs.Entities.CategoryProduct", b =>

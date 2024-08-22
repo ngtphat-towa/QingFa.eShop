@@ -10,14 +10,16 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Models
     {
         public BrandSpecification(
             string? name = null,
-            Guid? id = null,
+            IEnumerable<Guid>? ids = null,
             string? createdBy = null,
             SeoMeta? seoMeta = null)
         {
-            // Build the criteria based on the provided parameters
-            if (id.HasValue)
+            // Build the base criteria expression
+            Expression<Func<Category, bool>> baseCriteria = e => true;
+
+            if (ids != null && ids.Any())
             {
-                Criteria = e => e.Id == id.Value;
+                baseCriteria = e => ids.Contains(e.Id);
             }
 
             if (!string.IsNullOrEmpty(name))
@@ -85,16 +87,6 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Models
                     Criteria = robotsCriteria;
                 }
             }
-        }
-
-        public new void AddInclude(Expression<Func<Brand, object>> includeExpression)
-        {
-            base.AddInclude(includeExpression);
-        }
-
-        public new void AddInclude(string includeString)
-        {
-            base.AddInclude(includeString);
         }
     }
 }

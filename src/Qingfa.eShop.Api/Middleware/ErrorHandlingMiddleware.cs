@@ -16,8 +16,8 @@ namespace QingFa.EShop.Api.Middleware
 
         public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger, IWebHostEnvironment env)
         {
-            _next = next ?? throw new ArgumentNullException(nameof(next));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _next = next ?? throw CoreException.NullArgument(nameof(next));
+            _logger = logger ?? throw CoreException.NullArgument(nameof(logger));
             _isDevelopment = env.IsDevelopment();
         }
 

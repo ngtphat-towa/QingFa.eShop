@@ -20,7 +20,7 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Get
         public SeoMetaTransfer? SeoMeta { get; set; }
         public string? SortField { get; set; } = "Name";
         public bool SortDescending { get; set; }
-        public Guid? Id { get; set; }
+        public IEnumerable<Guid>? Ids { get; set; }
     }
     public class ListBrandsQueryHandler(IBrandRepository repository)
         : IRequestHandler<ListBrandsQuery, PaginatedList<BrandResponse>>
@@ -32,7 +32,7 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Get
             // Convert SeoMetaTransfer to SeoMeta if not null
             var seoMeta = request.SeoMeta != null
                 ? SeoMeta.Create(
-                    request.SeoMeta.Title?? string.Empty,
+                    request.SeoMeta.Title ?? string.Empty,
                     request.SeoMeta.Description ?? string.Empty,
                     request.SeoMeta.Keywords ?? string.Empty,
                     request.SeoMeta.CanonicalUrl,
@@ -43,13 +43,28 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Get
             // Create a specification based on the query parameters
             var specification = new BrandSpecification(
                 name: request.Name,
-                id: request.Id,
+                ids: request.Ids,
                 createdBy: request.CreatedBy,
                 seoMeta: seoMeta
             );
 
             // Fetch the total count of items matching the specification
             var totalCount = await _repository.CountBySpecificationAsync(specification, cancellationToken);
+
+            specification.ApplyPaging(request.PageNumber, request.PageSize);
+
+            // Apply sorting
+            if (!string.IsNullOrEmpty(request.SortField))
+            {
+                if (request.SortDescending)
+                {
+                    specification.ApplyOrderByDescending(request.SortField);
+                }
+                else
+                {
+                    specification.ApplyOrderBy(request.SortField);
+                }
+            }
 
             // Apply paging parameters to the specification and fetch data
             var brands = await _repository.FindBySpecificationAsync(specification, cancellationToken);

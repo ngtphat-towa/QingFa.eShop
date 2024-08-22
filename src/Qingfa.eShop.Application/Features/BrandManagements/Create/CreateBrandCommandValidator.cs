@@ -1,10 +1,11 @@
 ﻿using FluentValidation;
 
+using QingFa.EShop.Application.Features.Common.Extensions;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.Create
 {
-    public class CreateBrandCommandValidator : AbstractValidator<CreateBrandCommand>
+    internal class CreateBrandCommandValidator : AbstractValidator<CreateBrandCommand>
     {
         public CreateBrandCommandValidator(IValidator<SeoMetaTransfer> seoMetaValidator)
         {
@@ -16,18 +17,15 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Create
                 .MaximumLength(500).WithMessage("Description cannot be longer than 500 characters.");
 
             RuleFor(x => x.SeoMeta)
-                .SetValidator(seoMetaValidator) // Validate only if SeoMeta is not null
+                .SetValidator(seoMetaValidator)
                 .When(x => x.SeoMeta != null);
 
             RuleFor(x => x.LogoUrl)
-                .MaximumLength(2000).WithMessage("Logo URL cannot be longer than 2000 characters.")
-                .Must(BeAValidUrl).WithMessage("Logo URL must be a valid URL.");
-        }
-
-        private bool BeAValidUrl(string? url)
-        {
-            if (string.IsNullOrEmpty(url)) return true; // null or empty is allowed
-            return Uri.TryCreate(url, UriKind.Absolute, out _);
+                .MaximumLength(2000)
+                .WithMessage("Logo URL cannot be longer than 2000 characters.")
+                .Must(ValidatorExtension.IsValidUrl)
+                .When(x => x.LogoUrl != null)
+                .WithMessage("Logo URL must be a valid URL.");
         }
     }
 }

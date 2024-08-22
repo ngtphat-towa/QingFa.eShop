@@ -1,4 +1,5 @@
-﻿using QingFa.EShop.Domain.Core.Entities;
+﻿using QingFa.EShop.Domain.Common.ValueObjects;
+using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Domain.Core.Exceptions;
 
 namespace QingFa.EShop.Domain.Catalogs.Entities
@@ -8,49 +9,59 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         public string Name { get; private set; } = default!;
         public string? Description { get; private set; }
         public string? ImageUrl { get; private set; }
+        public SeoMeta SeoMeta { get; private set; } = SeoMeta.CreateDefault();
         public Guid? ParentCategoryId { get; private set; }
-        public virtual Category? ParentCategory { get; private set; }
+        public virtual Category ParentCategory { get; private set; } = default!;
         public virtual ICollection<Category> ChildCategories { get; private set; } = new HashSet<Category>();
         public virtual ICollection<CategoryProduct> CategoryProducts { get; private set; } = new HashSet<CategoryProduct>();
 
-
-        private Category(Guid id, string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null)
+        private Category(Guid id, string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null, SeoMeta? seoMeta = null)
             : base(id)
         {
-            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Name = name ?? throw CoreException.NullOrEmptyArgument(nameof(name));
             Description = description;
             ImageUrl = imageUrl;
             ParentCategoryId = parentCategoryId;
+            SeoMeta = seoMeta ?? SeoMeta.CreateDefault(); // Ensure SeoMeta is initialized
         }
 
-        public static Category Create(string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null)
+        private Category(): base(default!)
+        {
+        }
+
+        public static Category Create(string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null, SeoMeta? seoMeta = null)
         {
             if (string.IsNullOrWhiteSpace(name)) throw CoreException.NullOrEmptyArgument(nameof(name));
-            return new Category(Guid.NewGuid(), name, description, imageUrl, parentCategoryId);
+            return new Category(Guid.NewGuid(), name, description, imageUrl, parentCategoryId, seoMeta);
         }
 
         public void Update(string name, string? description = null, string? imageUrl = null, Guid? parentCategoryId = null, string? lastModifiedBy = null)
         {
             if (string.IsNullOrWhiteSpace(name)) throw CoreException.NullOrEmptyArgument(nameof(name));
+
             Name = name;
             Description = description;
             ImageUrl = imageUrl;
             ParentCategoryId = parentCategoryId;
+
             UpdateAuditInfo(lastModifiedBy);
+        }
+
+        public void UpdateSeoMeta(SeoMeta seoMeta)
+        {
+            SeoMeta = seoMeta ?? throw CoreException.NullArgument(nameof(seoMeta));
+            LastModified = DateTimeOffset.UtcNow;
         }
 
         public void AddChildCategory(Category childCategory)
         {
-            if (childCategory == null) throw CoreException.NullArgument(nameof(childCategory));
-            if (childCategory.Id == this.Id) throw CoreException.NullArgument(nameof(childCategory));
-            if (ChildCategories.Any(c => c.Id == childCategory.Id)) throw new InvalidOperationException("The category is already a child.");
-
+            ValidateChildCategory(childCategory);
             ChildCategories.Add(childCategory);
         }
 
         public void RemoveChildCategory(Guid childCategoryId)
         {
-            var childCategory = ChildCategories.FirstOrDefault(c => c.Id == childCategoryId);
+            var childCategory = FindChildCategory(childCategoryId);
             if (childCategory == null) throw CoreException.NotFound(nameof(ChildCategories));
 
             ChildCategories.Remove(childCategory);
@@ -59,6 +70,18 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
         public void ClearChildCategories()
         {
             ChildCategories.Clear();
+        }
+
+        private void ValidateChildCategory(Category childCategory)
+        {
+            if (childCategory == null) throw CoreException.NullArgument(nameof(childCategory));
+            if (childCategory.Id == this.Id) throw new InvalidOperationException("A category cannot be its own child.");
+            if (ChildCategories.Any(c => c.Id == childCategory.Id)) throw new InvalidOperationException("The category is already a child.");
+        }
+
+        private Category? FindChildCategory(Guid childCategoryId)
+        {
+            return ChildCategories.FirstOrDefault(c => c.Id == childCategoryId);
         }
     }
 }

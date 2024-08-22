@@ -1,4 +1,5 @@
-﻿using QingFa.EShop.Application.Features.Common.SeoInfo;
+﻿using QingFa.EShop.Application.Features.Common.Responses;
+using QingFa.EShop.Application.Features.Common.SeoInfo;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.Models
 {
@@ -8,4 +9,6 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Models
         string Description,
         SeoMetaResponse SeoMeta,
         string? LogoUrl);
+
+    public record BasicBrandResponse: BasicResponse<Guid>;
 }

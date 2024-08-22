@@ -29,7 +29,7 @@ namespace QingFa.EShop.API.Controllers
             [FromQuery] int pageSize = 10,
             [FromQuery] string? name = null,
             [FromQuery] string? createdBy = null,
-            [FromQuery] string sortField = "Created",
+            [FromQuery] string sortField = "Name",
             [FromQuery] bool sortDescending = false)
         {
             var query = new ListExampleMetasQuery

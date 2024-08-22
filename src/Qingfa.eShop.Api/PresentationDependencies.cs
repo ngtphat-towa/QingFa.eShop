@@ -1,5 +1,6 @@
 ﻿using Microsoft.OpenApi.Models;
 
+using QingFa.EShop.Api.Extensions;
 using QingFa.EShop.Api.Services;
 using QingFa.EShop.Application.Core.Interfaces;
 
@@ -23,6 +24,8 @@ namespace QingFa.EShop.Api
 
                 // Enable annotations if you are using attributes in your controller actions
                 c.EnableAnnotations();
+                c.SchemaFilter<EnumSchemaFilter>();
+                c.DocumentFilter<EnumDocumentFilter>();
 
             });
 

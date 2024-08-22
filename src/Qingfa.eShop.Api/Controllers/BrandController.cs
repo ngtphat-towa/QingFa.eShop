@@ -6,9 +6,6 @@ using QingFa.EShop.Application.Features.BrandManagements.Get;
 using QingFa.EShop.Application.Features.BrandManagements.Models;
 using QingFa.EShop.Application.Core.Models;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using QingFa.EShop.Application.Features.BrandManagements.Update;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 
@@ -35,7 +32,7 @@ namespace QingFa.EShop.API.Controllers
             [FromQuery] string? sortField = null,
             [FromQuery] bool sortDescending = false,
             [FromQuery] SeoMetaTransfer? seoMeta = null,
-            [FromQuery] Guid? id = null)
+            [FromQuery] List<Guid>? id = null)
         {
             var query = new ListBrandsQuery
             {
@@ -46,7 +43,7 @@ namespace QingFa.EShop.API.Controllers
                 SortField = sortField,
                 SortDescending = sortDescending,
                 SeoMeta = seoMeta,
-                Id = id
+                Ids = id
             };
 
             var result = await _mediator.Send(query);
@@ -106,7 +103,7 @@ namespace QingFa.EShop.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(Guid id, [FromBody] CreateBrandRequest request)
         {
-            var command = new UpdateBrandCommand // Assume you have an UpdateBrandCommand similar to CreateBrandCommand
+            var command = new UpdateBrandCommand
             {
                 Id = id,
                 Name = request.Name,

@@ -42,7 +42,7 @@
         }
 
         // Method to update the last modified fields
-        public void UpdateAuditInfo(string? lastModifiedBy = null)
+        protected void UpdateAuditInfo(string? lastModifiedBy = null)
         {
             LastModified = DateTimeOffset.UtcNow;
             LastModifiedBy = lastModifiedBy;

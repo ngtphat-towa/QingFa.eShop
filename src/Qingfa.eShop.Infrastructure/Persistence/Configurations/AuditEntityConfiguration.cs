@@ -22,6 +22,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
             builder.Property(a => a.LastModifiedBy)
                 .HasMaxLength(100);
 
+            builder.HasIndex(a => a.Id);
             builder.HasIndex(a => a.Created);
             builder.HasIndex(a => a.CreatedBy);
             builder.HasIndex(a => a.LastModified);

@@ -44,7 +44,11 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.SetNull);
 
             // Add index on Name for faster lookups
-            builder.HasIndex(p => p.Name);
+            builder.HasIndex(b => b.Name);
+            builder.HasIndex(a => a.Created);
+            builder.HasIndex(a => a.CreatedBy);
+            builder.HasIndex(a => a.LastModified);
+            builder.HasIndex(a => a.LastModifiedBy);
         }
     }
 }

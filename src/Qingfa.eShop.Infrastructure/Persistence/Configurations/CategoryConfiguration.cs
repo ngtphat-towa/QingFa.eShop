@@ -33,16 +33,34 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
             builder.HasOne(c => c.ParentCategory)
                 .WithMany(p => p.ChildCategories)
                 .HasForeignKey(c => c.ParentCategoryId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Restrict); 
 
-            // Configure the many-to-many relationship with Product
+            // Configure the many-to-many relationship with CategoryProduct
             builder.HasMany(c => c.CategoryProducts)
                 .WithOne(cp => cp.Category)
                 .HasForeignKey(cp => cp.CategoryId);
 
-            // Add index on Name for faster lookups
+            // Add indexes for faster lookups
             builder.HasIndex(c => c.Name);
             builder.HasIndex(c => c.ParentCategoryId);
+            builder.HasIndex(a => a.Created);
+            builder.HasIndex(a => a.CreatedBy);
+            builder.HasIndex(a => a.LastModified);
+            builder.HasIndex(a => a.LastModifiedBy);
+
+            // Configure SeoMeta as a complex type if applicable
+            builder.OwnsOne(c => c.SeoMeta, seo =>
+            {
+                seo.Property(s => s.Title).HasMaxLength(100).IsRequired();
+                seo.Property(s => s.Description).HasMaxLength(300).IsRequired();
+                seo.Property(s => s.Keywords).HasMaxLength(500).IsRequired();
+                seo.Property(s => s.CanonicalUrl).HasMaxLength(1000);
+                seo.Property(s => s.Robots).HasMaxLength(100);
+
+                seo.HasIndex(s => s.Title);
+                seo.HasIndex(s => s.Description);
+                seo.HasIndex(s => s.Keywords);
+            });
         }
     }
 }

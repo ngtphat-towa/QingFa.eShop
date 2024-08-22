@@ -22,7 +22,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
                 .HasMaxLength(1000);
 
             // Configure the SEO metadata as a complex type
-            builder.OwnsOne(b => b.SeoMeta, seo =>
+            builder.OwnsOne(c => c.SeoMeta, seo =>
             {
                 seo.Property(s => s.Title).HasMaxLength(100).IsRequired();
                 seo.Property(s => s.Description).HasMaxLength(300).IsRequired();
@@ -41,6 +41,10 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 
             // Add index on Name for faster lookups
             builder.HasIndex(b => b.Name);
+            builder.HasIndex(a => a.Created);
+            builder.HasIndex(a => a.CreatedBy);
+            builder.HasIndex(a => a.LastModified);
+            builder.HasIndex(a => a.LastModifiedBy);
         }
     }
 }

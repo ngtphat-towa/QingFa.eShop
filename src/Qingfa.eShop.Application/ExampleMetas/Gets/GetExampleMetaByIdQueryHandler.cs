@@ -1,12 +1,11 @@
 ﻿using Ardalis.GuardClauses;
 using MediatR;
-using QingFa.EShop.Application.ExampleMetas.Gets;
 using QingFa.EShop.Application.ExampleMetas.Models;
 using QingFa.EShop.Domain.Metas;
 using Mapster;
 using QingFa.EShop.Application.Core.Models;
 
-namespace QingFa.EShop.Application.ExampleMetas.Queries
+namespace QingFa.EShop.Application.ExampleMetas.Gets
 {
     public class GetExampleMetaByIdQueryHandler : IRequestHandler<GetExampleMetaByIdQuery, ResultValue<ExampleMetaResponse>>
     {

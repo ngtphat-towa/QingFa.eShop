@@ -11,5 +11,23 @@
         /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         /// <returns>The number of state entries written to the data store.</returns>
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Begins a new transaction.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task BeginTransactionAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Commits the current transaction.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task CommitTransactionAsync(CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Rolls back the current transaction.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        Task RollbackTransactionAsync(CancellationToken cancellationToken = default);
     }
 }

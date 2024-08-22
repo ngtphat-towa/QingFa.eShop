@@ -8,11 +8,9 @@ namespace QingFa.EShop.Infrastructure.Repositories
 {
     public class ExampleMetaRepository : GenericRepository<ExampleMeta, Guid>, IExampleMetaRepository
     {
-        private readonly EShopDbContext _context;
 
         public ExampleMetaRepository(EShopDbContext context) : base(context)
         {
-            _context = context;
         }
 
         public async Task<IEnumerable<ExampleMeta>> ListAsync(ISpecification<ExampleMeta> specification, CancellationToken cancellationToken = default)

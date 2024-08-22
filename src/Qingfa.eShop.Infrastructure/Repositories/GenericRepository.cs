@@ -16,8 +16,8 @@ namespace QingFa.EShop.Infrastructure.Repositories
         where TEntity : BaseEntity<TId>
         where TId : notnull
     {
-        private readonly DbContext _context;
-        private readonly DbSet<TEntity> _dbSet;
+        protected readonly DbContext _context;
+        protected readonly DbSet<TEntity> _dbSet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="GenericRepository{TEntity, TId}"/> class.
@@ -37,7 +37,7 @@ namespace QingFa.EShop.Infrastructure.Repositories
         /// <returns>The entity with the specified identifier, or null if not found.</returns>
         public async Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
+            return await _dbSet.FindAsync([id], cancellationToken);
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace QingFa.EShop.Infrastructure.Repositories
                 query = query.GroupBy(specification.GroupBy).SelectMany(g => g);
             }
 
-            return await query.CountAsync(cancellationToken);
+            return await query.AsNoTracking().CountAsync(cancellationToken);
         }
 
         /// <summary>

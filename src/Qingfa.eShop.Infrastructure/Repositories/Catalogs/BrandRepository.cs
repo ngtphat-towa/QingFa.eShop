@@ -4,7 +4,7 @@ using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Infrastructure.Persistence;
 
-namespace QingFa.EShop.Infrastructure.Repositories
+namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
 {
     public class BrandRepository : GenericRepository<Brand, Guid>, IBrandRepository
     {

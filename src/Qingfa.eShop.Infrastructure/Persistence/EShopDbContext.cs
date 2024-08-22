@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Repositories;
@@ -17,6 +18,8 @@ namespace QingFa.EShop.Infrastructure.Persistence
         // Define DbSet properties for your entities
         public DbSet<ExampleMeta> ExampleMetas { get; set; }
         public DbSet<Brand> Brands { get; set; }
+        public DbSet<Product> Products { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -27,7 +30,6 @@ namespace QingFa.EShop.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryProductConfiguration());
             modelBuilder.ApplyConfiguration(new BrandConfiguration());
-
         }
 
         // IUnitOfWork implementation
@@ -35,6 +37,43 @@ namespace QingFa.EShop.Infrastructure.Persistence
         {
             // Optional: Add any additional logic here if needed
             return await base.SaveChangesAsync(cancellationToken);
+        }
+
+        // Transaction management
+        private IDbContextTransaction? _currentTransaction;
+
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_currentTransaction != null)
+            {
+                throw new InvalidOperationException("A transaction is already in progress.");
+            }
+
+            _currentTransaction = await Database.BeginTransactionAsync(cancellationToken);
+        }
+
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_currentTransaction == null)
+            {
+                throw new InvalidOperationException("No transaction is in progress.");
+            }
+
+            await _currentTransaction.CommitAsync(cancellationToken);
+            _currentTransaction.Dispose();
+            _currentTransaction = null;
+        }
+
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_currentTransaction == null)
+            {
+                throw new InvalidOperationException("No transaction is in progress.");
+            }
+
+            await _currentTransaction.RollbackAsync(cancellationToken);
+            _currentTransaction.Dispose();
+            _currentTransaction = null;
         }
     }
 }

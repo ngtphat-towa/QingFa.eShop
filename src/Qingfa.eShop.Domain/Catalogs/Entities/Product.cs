@@ -4,7 +4,7 @@ using QingFa.EShop.Domain.Core.Exceptions;
 
 namespace QingFa.EShop.Domain.Catalogs.Entities
 {
-    public class Product : BaseEntity<Guid>
+    public class Product : AuditEntity
     {
         // Properties
         public string Name { get; private set; }

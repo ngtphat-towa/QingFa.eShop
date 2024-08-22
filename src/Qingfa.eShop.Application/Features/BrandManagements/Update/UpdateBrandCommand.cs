@@ -49,9 +49,9 @@ namespace QingFa.EShop.Application.Features.BrandManagements.Update
                 brand.UpdateName(request.Name);
                 brand.UpdateDescription(request.Description ?? string.Empty);
                 brand.UpdateSeoMeta(SeoMeta.Create(
-                    request.SeoMeta.Title,
-                    request.SeoMeta.Description,
-                    request.SeoMeta.Keywords,
+                    request.SeoMeta.Title ?? string.Empty,
+                    request.SeoMeta.Description ?? string.Empty,
+                    request.SeoMeta.Keywords ?? string.Empty,
                     request.SeoMeta.CanonicalUrl,
                     request.SeoMeta.Robots
                 ));
