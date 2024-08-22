@@ -2,7 +2,7 @@
 
 namespace QingFa.EShop.Application.Features.Common.SeoInfo
 {
-    public class SeoMetaTransferValidator : AbstractValidator<SeoMetaTransfer>
+    internal class SeoMetaTransferValidator : AbstractValidator<SeoMetaTransfer>
     {
         public SeoMetaTransferValidator()
         {
