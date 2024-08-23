@@ -21,7 +21,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
         public EntityStatus? Status { get; set; }
     }
 
-    public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, ResultValue<Guid>>
+    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, ResultValue<Guid>>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IUnitOfWork _unitOfWork;

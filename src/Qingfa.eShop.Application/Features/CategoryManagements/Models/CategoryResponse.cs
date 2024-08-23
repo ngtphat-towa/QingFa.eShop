@@ -1,11 +1,10 @@
-﻿using QingFa.EShop.Application.Features.Common.SeoInfo;
-using QingFa.EShop.Domain.Core.Enums;
+﻿using QingFa.EShop.Application.Features.Common.Responses;
+using QingFa.EShop.Application.Features.Common.SeoInfo;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.Models
 {
-    public record CategoryResponse
+    public record CategoryResponse : AuditEntityResponse<Guid>
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
@@ -13,10 +12,5 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.Models
         public string? ParentCategoryName { get; set; }
         public SeoMetaTransfer SeoMeta { get; set; } = default!;
         public IReadOnlyList<SubCategoryResponse> ChildCategories { get; set; } = [];
-        public DateTimeOffset Created { get; set; }
-        public string? CreatedBy { get; set; }
-        public DateTimeOffset LastModified { get; set; }
-        public string? LastModifiedBy { get; set; }
-        public EntityStatus Status { get; set; }
     }
 }
