@@ -6,7 +6,7 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 namespace QingFa.EShop.Infrastructure.Repositories
 {
-    public class ExampleMetaRepository : GenericRepository<ExampleMeta, Guid>, IExampleMetaRepository
+    internal class ExampleMetaRepository : GenericRepository<ExampleMeta, Guid>, IExampleMetaRepository
     {
 
         public ExampleMetaRepository(EShopDbContext context) : base(context)

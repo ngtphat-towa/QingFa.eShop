@@ -8,7 +8,7 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace Qingfa.eShop.Infrastructure.Migrations
+namespace QingFa.EShop.Infrastructure.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
     partial class EShopDbContextModelSnapshot : ModelSnapshot
@@ -240,8 +240,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                             b1.IsRequired();
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("PriceAmount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()

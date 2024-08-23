@@ -1,6 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Linq.Expressions;
+
+using Microsoft.EntityFrameworkCore;
 
 using QingFa.EShop.Domain.Core.Entities;
+using QingFa.EShop.Domain.Core.Exceptions;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Core.Specifications;
 
@@ -12,7 +15,7 @@ namespace QingFa.EShop.Infrastructure.Repositories
     /// </summary>
     /// <typeparam name="TEntity">The type of the entity.</typeparam>
     /// <typeparam name="TId">The type of the entity's identifier.</typeparam>
-    public class GenericRepository<TEntity, TId> : IGenericRepository<TEntity, TId>
+    internal class GenericRepository<TEntity, TId> : IGenericRepository<TEntity, TId>
         where TEntity : BaseEntity<TId>
         where TId : notnull
     {
@@ -37,7 +40,7 @@ namespace QingFa.EShop.Infrastructure.Repositories
         /// <returns>The entity with the specified identifier, or null if not found.</returns>
         public async Task<TEntity?> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
         {
-            return await _dbSet.FindAsync([id], cancellationToken);
+            return await _dbSet.FindAsync(new object[] { id }, cancellationToken);
         }
 
         /// <summary>
@@ -164,6 +167,28 @@ namespace QingFa.EShop.Infrastructure.Repositories
         {
             _dbSet.Remove(entity);
             return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Checks if an entity exists by a specified field name and value.
+        /// If no field name is specified, defaults to "Name".
+        /// </summary>
+        /// <param name="value">The value of the field to match.</param>
+        /// <param name="fieldName">The name of the field to check. Defaults to "Name".</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>True if an entity with the specified field value exists; otherwise, false.</returns>
+        public async Task<bool> ExistsByFieldAsync(object value, CancellationToken cancellationToken = default, string? fieldName = "Name")
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+                throw CoreException.NullOrEmptyArgument(nameof(fieldName));
+
+            var parameter = Expression.Parameter(typeof(TEntity), "e");
+            var property = Expression.Property(parameter, fieldName);
+            var constant = Expression.Constant(value);
+            var equals = Expression.Equal(property, constant);
+            var lambda = Expression.Lambda<Func<TEntity, bool>>(equals, parameter);
+
+            return await _dbSet.AnyAsync(lambda, cancellationToken);
         }
     }
 }

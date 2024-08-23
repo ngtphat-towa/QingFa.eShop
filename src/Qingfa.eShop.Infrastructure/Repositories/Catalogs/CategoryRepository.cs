@@ -7,7 +7,7 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
 {
-    public class CategoryRepository : GenericRepository<Category, Guid>, ICategoryRepository
+    internal class CategoryRepository : GenericRepository<Category, Guid>, ICategoryRepository
     {
         public CategoryRepository(EShopDbContext context) : base(context)
         {

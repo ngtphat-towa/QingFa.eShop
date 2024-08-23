@@ -13,7 +13,7 @@ namespace QingFa.EShop.Application.Features.BrandManagements.GetBrandById
         public Guid Id { get; set; }
     }
 
-    public class GetBrandByIdQueryHandler : IRequestHandler<GetBrandByIdQuery, ResultValue<BrandResponse>>
+    internal class GetBrandByIdQueryHandler : IRequestHandler<GetBrandByIdQuery, ResultValue<BrandResponse>>
     {
         private readonly IBrandRepository _repository;
 

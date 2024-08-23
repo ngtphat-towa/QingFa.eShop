@@ -9,10 +9,10 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace Qingfa.eShop.Infrastructure.Migrations
+namespace QingFa.EShop.Infrastructure.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    [Migration("20240823031236_Init_Catalog")]
+    [Migration("20240823033829_Init_Catalog")]
     partial class Init_Catalog
     {
         /// <inheritdoc />
@@ -243,8 +243,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                             b1.IsRequired();
 
                             b1.Property<decimal>("Amount")
-                                .HasColumnType("decimal(18,2)")
-                                .HasColumnName("PriceAmount");
+                                .HasColumnType("decimal(18,2)");
 
                             b1.Property<string>("Currency")
                                 .IsRequired()

@@ -1,9 +1,8 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Qingfa.eShop.Infrastructure.Migrations
+namespace QingFa.EShop.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Init_Catalog : Migration
@@ -194,7 +193,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                     SKU = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     StockLevel = table.Column<int>(type: "INTEGER", nullable: false),
                     VariantStatus = table.Column<int>(type: "INTEGER", nullable: false),
-                    PriceAmount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price_Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Price_Currency = table.Column<string>(type: "TEXT", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
