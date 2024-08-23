@@ -13,7 +13,7 @@ namespace QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes
         {
             return await _dbSet
                 .AsNoTracking()
-                .AnyAsync(c => EF.Functions.Like(c.Name, $"%{name}%"),cancellationToken);
+                .AnyAsync(c => EF.Functions.Like(c.GroupName, $"%{name}%"),cancellationToken);
         }
     }
 }
