@@ -2,6 +2,8 @@
 
 using Microsoft.Extensions.Logging;
 
+using QingFa.EShop.Domain.Core.Exceptions;
+
 namespace QingFa.EShop.Application.Core.Behaviors
 {
     public class UnhandledExceptionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
@@ -11,7 +13,7 @@ namespace QingFa.EShop.Application.Core.Behaviors
 
         public UnhandledExceptionBehavior(ILogger<UnhandledExceptionBehavior<TRequest, TResponse>> logger)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _logger = logger ?? throw CoreException.NullArgument(nameof(logger));
         }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)

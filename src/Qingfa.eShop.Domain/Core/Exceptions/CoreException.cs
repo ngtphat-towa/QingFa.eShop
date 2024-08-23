@@ -59,6 +59,28 @@
         }
 
         /// <summary>
+        /// Creates a new instance of <see cref="CoreException"/> with a message indicating an invalid argument.
+        /// </summary>
+        /// <param name="argumentName">The name of the argument that is invalid.</param>
+        /// <param name="reason">The reason why the argument is invalid.</param>
+        /// <param name="statusCode">The HTTP status code.</param>
+        /// <param name="errorCode">The application-specific error code.</param>
+        /// <param name="title">A short, human-readable summary of the exception.</param>
+        /// <param name="details">Additional details about the error.</param>
+        /// <param name="innerException">The inner exception to be wrapped.</param>
+        /// <returns>A new <see cref="CoreException"/> instance.</returns>
+        public static CoreException InvalidArgument(string argumentName, string? reason = null, int statusCode = 400, string? errorCode = "INVALID_ARGUMENT", string? title = "Invalid Argument", string? details = null, Exception? innerException = null)
+        {
+            if (string.IsNullOrWhiteSpace(argumentName))
+            {
+                throw new ArgumentException("Argument name cannot be null or empty.", nameof(argumentName));
+            }
+            reason ??= "null or empty";
+
+            return new CoreException($"Argument '{argumentName}' is invalid: {reason}.", statusCode, errorCode, title, details, innerException);
+        }
+
+        /// <summary>
         /// Creates a new instance of <see cref="CoreException"/> with a message indicating a null argument.
         /// </summary>
         /// <param name="argumentName">The name of the argument that is null.</param>
@@ -75,7 +97,7 @@
                 throw new ArgumentException("Argument name cannot be null or empty.", nameof(argumentName));
             }
 
-            return new CoreException($"Argument '{argumentName}' cannot be null.", statusCode, errorCode, title, details, innerException);
+            return InvalidArgument(argumentName, "cannot be null", statusCode, errorCode, title, details, innerException);
         }
 
         /// <summary>
@@ -95,27 +117,7 @@
                 throw new ArgumentException("Argument name cannot be null or empty.", nameof(argumentName));
             }
 
-            return new CoreException($"Argument '{argumentName}' cannot be null or empty.", statusCode, errorCode, title, details, innerException);
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="CoreException"/> with a message indicating an invalid argument.
-        /// </summary>
-        /// <param name="argumentName">The name of the argument that is invalid.</param>
-        /// <param name="statusCode">The HTTP status code.</param>
-        /// <param name="errorCode">The application-specific error code.</param>
-        /// <param name="title">A short, human-readable summary of the exception.</param>
-        /// <param name="details">Additional details about the error.</param>
-        /// <param name="innerException">The inner exception to be wrapped.</param>
-        /// <returns>A new <see cref="CoreException"/> instance.</returns>
-        public static CoreException InvalidArgument(string argumentName, int statusCode = 400, string? errorCode = "INVALID_ARGUMENT", string? title = "Invalid Argument", string? details = null, Exception? innerException = null)
-        {
-            if (string.IsNullOrWhiteSpace(argumentName))
-            {
-                throw new ArgumentException("Argument name cannot be null or empty.", nameof(argumentName));
-            }
-
-            return new CoreException($"Argument '{argumentName}' is invalid.", statusCode, errorCode, title, details, innerException);
+            return InvalidArgument(argumentName, "cannot be null or empty", statusCode, errorCode, title, details, innerException);
         }
 
         /// <summary>

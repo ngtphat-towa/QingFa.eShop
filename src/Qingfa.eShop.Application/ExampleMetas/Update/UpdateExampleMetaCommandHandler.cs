@@ -10,10 +10,10 @@ namespace QingFa.EShop.Application.ExampleMetas.Update
 {
     public class UpdateExampleMetaCommandHandler : IRequestHandler<UpdateExampleMetaCommand, Result>
     {
-        private readonly IGenericRepository<ExampleMeta, Guid> _repository;
+        private readonly IExampleMetaRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateExampleMetaCommandHandler(IGenericRepository<ExampleMeta, Guid> repository, IUnitOfWork unitOfWork)
+        public UpdateExampleMetaCommandHandler(IExampleMetaRepository repository, IUnitOfWork unitOfWork)
         {
             _repository = repository;
             _unitOfWork = unitOfWork;

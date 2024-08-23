@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+using QingFa.EShop.Domain.Core.Enums;
 using QingFa.EShop.Domain.Metas;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Configurations
@@ -28,6 +29,19 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 
             builder.Property(e => e.LastModifiedBy)
                    .HasMaxLength(255);
+
+            builder.Property(b => b.Status)
+                    .HasConversion(
+                        v => (int)v,
+                        v => (EntityStatus)v)
+                    .IsRequired();
+
+            builder.HasIndex(b => b.Name);
+            builder.HasIndex(b => b.Status);
+            builder.HasIndex(a => a.Created);
+            builder.HasIndex(a => a.CreatedBy);
+            builder.HasIndex(a => a.LastModified);
+            builder.HasIndex(a => a.LastModifiedBy);
 
         }
     }

@@ -16,8 +16,8 @@ namespace QingFa.EShop.Api.Middleware
 
         public ErrorHandlingMiddleware(RequestDelegate next, ILogger<ErrorHandlingMiddleware> logger, IWebHostEnvironment env)
         {
-            _next = next ?? throw new ArgumentNullException(nameof(next));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _next = next ?? throw CoreException.NullArgument(nameof(next));
+            _logger = logger ?? throw CoreException.NullArgument(nameof(logger));
             _isDevelopment = env.IsDevelopment();
         }
 
@@ -98,7 +98,7 @@ namespace QingFa.EShop.Api.Middleware
 
             if (_isDevelopment)
             {
-                problemDetails.Extensions["stackTrace"] = ErrorHandlingMiddlewareHelpers.FormatStackTrace(ex.StackTrace);
+                problemDetails.Extensions["stackTrace"] = ErrorHandlingMiddlewareHelpers.FormatStackTrace(ex.StackTrace ?? "An unexpected error occurred.");
             }
 
             await ErrorHandlingMiddlewareHelpers.WriteResponseAsync(context, problemDetails, HttpStatusCode.InternalServerError);

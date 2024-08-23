@@ -11,9 +11,7 @@ using QingFa.EShop.Api.Models;
 
 namespace QingFa.EShop.API.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class ExampleMetasController : ControllerBase
+    public class ExampleMetasController : BaseController
     {
         private readonly IMediator _mediator;
 
@@ -22,16 +20,6 @@ namespace QingFa.EShop.API.Controllers
             _mediator = mediator;
         }
 
-        /// <summary>
-        /// Gets a paginated list of ExampleMetas with optional filtering and sorting.
-        /// </summary>
-        /// <param name="pageNumber">The page number for pagination. Default is 1.</param>
-        /// <param name="pageSize">The number of items per page. Default is 10.</param>
-        /// <param name="name">Optional filter by name.</param>
-        /// <param name="createdBy">Optional filter by creator.</param>
-        /// <param name="sortField">The field to sort by. Default is "Created".</param>
-        /// <param name="sortDescending">Indicates if sorting should be in descending order. Default is false.</param>
-        /// <returns>A paginated list of ExampleMetas.</returns>
         [HttpGet]
         [SwaggerOperation(Summary = "Gets a paginated list of ExampleMetas with optional filtering and sorting.")]
         [ProducesResponseType(typeof(PaginatedList<ExampleMetaResponse>), StatusCodes.Status200OK)]
@@ -41,7 +29,7 @@ namespace QingFa.EShop.API.Controllers
             [FromQuery] int pageSize = 10,
             [FromQuery] string? name = null,
             [FromQuery] string? createdBy = null,
-            [FromQuery] string sortField = "Created",
+            [FromQuery] string sortField = "Name",
             [FromQuery] bool sortDescending = false)
         {
             var query = new ListExampleMetasQuery
@@ -59,32 +47,23 @@ namespace QingFa.EShop.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Gets an ExampleMeta by its unique identifier.
-        /// </summary>
-        /// <param name="id">The unique identifier of the ExampleMeta.</param>
-        /// <returns>An ExampleMeta if found; otherwise, a 404 Not Found response.</returns>
         [HttpGet("{id}")]
         [SwaggerOperation(Summary = "Gets an ExampleMeta by its unique identifier.")]
         [ProducesResponseType(typeof(ExampleMetaResponse), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetById(Guid id)
         {
-            var query = new GetExampleMetaByIdQuery
-            {
-                Id = id
-            };
-
+            var query = new GetExampleMetaByIdQuery { Id = id };
             var result = await _mediator.Send(query);
 
-            return result != null ? Ok(result) : NotFound();
+            if (result.Succeeded)
+            {
+                return Ok(result.Value);
+            }
+
+            return HandleResult(result);
         }
 
-        /// <summary>
-        /// Creates a new ExampleMeta.
-        /// </summary>
-        /// <param name="request">The details of the ExampleMeta to create.</param>
-        /// <returns>201 Created response with the location of the newly created ExampleMeta.</returns>
         [HttpPost]
         [SwaggerOperation(Summary = "Creates a new ExampleMeta.")]
         [ProducesResponseType(typeof(Guid), StatusCodes.Status201Created)]
@@ -101,19 +80,16 @@ namespace QingFa.EShop.API.Controllers
 
             if (result.Succeeded)
             {
-                // Return 201 Created status with location of the new resource
-                return CreatedAtAction(nameof(GetById), new { id = result.Value }, null);
+                return CreatedAtAction(
+                    nameof(GetById),
+                    new { id = result.Value },
+                    result.Value
+                );
             }
 
-            return BadRequest(new { Errors = result.Errors });
+            return HandleResult(result);
         }
 
-        /// <summary>
-        /// Updates an existing ExampleMeta.
-        /// </summary>
-        /// <param name="id">The unique identifier of the ExampleMeta to update.</param>
-        /// <param name="request">The updated details of the ExampleMeta.</param>
-        /// <returns>204 No Content if the update is successful; otherwise, a 400 Bad Request response.</returns>
         [HttpPut("{id}")]
         [SwaggerOperation(Summary = "Updates an existing ExampleMeta.")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -130,34 +106,23 @@ namespace QingFa.EShop.API.Controllers
 
             var result = await _mediator.Send(command);
 
-            if (result.Succeeded)
-                return NoContent();
+            if (result.Succeeded) return NoContent();
 
-            return BadRequest(new { Errors = result.Errors });
+            return HandleResult(result);
         }
 
-        /// <summary>
-        /// Deletes an ExampleMeta by its unique identifier.
-        /// </summary>
-        /// <param name="id">The unique identifier of the ExampleMeta to delete.</param>
-        /// <returns>204 No Content if the deletion is successful; otherwise, a 404 Not Found response.</returns>
         [HttpDelete("{id}")]
         [SwaggerOperation(Summary = "Deletes an ExampleMeta by its unique identifier.")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(typeof(ValidationErrorResponse), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var command = new DeleteExampleMetaCommand
-            {
-                Id = id
-            };
-
+            var command = new DeleteExampleMetaCommand { Id = id };
             var result = await _mediator.Send(command);
 
-            if (result.Succeeded)
-                return NoContent();
+            if (result.Succeeded) return NoContent();
 
-            return NotFound(new { Errors = result.Errors });
+            return HandleResult(result);
         }
     }
 }

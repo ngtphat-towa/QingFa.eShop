@@ -8,15 +8,22 @@
 
   <ItemGroup>
     <Compile Remove="Abtractions\**" />
+    <Compile Remove="Domain\**" />
     <Compile Remove="Products\**" />
     <EmbeddedResource Remove="Abtractions\**" />
+    <EmbeddedResource Remove="Domain\**" />
     <EmbeddedResource Remove="Products\**" />
     <None Remove="Abtractions\**" />
+    <None Remove="Domain\**" />
     <None Remove="Products\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.4.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Catalogs\Services\" />
   </ItemGroup>
 
 </Project>

@@ -3,6 +3,7 @@
 using Microsoft.Extensions.Logging;
 
 using QingFa.EShop.Application.Core.Interfaces;
+using QingFa.EShop.Domain.Core.Exceptions;
 
 namespace QingFa.EShop.Application.Core.Behaviors
 {
@@ -11,9 +12,9 @@ namespace QingFa.EShop.Application.Core.Behaviors
         ICurrentUser user,
         IIdentityService identityService) : IRequestPreProcessor<TRequest> where TRequest : notnull
     {
-        private readonly ILogger<LoggingBehavior<TRequest>> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        private readonly ICurrentUser _user = user ?? throw new ArgumentNullException(nameof(user));
-        private readonly IIdentityService _identityService = identityService ?? throw new ArgumentNullException(nameof(identityService));
+        private readonly ILogger<LoggingBehavior<TRequest>> _logger = logger ?? throw CoreException.NullArgument(nameof(logger));
+        private readonly ICurrentUser _user = user ?? throw CoreException.NullArgument(nameof(user));
+        private readonly IIdentityService _identityService = identityService ?? throw CoreException.NullArgument(nameof(identityService));
 
         public async Task Process(TRequest request, CancellationToken cancellationToken)
         {

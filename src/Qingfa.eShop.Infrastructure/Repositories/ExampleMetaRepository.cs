@@ -1,40 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Core.Specifications;
 using QingFa.EShop.Domain.Metas;
 using QingFa.EShop.Infrastructure.Persistence;
 
 namespace QingFa.EShop.Infrastructure.Repositories
 {
-    public class ExampleMetaRepository : IGenericRepository<ExampleMeta, Guid>
+    public class ExampleMetaRepository : GenericRepository<ExampleMeta, Guid>, IExampleMetaRepository
     {
-        private readonly EShopDbContext _context;
 
-        public ExampleMetaRepository(EShopDbContext context)
+        public ExampleMetaRepository(EShopDbContext context) : base(context)
         {
-            _context = context;
-        }
-
-        public async Task<ExampleMeta?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
-        {
-            return await _context.ExampleMetas.FindAsync(new object[] { id }, cancellationToken);
-        }
-
-        public async Task<IEnumerable<ExampleMeta>> ListAllAsync(CancellationToken cancellationToken = default)
-        {
-            return await _context.ExampleMetas.ToListAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<ExampleMeta>> ListAsync(ISpecification<ExampleMeta> specification, CancellationToken cancellationToken = default)
         {
-            var query = _context.ExampleMetas.AsQueryable();
+            var query = _context.Set<ExampleMeta>().AsQueryable();
 
+            // Apply criteria
             if (specification.Criteria != null)
             {
                 query = query.Where(specification.Criteria);
             }
 
+            // Apply includes
             foreach (var include in specification.Includes)
             {
                 query = query.Include(include);
@@ -45,6 +34,7 @@ namespace QingFa.EShop.Infrastructure.Repositories
                 query = query.Include(includeString);
             }
 
+            // Apply sorting
             if (specification.OrderBy != null)
             {
                 query = query.OrderBy(specification.OrderBy);
@@ -55,11 +45,13 @@ namespace QingFa.EShop.Infrastructure.Repositories
                 query = query.OrderByDescending(specification.OrderByDescending);
             }
 
+            // Apply grouping
             if (specification.GroupBy != null)
             {
                 query = query.GroupBy(specification.GroupBy).SelectMany(g => g);
             }
 
+            // Apply pagination
             if (specification.Skip.HasValue)
             {
                 query = query.Skip(specification.Skip.Value);
@@ -71,24 +63,6 @@ namespace QingFa.EShop.Infrastructure.Repositories
             }
 
             return await query.ToListAsync(cancellationToken);
-        }
-
-        public async Task AddAsync(ExampleMeta entity, CancellationToken cancellationToken = default)
-        {
-            await _context.ExampleMetas.AddAsync(entity, cancellationToken);
-        }
-
-        public async Task UpdateAsync(ExampleMeta entity, CancellationToken cancellationToken = default)
-        {
-            _context.ExampleMetas.Update(entity);
-            await Task.CompletedTask;
-
-        }
-
-        public async Task DeleteAsync(ExampleMeta entity, CancellationToken cancellationToken = default)
-        {
-            _context.ExampleMetas.Remove(entity);
-           await Task.CompletedTask;
         }
     }
 }
