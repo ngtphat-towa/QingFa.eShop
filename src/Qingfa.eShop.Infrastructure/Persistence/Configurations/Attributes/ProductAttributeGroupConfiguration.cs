@@ -10,7 +10,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Attributes
         {
             builder.HasKey(vag => vag.Id);
 
-            builder.Property(vag => vag.GroupName)
+            builder.Property(vag => vag.Name)
                 .IsRequired()
                 .HasMaxLength(255);
 

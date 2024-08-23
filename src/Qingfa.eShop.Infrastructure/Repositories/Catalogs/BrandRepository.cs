@@ -6,7 +6,7 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
 {
-    public class BrandRepository : GenericRepository<Brand, Guid>, IBrandRepository
+    internal class BrandRepository : GenericRepository<Brand, Guid>, IBrandRepository
     {
         private readonly DbSet<Brand> _brandSet;
 

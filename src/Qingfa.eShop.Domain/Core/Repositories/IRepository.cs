@@ -56,5 +56,15 @@ namespace QingFa.EShop.Domain.Core.Repositories
         /// <param name="entity">The entity to delete.</param>
         /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Checks if an entity exists by a specified field name and value.
+        /// If no field name is specified, defaults to "Name".
+        /// </summary>
+        /// <param name="value">The value of the field to match.</param>
+        /// <param name="fieldName">The name of the field to check. Defaults to "Name".</param>
+        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        /// <returns>True if an entity with the specified field value exists; otherwise, false.</returns>
+        Task<bool> ExistsByFieldAsync(object value, CancellationToken cancellationToken = default, string fieldName = "Name");
     }
 }

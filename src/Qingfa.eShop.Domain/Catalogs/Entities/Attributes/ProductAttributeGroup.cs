@@ -5,7 +5,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities.Attributes
 {
     public class ProductAttributeGroup : AuditEntity
     {
-        public string GroupName { get; private set; } = string.Empty;
+        public string Name { get; private set; } = string.Empty;
 
         // Navigation property
         public virtual ICollection<ProductAttribute> Attributes { get; private set; } = new HashSet<ProductAttribute>();
@@ -13,7 +13,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities.Attributes
         private ProductAttributeGroup(Guid id, string groupName)
             : base(id)
         {
-            GroupName = !string.IsNullOrWhiteSpace(groupName) ? groupName : throw CoreException.NullOrEmptyArgument(nameof(groupName));
+            Name = !string.IsNullOrWhiteSpace(groupName) ? groupName : throw CoreException.NullOrEmptyArgument(nameof(groupName));
         }
 
         private ProductAttributeGroup() : base(default!)
@@ -28,7 +28,7 @@ namespace QingFa.EShop.Domain.Catalogs.Entities.Attributes
         public void UpdateGroupName(string groupName, string? lastModifiedBy = null)
         {
             if (string.IsNullOrWhiteSpace(groupName)) throw CoreException.NullOrEmptyArgument(nameof(groupName));
-            GroupName = groupName;
+            Name = groupName;
             UpdateAuditInfo(lastModifiedBy);
         }
     }
