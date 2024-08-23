@@ -49,12 +49,7 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations
 
             // Add indexes for faster lookups
             builder.HasIndex(c => c.Name);
-            builder.HasIndex(c => c.Status);
             builder.HasIndex(c => c.ParentCategoryId);
-            builder.HasIndex(a => a.Created);
-            builder.HasIndex(a => a.CreatedBy);
-            builder.HasIndex(a => a.LastModified);
-            builder.HasIndex(a => a.LastModifiedBy);
 
             // Configure SeoMeta as a complex type if applicable
             builder.OwnsOne(c => c.SeoMeta, seo =>
