@@ -7,6 +7,8 @@ namespace QingFa.EShop.Domain.Catalogs.Entities.Attributes
     {
         public string Name { get; private set; } = string.Empty;
         public string AttributeCode { get; private set; } = string.Empty;
+        public string? Description { get; private set; } = string.Empty;
+
         public AttributeType Type { get; private set; }
         public bool IsRequired { get; private set; }
         public bool IsFilterable { get; private set; }
@@ -19,12 +21,13 @@ namespace QingFa.EShop.Domain.Catalogs.Entities.Attributes
         public virtual ICollection<ProductAttributeOption> AttributeOptions { get; private set; } = new HashSet<ProductAttributeOption>();
         public virtual ICollection<ProductVariantAttribute> VariantAttributes { get; private set; } = new HashSet<ProductVariantAttribute>();
 
-        private ProductAttribute(Guid id, string name, string attributeCode, AttributeType type, bool isRequired, bool isFilterable, bool showToCustomers, int sortOrder, Guid groupId)
+        private ProductAttribute(Guid id, string name, string attributeCode,string? description, AttributeType type, bool isRequired, bool isFilterable, bool showToCustomers, int sortOrder, Guid groupId)
             : base(id)
         {
             Name = !string.IsNullOrWhiteSpace(name) ? name : throw CoreException.NullOrEmptyArgument(nameof(name));
             AttributeCode = !string.IsNullOrWhiteSpace(attributeCode) ? attributeCode : throw CoreException.NullOrEmptyArgument(nameof(attributeCode));
             Type = type;
+            Description = description;
             IsRequired = isRequired;
             IsFilterable = isFilterable;
             ShowToCustomers = showToCustomers;
@@ -36,12 +39,39 @@ namespace QingFa.EShop.Domain.Catalogs.Entities.Attributes
         {
         }
 
-        public static ProductAttribute Create(string name, string attributeCode, AttributeType type, bool isRequired, bool isFilterable, bool showToCustomers, int sortOrder, Guid groupId)
+        public static ProductAttribute Create(
+            string name,
+            string attributeCode,
+            string? description,
+            AttributeType type,
+            bool isRequired,
+            bool isFilterable,
+            bool showToCustomers,
+            int sortOrder,
+            Guid groupId)
         {
-            return new ProductAttribute(Guid.NewGuid(), name, attributeCode, type, isRequired, isFilterable, showToCustomers, sortOrder, groupId);
+            return new ProductAttribute(
+                Guid.NewGuid(),
+                name,
+                attributeCode,
+                description,
+                type,
+                isRequired,
+                isFilterable,
+                showToCustomers,
+                sortOrder,
+                groupId);
         }
 
-        public void Update(string name, string attributeCode, AttributeType type, bool isRequired, bool isFilterable, bool showToCustomers, int sortOrder, string? lastModifiedBy = null)
+        public void Update(
+            string name,
+            string attributeCode,
+            AttributeType type,
+            bool isRequired,
+            bool isFilterable,
+            bool showToCustomers,
+            int sortOrder,
+            string? lastModifiedBy = null)
         {
             if (string.IsNullOrWhiteSpace(name)) throw CoreException.NullOrEmptyArgument(nameof(name));
             if (string.IsNullOrWhiteSpace(attributeCode)) throw CoreException.NullOrEmptyArgument(nameof(attributeCode));
