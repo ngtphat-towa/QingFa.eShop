@@ -29,7 +29,7 @@ namespace QingFa.EShop.Api.Controllers
             [FromQuery] string? name = null,
             [FromQuery] string? description = null,
             [FromQuery] string? createdBy = null,
-            [FromQuery] string sortField = "Name",
+            [FromQuery] string? sortField = null,
             [FromQuery] bool sortDescending = false,
             [FromQuery] List<Guid>? ids = null)
         {
@@ -40,7 +40,7 @@ namespace QingFa.EShop.Api.Controllers
                 Name = name,
                 Description = description,
                 CreatedBy = createdBy,
-                SortField = sortField,
+                SortField = sortField ?? "GroupName",
                 SortDescending = sortDescending,
                 Ids = ids
             };

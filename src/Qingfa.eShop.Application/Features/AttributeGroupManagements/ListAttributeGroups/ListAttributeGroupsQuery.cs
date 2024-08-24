@@ -15,7 +15,7 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttrib
         public string? Description { get; set; }
         public string? CreatedBy { get; set; }
         public List<Guid>? Ids { get; set; }
-        public string SortField { get; set; } = "Name";
+        public string? SortField { get; set; } = "GroupName";
         public bool SortDescending { get; set; }
     }
     public class ListAttributeGroupsQueryHandler : IRequestHandler<ListAttributeGroupsQuery, PaginatedList<AttributeGroupResponse>>

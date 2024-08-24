@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace QingFa.EShop.Infrastructure.Migrations
+namespace Qingfa.eShop.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class Init_Catalog : Migration
@@ -88,6 +89,7 @@ namespace QingFa.EShop.Infrastructure.Migrations
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     GroupName = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
                     Created = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
                     CreatedBy = table.Column<string>(type: "TEXT", nullable: true),
                     LastModified = table.Column<DateTimeOffset>(type: "TEXT", nullable: false),
@@ -136,6 +138,7 @@ namespace QingFa.EShop.Infrastructure.Migrations
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
                     Name = table.Column<string>(type: "TEXT", maxLength: 255, nullable: false),
                     AttributeCode = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: true),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     IsRequired = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsFilterable = table.Column<bool>(type: "INTEGER", nullable: false),

@@ -1,8 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <Compile Remove="Features\NewFolder\**" />
     <Compile Remove="Features\ProductAttributeGroups\**" />
+    <EmbeddedResource Remove="Features\NewFolder\**" />
     <EmbeddedResource Remove="Features\ProductAttributeGroups\**" />
+    <None Remove="Features\NewFolder\**" />
     <None Remove="Features\ProductAttributeGroups\**" />
   </ItemGroup>
 
@@ -23,7 +26,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Common\Enums\" />
-    <Folder Include="Features\NewFolder\" />
   </ItemGroup>
 
   <PropertyGroup>

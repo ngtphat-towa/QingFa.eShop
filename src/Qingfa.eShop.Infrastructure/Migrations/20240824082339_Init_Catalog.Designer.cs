@@ -9,10 +9,10 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace QingFa.EShop.Infrastructure.Migrations
+namespace Qingfa.eShop.Infrastructure.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    [Migration("20240823033829_Init_Catalog")]
+    [Migration("20240824082339_Init_Catalog")]
     partial class Init_Catalog
     {
         /// <inheritdoc />
@@ -39,6 +39,9 @@ namespace QingFa.EShop.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsFilterable")
@@ -105,6 +108,9 @@ namespace QingFa.EShop.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("GroupName")

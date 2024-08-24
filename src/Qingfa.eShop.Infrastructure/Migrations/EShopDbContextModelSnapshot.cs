@@ -8,7 +8,7 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 #nullable disable
 
-namespace QingFa.EShop.Infrastructure.Migrations
+namespace Qingfa.eShop.Infrastructure.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
     partial class EShopDbContextModelSnapshot : ModelSnapshot
@@ -36,6 +36,9 @@ namespace QingFa.EShop.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("IsFilterable")
@@ -102,6 +105,9 @@ namespace QingFa.EShop.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("CreatedBy")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Description")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("GroupName")
