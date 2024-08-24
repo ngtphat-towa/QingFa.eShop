@@ -11,12 +11,17 @@ namespace QingFa.EShop.Infrastructure.Services
 
         public CategoryService(ICategoryRepository categoryRepository)
         {
-            _categoryRepository = categoryRepository;
+            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
         }
 
         /// <inheritdoc/>
         public async Task<TreeCategoryTransfer> GetCategoryTreeAsync(Guid rootCategoryId, CancellationToken cancellationToken = default)
         {
+            if (rootCategoryId == Guid.Empty)
+            {
+                throw new ArgumentException("Root category ID cannot be empty.", nameof(rootCategoryId));
+            }
+
             // Fetch categories with minimal details
             var categories = await _categoryRepository.GetCategoriesMinimalAsync(rootCategoryId, cancellationToken);
 
@@ -31,7 +36,8 @@ namespace QingFa.EShop.Infrastructure.Services
         {
             if (!categoryDict.TryGetValue(rootId, out var rootCategory))
             {
-                return null!;
+                // Returning null is not ideal; consider throwing an exception or returning a specific result
+                throw new KeyNotFoundException($"Category with ID {rootId} not found.");
             }
 
             var subCategories = categoryDict.Values

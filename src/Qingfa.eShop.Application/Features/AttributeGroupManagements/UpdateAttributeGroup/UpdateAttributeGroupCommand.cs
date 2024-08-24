@@ -4,6 +4,7 @@ using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Catalogs.Repositories;
+using QingFa.EShop.Domain.Core.Enums;
 using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttributeGroup
@@ -12,6 +13,7 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttr
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
+        public EntityStatus? Status { get; set; } = default!;
     }
     internal class UpdateAttributeGroupCommandHandler : IRequestHandler<UpdateAttributeGroupCommand, Result>
     {
@@ -36,6 +38,8 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttr
 
                 // Update properties
                 attributeGroup.Update(request.Name,request.Description);
+
+                attributeGroup.SetStatus(request.Status);
 
                 await _attributeGroupRepository.UpdateAsync(attributeGroup, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);

@@ -1,6 +1,7 @@
 ﻿using MediatR;
 
 using QingFa.EShop.Application.Core.Models;
+using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Enums;
@@ -8,9 +9,8 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
 {
-    public record UpdateCategoryCommand : IRequest<Result>
+    public record UpdateCategoryCommand : RequestType<Guid>, IRequest<Result>
     {
-        public Guid Id { get; set; }
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
         public string? ImageUrl { get; set; }
@@ -18,16 +18,10 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
         public EntityStatus? Status { get; set; }
     }
 
-    public class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result>
+    public class UpdateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork) : IRequestHandler<UpdateCategoryCommand, Result>
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public UpdateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
-        {
-            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly ICategoryRepository _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
@@ -48,6 +42,12 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
                     {
                         return Result.NotFound(nameof(Category), "The specified parent category does not exist.");
                     }
+
+                    // Check for cyclic dependency
+                    if (IsCyclicDependency(request.Id, request.ParentCategoryId.Value, cancellationToken))
+                    {
+                        return Result.Conflict(nameof(Category), "Assigning this parent category would create a cyclic dependency.");
+                    }
                 }
 
                 // Check if a category with the same name exists under the same parent category
@@ -65,8 +65,11 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
                     request.ParentCategoryId
                 );
 
-                // TODO: check if the status is valid or not 
-                category.SetStatus(request.Status);
+                // Check if the status is valid
+                if (request.Status.HasValue)
+                {
+                    category.SetStatus(request.Status.Value);
+                }
 
                 // Commit the transaction
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
@@ -78,6 +81,39 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
                 // Handle unexpected exceptions
                 return Result.UnexpectedError(ex);
             }
+        }
+
+        private bool IsCyclicDependency(Guid categoryId, Guid newParentId, CancellationToken cancellationToken)
+        {
+            var visited = new HashSet<Guid>();
+            var stack = new Stack<Guid>();
+            stack.Push(newParentId);
+
+            while (stack.Count > 0)
+            {
+                var currentId = stack.Pop();
+                if (currentId == categoryId)
+                {
+                    return true;
+                }
+
+                var currentCategory = _categoryRepository.GetByIdAsync(currentId, cancellationToken).Result;
+                if (currentCategory == null)
+                {
+                    continue;
+                }
+
+                foreach (var child in currentCategory.ChildCategories)
+                {
+                    if (!visited.Contains(child.Id))
+                    {
+                        visited.Add(child.Id);
+                        stack.Push(child.Id);
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

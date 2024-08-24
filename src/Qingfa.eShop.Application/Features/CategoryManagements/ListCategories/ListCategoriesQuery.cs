@@ -80,8 +80,6 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.ListCategories
             }
             catch (Exception ex)
             {
-                // Log exception or handle it as necessary
-                // For now, rethrow or return a failed result
                 throw new ApplicationException("An error occurred while processing your request.", ex);
             }
         }

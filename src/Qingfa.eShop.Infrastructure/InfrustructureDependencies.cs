@@ -9,6 +9,7 @@ using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Infrastructure.Repositories.Catalogs;
 using QingFa.EShop.Application.Features.CategoryManagements.Services;
 using QingFa.EShop.Infrastructure.Services;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes;
 
 namespace QingFa.EShop.Infrastructure
@@ -22,7 +23,12 @@ namespace QingFa.EShop.Infrastructure
 
             // Register DbContext with the connection string
             services.AddDbContext<EShopDbContext>(options =>
-                options.UseSqlite(connectionString));
+            {
+                options.UseSqlite(connectionString).EnableSensitiveDataLogging();
+            });
+
+            // Register IApplicationDbContext to use EShopDbContext
+            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<EShopDbContext>());
 
             // Register repositories
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));

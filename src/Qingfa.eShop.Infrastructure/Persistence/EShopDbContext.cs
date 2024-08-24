@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Domain.Core.Repositories;
@@ -12,7 +13,7 @@ using QingFa.EShop.Infrastructure.Persistence.Configurations.Attributes;
 
 namespace QingFa.EShop.Infrastructure.Persistence
 {
-    public class EShopDbContext : DbContext, IUnitOfWork
+    internal class EShopDbContext : DbContext, IUnitOfWork, IApplicationDbContext
     {
         private readonly ILogger<EShopDbContext> _logger;
         private IDbContextTransaction? _currentTransaction;
@@ -73,7 +74,6 @@ namespace QingFa.EShop.Infrastructure.Persistence
 
         private bool IsAuditProperty(string propertyName)
         {
-            // List of known audit properties
             var auditProperties = new[]
             {
                 "Created",
@@ -91,12 +91,15 @@ namespace QingFa.EShop.Infrastructure.Persistence
         {
             try
             {
-                return await base.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Saving changes to the database.");
+                var changes = await base.SaveChangesAsync(cancellationToken);
+                _logger.LogInformation("Changes saved successfully. Number of entities affected: {NumberOfEntities}", changes);
+                return changes;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while saving changes.");
-                throw; // Rethrow the exception after logging it
+                throw;
             }
         }
 
@@ -108,7 +111,17 @@ namespace QingFa.EShop.Infrastructure.Persistence
                 throw new InvalidOperationException("A transaction is already in progress.");
             }
 
-            _currentTransaction = await Database.BeginTransactionAsync(cancellationToken);
+            try
+            {
+                _logger.LogInformation("Beginning a new transaction.");
+                _currentTransaction = await Database.BeginTransactionAsync(cancellationToken);
+                _logger.LogInformation("Transaction started successfully.");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while starting the transaction.");
+                throw;
+            }
         }
 
         public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
@@ -120,7 +133,9 @@ namespace QingFa.EShop.Infrastructure.Persistence
 
             try
             {
+                _logger.LogInformation("Committing the transaction.");
                 await _currentTransaction.CommitAsync(cancellationToken);
+                _logger.LogInformation("Transaction committed successfully.");
             }
             catch (Exception ex)
             {
@@ -143,7 +158,9 @@ namespace QingFa.EShop.Infrastructure.Persistence
 
             try
             {
+                _logger.LogInformation("Rolling back the transaction.");
                 await _currentTransaction.RollbackAsync(cancellationToken);
+                _logger.LogInformation("Transaction rolled back successfully.");
             }
             catch (Exception ex)
             {
@@ -155,6 +172,19 @@ namespace QingFa.EShop.Infrastructure.Persistence
                 _currentTransaction.Dispose();
                 _currentTransaction = null;
             }
+        }
+
+        // Optional: Log database commands
+        public override int SaveChanges(bool acceptAllChangesOnSuccess)
+        {
+            _logger.LogInformation("Saving changes with acceptAllChangesOnSuccess: {AcceptAllChangesOnSuccess}", acceptAllChangesOnSuccess);
+            return base.SaveChanges(acceptAllChangesOnSuccess);
+        }
+
+        public override void Dispose()
+        {
+            _logger.LogInformation("Disposing the DbContext.");
+            base.Dispose();
         }
     }
 

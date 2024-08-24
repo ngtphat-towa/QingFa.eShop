@@ -43,11 +43,15 @@ namespace QingFa.EShop.Application.Mappings
 
             TypeAdapterConfig<CreateAttributeGroupRequest, CreateAttributeGroupCommand>
                 .NewConfig()
-                .Map(dest => dest.Name, src => src.Name);
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.Description, src => src.Description);
 
             TypeAdapterConfig<UpdateAttributeGroupRequest, UpdateAttributeGroupCommand>
                .NewConfig()
-               .Map(dest => dest.Name, src => src.Name);
+               .Map(dest => dest.Name, src => src.Name)
+               .Map(dest => dest.Description, src => src.Description)
+               .Map(dest => dest.Status, src => src.Status);
+
         }
 
         private static void ConfigureAuditsEntityMappingMappings()
@@ -64,7 +68,6 @@ namespace QingFa.EShop.Application.Mappings
 
         private static void ConfigureExampleMetaMappings()
         {
-            // Mapping from ExampleMeta domain model to ExampleMetaResponse DTO
             TypeAdapterConfig<ExampleMeta, ExampleMetaResponse>
                 .NewConfig()
                 .Map(dest => dest.Name, src => src.Name);
@@ -108,7 +111,6 @@ namespace QingFa.EShop.Application.Mappings
 
         private static void ConfigureSeoMetaMappings()
         {
-            // Mapping from SeoMetaTransfer to SeoMeta
             TypeAdapterConfig<SeoMetaTransfer, SeoMeta>
                 .NewConfig()
                 .Map(dest => dest.Title, src => src.Title)
@@ -117,7 +119,6 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.CanonicalUrl, src => src.CanonicalUrl)
                 .Map(dest => dest.Robots, src => src.Robots);
 
-            // Mapping from SeoMeta to SeoMetaResponse
             TypeAdapterConfig<SeoMeta, SeoMetaResponse>
                 .NewConfig()
                 .Map(dest => dest.Title, src => src.Title)
@@ -128,7 +129,6 @@ namespace QingFa.EShop.Application.Mappings
         }
         private static void ConfigureCategoryMappings()
         {
-            // Mapping from Category domain model to CategoryResponse DTO
             TypeAdapterConfig<Category, CategoryResponse>
                 .NewConfig()
                 .Map(dest => dest.Name, src => src.Name)
@@ -141,7 +141,6 @@ namespace QingFa.EShop.Application.Mappings
                 .NewConfig()
                 .Map(dest => dest.Name, src => src.Name);
 
-            // Mapping from CreateCategoryRequest DTO to CreateCategoryCommand
             TypeAdapterConfig<CreateCategoryRequest, CreateCategoryCommand>
                 .NewConfig()
                 .Map(dest => dest.Name, src => src.Name)
@@ -149,7 +148,6 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.ImageUrl, src => src.ImageUrl)
                 .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId);
 
-            // Mapping from UpdateCategoryRequest DTO to UpdateCategoryCommand
             TypeAdapterConfig<UpdateCategoryRequest, UpdateCategoryCommand>
                 .NewConfig()
                 .Map(dest => dest.Id, src => src.Id)

@@ -9,6 +9,10 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttr
             RuleFor(x => x.Name)
                 .NotEmpty().WithMessage("Name is required.")
                 .Length(2, 100).WithMessage("Name must be between 2 and 100 characters.");
+
+            RuleFor(x => x.Status)
+                .IsInEnum()
+                .When(x => x.Status.HasValue).WithMessage("Invalid status value.");
         }
     }
 }

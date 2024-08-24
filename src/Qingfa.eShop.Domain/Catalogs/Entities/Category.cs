@@ -55,35 +55,47 @@ namespace QingFa.EShop.Domain.Catalogs.Entities
             LastModified = DateTimeOffset.UtcNow;
         }
 
-        public void AddChildCategory(Category childCategory)
+        public void AddChildCategory(Category newChildCategory)
         {
-            ValidateChildCategory(childCategory);
-            ChildCategories.Add(childCategory);
+            if (this == null)
+            {
+                throw CoreException.NullArgument("Parent category");
+            }
+
+            if (newChildCategory == null)
+            {
+                throw CoreException.NullArgument("New child category");
+            }
+
+            if (this.ChildCategories.Any(c => c.Id == newChildCategory.Id))
+            {
+                return;
+            }
+
+            this.ChildCategories.Add(newChildCategory);
         }
 
         public void RemoveChildCategory(Guid childCategoryId)
         {
-            var childCategory = FindChildCategory(childCategoryId);
-            if (childCategory == null) throw CoreException.NotFound(nameof(ChildCategories));
+            if (ChildCategories == null || !ChildCategories.Any())
+            {
+                throw CoreException.NullArgument("Parent category");
+            }
+
+            var childCategory = ChildCategories.SingleOrDefault(c => c.Id == childCategoryId);
+            if (childCategory == null)
+            {
+                return;
+            }
 
             ChildCategories.Remove(childCategory);
         }
 
+
+
         public void ClearChildCategories()
         {
             ChildCategories.Clear();
-        }
-
-        private void ValidateChildCategory(Category childCategory)
-        {
-            if (childCategory == null) throw CoreException.NullArgument(nameof(childCategory));
-            if (childCategory.Id == this.Id) throw new InvalidOperationException("A category cannot be its own child.");
-            if (ChildCategories.Any(c => c.Id == childCategory.Id)) throw new InvalidOperationException("The category is already a child.");
-        }
-
-        private Category? FindChildCategory(Guid childCategoryId)
-        {
-            return ChildCategories.FirstOrDefault(c => c.Id == childCategoryId);
         }
     }
 }

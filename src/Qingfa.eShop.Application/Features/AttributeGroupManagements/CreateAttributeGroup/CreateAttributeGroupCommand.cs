@@ -23,27 +23,22 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttr
         {
             try
             {
-                // Check if an attribute group with the same name already exists
                 var attributeGroupExists = await _attributeGroupRepository.ExistsByNameAsync(request.Name, cancellationToken);
                 if (attributeGroupExists)
                 {
                     return ResultValue<Guid>.Conflict(nameof(ProductAttributeGroup), "An attribute group with this name already exists.");
                 }
 
-                // Create the new attribute group
                 var attributeGroup = ProductAttributeGroup.Create(request.Name, request.Description);
 
-                // Add the attribute group to the repository
                 await _attributeGroupRepository.AddAsync(attributeGroup, cancellationToken);
 
-                // Commit the transaction
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 return ResultValue<Guid>.Success(attributeGroup.Id);
             }
             catch (Exception ex)
             {
-                // Handle unexpected exceptions
                 return ResultValue<Guid>.UnexpectedError(ex);
             }
         }

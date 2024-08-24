@@ -23,14 +23,6 @@ namespace QingFa.EShop.Domain.Catalogs.Repositories
         /// <returns>A read-only list of child categories under the specified parent category.</returns>
         Task<IReadOnlyList<Category>> GetChildCategoriesAsync(Guid parentId, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Retrieves a category by its name and optional parent category ID.
-        /// </summary>
-        /// <param name="name">The name of the category to retrieve.</param>
-        /// <param name="parentCategoryId">The ID of the parent category to filter by, or null for top-level categories.</param>
-        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-        /// <returns>The category matching the given name and parent category ID, or null if no match is found.</returns>
-        Task<Category?> GetByNameAndParentAsync(string name, Guid? parentCategoryId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Retrieves minimal details (ID, Name, and ParentCategoryId) for categories related to the specified root category.

@@ -12,7 +12,10 @@ namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
         public CategoryRepository(EShopDbContext context) : base(context)
         {
         }
-
+        public new async Task<Category?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.Include(x => x.ChildCategories).FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
+        }
         public async Task<bool> ExistsByNameAsync(string name, Guid? parentCategoryId, CancellationToken cancellationToken = default)
         {
             return await _dbSet
@@ -21,16 +24,6 @@ namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
                                (c.ParentCategoryId == parentCategoryId ||
                                 (parentCategoryId == null && c.ParentCategoryId == null)),
                            cancellationToken);
-        }
-
-        public async Task<Category?> GetByNameAndParentAsync(string name, Guid? parentCategoryId, CancellationToken cancellationToken = default)
-        {
-            return await _dbSet
-                .AsNoTracking()
-                .Where(c => EF.Functions.Like(c.Name, $"%{name}%") &&
-                            (c.ParentCategoryId == parentCategoryId ||
-                             (parentCategoryId == null && c.ParentCategoryId == null)))
-                .FirstOrDefaultAsync(cancellationToken);
         }
 
         public async Task<IReadOnlyList<Category>> GetChildCategoriesAsync(Guid parentId, CancellationToken cancellationToken = default)
@@ -46,6 +39,7 @@ namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
             return await _dbSet
                 .AsNoTracking()
                 .Where(c => c.Id == rootCategoryId || c.ParentCategoryId == rootCategoryId)
+                .Include(x => x.ChildCategories)
                 .Select(c => new MinimalCategoryTransfer
                 {
                     Id = c.Id,

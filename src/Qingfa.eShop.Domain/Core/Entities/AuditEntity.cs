@@ -69,7 +69,7 @@ namespace QingFa.EShop.Domain.Core.Entities
         public void SetStatus(EntityStatus? status = default, string? lastModifiedBy = null)
         {
 
-            Status = status ?? EntityStatus.Inactive;
+            Status = status ?? Status;
             UpdateAuditInfo(lastModifiedBy);
         }
 
