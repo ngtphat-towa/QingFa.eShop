@@ -12,7 +12,7 @@ using QingFa.EShop.Infrastructure.Persistence;
 namespace Qingfa.eShop.Infrastructure.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    [Migration("20240824082339_Init_Catalog")]
+    [Migration("20240824102413_Init_Catalog")]
     partial class Init_Catalog
     {
         /// <inheritdoc />
@@ -81,21 +81,21 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                     b.HasIndex("AttributeGroupId");
 
                     b.HasIndex("Created")
-                        .HasDatabaseName("IX_ProductAttribute_Created");
+                        .HasDatabaseName("IX_ProductAttributes_Created");
 
                     b.HasIndex("CreatedBy")
-                        .HasDatabaseName("IX_ProductAttribute_CreatedBy");
+                        .HasDatabaseName("IX_ProductAttributes_CreatedBy");
 
                     b.HasIndex("LastModified")
-                        .HasDatabaseName("IX_ProductAttribute_LastModified");
+                        .HasDatabaseName("IX_ProductAttributes_LastModified");
 
                     b.HasIndex("LastModifiedBy")
-                        .HasDatabaseName("IX_ProductAttribute_LastModifiedBy");
+                        .HasDatabaseName("IX_ProductAttributes_LastModifiedBy");
 
                     b.HasIndex("Status")
-                        .HasDatabaseName("IX_ProductAttribute_Status");
+                        .HasDatabaseName("IX_ProductAttributes_Status");
 
-                    b.ToTable("ProductAttribute");
+                    b.ToTable("ProductAttributes");
                 });
 
             modelBuilder.Entity("QingFa.EShop.Domain.Catalogs.Entities.Attributes.ProductAttributeGroup", b =>
@@ -130,21 +130,21 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Created")
-                        .HasDatabaseName("IX_ProductAttributeGroup_Created");
+                        .HasDatabaseName("IX_ProductAttributeGroups_Created");
 
                     b.HasIndex("CreatedBy")
-                        .HasDatabaseName("IX_ProductAttributeGroup_CreatedBy");
+                        .HasDatabaseName("IX_ProductAttributeGroups_CreatedBy");
 
                     b.HasIndex("LastModified")
-                        .HasDatabaseName("IX_ProductAttributeGroup_LastModified");
+                        .HasDatabaseName("IX_ProductAttributeGroups_LastModified");
 
                     b.HasIndex("LastModifiedBy")
-                        .HasDatabaseName("IX_ProductAttributeGroup_LastModifiedBy");
+                        .HasDatabaseName("IX_ProductAttributeGroups_LastModifiedBy");
 
                     b.HasIndex("Status")
-                        .HasDatabaseName("IX_ProductAttributeGroup_Status");
+                        .HasDatabaseName("IX_ProductAttributeGroups_Status");
 
-                    b.ToTable("ProductAttributeGroup");
+                    b.ToTable("ProductAttributeGroups");
                 });
 
             modelBuilder.Entity("QingFa.EShop.Domain.Catalogs.Entities.Attributes.ProductAttributeOption", b =>
@@ -190,23 +190,23 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("Created")
-                        .HasDatabaseName("IX_ProductAttributeOption_Created");
+                        .HasDatabaseName("IX_ProductAttributeOptions_Created");
 
                     b.HasIndex("CreatedBy")
-                        .HasDatabaseName("IX_ProductAttributeOption_CreatedBy");
+                        .HasDatabaseName("IX_ProductAttributeOptions_CreatedBy");
 
                     b.HasIndex("LastModified")
-                        .HasDatabaseName("IX_ProductAttributeOption_LastModified");
+                        .HasDatabaseName("IX_ProductAttributeOptions_LastModified");
 
                     b.HasIndex("LastModifiedBy")
-                        .HasDatabaseName("IX_ProductAttributeOption_LastModifiedBy");
+                        .HasDatabaseName("IX_ProductAttributeOptions_LastModifiedBy");
 
                     b.HasIndex("ProductAttributeId");
 
                     b.HasIndex("Status")
-                        .HasDatabaseName("IX_ProductAttributeOption_Status");
+                        .HasDatabaseName("IX_ProductAttributeOptions_Status");
 
-                    b.ToTable("ProductAttributeOption");
+                    b.ToTable("ProductAttributeOptions");
                 });
 
             modelBuilder.Entity("QingFa.EShop.Domain.Catalogs.Entities.Attributes.ProductVariant", b =>

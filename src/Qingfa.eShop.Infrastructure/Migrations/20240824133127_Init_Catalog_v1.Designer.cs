@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using QingFa.EShop.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using QingFa.EShop.Infrastructure.Persistence;
 namespace Qingfa.eShop.Infrastructure.Migrations
 {
     [DbContext(typeof(EShopDbContext))]
-    partial class EShopDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240824133127_Init_Catalog_v1")]
+    partial class Init_Catalog_v1
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.8");
@@ -175,8 +178,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("TEXT");
 
-                    b.Property<Guid?>("ProductAttributeId")
-                        .IsRequired()
+                    b.Property<Guid>("ProductAttributeId")
                         .HasColumnType("TEXT");
 
                     b.Property<int>("SortOrder")

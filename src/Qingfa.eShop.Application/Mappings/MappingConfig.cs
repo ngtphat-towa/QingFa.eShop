@@ -4,6 +4,8 @@ using QingFa.EShop.Application.ExampleMetas.Models;
 using QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttributeGroup;
 using QingFa.EShop.Application.Features.AttributeGroupManagements.Models;
 using QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttributeGroup;
+using QingFa.EShop.Application.Features.AttributeManagements.Models;
+using QingFa.EShop.Application.Features.AttributeOptionManagements.Models;
 using QingFa.EShop.Application.Features.BrandManagements.CreateBrand;
 using QingFa.EShop.Application.Features.BrandManagements.Models;
 using QingFa.EShop.Application.Features.BrandManagements.Update;
@@ -25,13 +27,11 @@ namespace QingFa.EShop.Application.Mappings
         public static void ConfigureMappings()
         {
             ConfigureExampleMetaMappings();
-
             ConfigureBrandMappings();
             ConfigureSeoMetaMappings();
             ConfigureCategoryMappings();
-
             ConfigureAttributeGroupMappings();
-
+            ConfigureProductAttributeMappings();
             ConfigureAuditsEntityMappingMappings();
         }
 
@@ -51,7 +51,6 @@ namespace QingFa.EShop.Application.Mappings
                .Map(dest => dest.Name, src => src.Name)
                .Map(dest => dest.Description, src => src.Description)
                .Map(dest => dest.Status, src => src.Status);
-
         }
 
         private static void ConfigureAuditsEntityMappingMappings()
@@ -81,6 +80,7 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.Id, src => src.Id)
                 .Map(dest => dest.Name, src => src.Name);
         }
+
         private static void ConfigureBrandMappings()
         {
             TypeAdapterConfig<Brand, BrandResponse>
@@ -127,6 +127,7 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.CanonicalUrl, src => src.CanonicalUrl)
                 .Map(dest => dest.Robots, src => src.Robots);
         }
+
         private static void ConfigureCategoryMappings()
         {
             TypeAdapterConfig<Category, CategoryResponse>
@@ -157,5 +158,55 @@ namespace QingFa.EShop.Application.Mappings
                 .Map(dest => dest.ParentCategoryId, src => src.ParentCategoryId);
         }
 
+        private static void ConfigureProductAttributeMappings()
+        {
+            // Detailed mapping for ProductAttributeResponse
+            TypeAdapterConfig<ProductAttribute, ProductAttributeResponse>
+                .NewConfig()
+                .Map(dest => dest.Name, src => src.Name)
+                .Map(dest => dest.AttributeCode, src => src.AttributeCode)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.Type, src => src.Type)
+                .Map(dest => dest.IsRequired, src => src.IsRequired)
+                .Map(dest => dest.IsFilterable, src => src.IsFilterable)
+                .Map(dest => dest.ShowToCustomers, src => src.ShowToCustomers)
+                .Map(dest => dest.SortOrder, src => src.SortOrder)
+                .Map(dest => dest.AttributeGroupId, src => src.AttributeGroupId)
+                .Map(dest => dest.AttributeOptions, src => src.AttributeOptions.Any()
+                    ? src.AttributeOptions.Select(option => option.Adapt<AttributeOptionResponse>()).ToList()
+                    : null);
+
+            // Basic mapping for AttributeOptionResponse
+            TypeAdapterConfig<ProductAttributeOption, AttributeOptionResponse>
+                .NewConfig()
+                .Map(dest => dest.OptionValue, src => src.OptionValue)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.IsDefault, src => src.IsDefault)
+                .Map(dest => dest.SortOrder, src => src.SortOrder)
+                .Map(dest => dest.ProductAttributeId, src => src.ProductAttributeId);
+
+            TypeAdapterConfig<ProductAttribute, BasicProductAttributeResponse>
+               .NewConfig()
+               .Map(dest => dest.Name, src => src.Name)
+               .Map(dest => dest.AttributeCode, src => src.AttributeCode)
+               .Map(dest => dest.Description, src => src.Description)
+               .Map(dest => dest.Type, src => src.Type)
+               .Map(dest => dest.IsRequired, src => src.IsRequired)
+               .Map(dest => dest.IsFilterable, src => src.IsFilterable)
+               .Map(dest => dest.ShowToCustomers, src => src.ShowToCustomers)
+               .Map(dest => dest.SortOrder, src => src.SortOrder)
+               .Map(dest => dest.AttributeOptions, src => src.AttributeOptions.Any()
+                   ? src.AttributeOptions.Select(option => option.Adapt<BasicAttributeOptionResponse>()).ToList()
+                   : null);
+
+            // Basic mapping for AttributeOptionResponse
+            TypeAdapterConfig<ProductAttributeOption, BasicAttributeOptionResponse>
+                .NewConfig()
+                .Map(dest => dest.OptionValue, src => src.OptionValue)
+                .Map(dest => dest.Description, src => src.Description)
+                .Map(dest => dest.IsDefault, src => src.IsDefault)
+                .Map(dest => dest.SortOrder, src => src.SortOrder);
+        }
     }
 }
+
