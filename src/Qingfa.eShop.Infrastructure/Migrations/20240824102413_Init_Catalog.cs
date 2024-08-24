@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -84,7 +83,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductAttributeGroup",
+                name: "ProductAttributeGroups",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -98,7 +97,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductAttributeGroup", x => x.Id);
+                    table.PrimaryKey("PK_ProductAttributeGroups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -132,7 +131,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductAttribute",
+                name: "ProductAttributes",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -153,11 +152,11 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductAttribute", x => x.Id);
+                    table.PrimaryKey("PK_ProductAttributes", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductAttribute_ProductAttributeGroup_AttributeGroupId",
+                        name: "FK_ProductAttributes_ProductAttributeGroups_AttributeGroupId",
                         column: x => x.AttributeGroupId,
-                        principalTable: "ProductAttributeGroup",
+                        principalTable: "ProductAttributeGroups",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -216,7 +215,7 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ProductAttributeOption",
+                name: "ProductAttributeOptions",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -233,11 +232,11 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ProductAttributeOption", x => x.Id);
+                    table.PrimaryKey("PK_ProductAttributeOptions", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductAttributeOption_ProductAttribute_ProductAttributeId",
+                        name: "FK_ProductAttributeOptions_ProductAttributes_ProductAttributeId",
                         column: x => x.ProductAttributeId,
-                        principalTable: "ProductAttribute",
+                        principalTable: "ProductAttributes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -263,15 +262,15 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 {
                     table.PrimaryKey("PK_ProductVariantAttribute", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ProductVariantAttribute_ProductAttributeOption_ProductAttributeOptionId",
+                        name: "FK_ProductVariantAttribute_ProductAttributeOptions_ProductAttributeOptionId",
                         column: x => x.ProductAttributeOptionId,
-                        principalTable: "ProductAttributeOption",
+                        principalTable: "ProductAttributeOptions",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ProductVariantAttribute_ProductAttribute_ProductAttributeId",
+                        name: "FK_ProductVariantAttribute_ProductAttributes_ProductAttributeId",
                         column: x => x.ProductAttributeId,
-                        principalTable: "ProductAttribute",
+                        principalTable: "ProductAttributes",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
@@ -408,94 +407,94 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 column: "Status");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_AttributeCode",
-                table: "ProductAttribute",
+                name: "IX_ProductAttributeGroups_Created",
+                table: "ProductAttributeGroups",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeGroups_CreatedBy",
+                table: "ProductAttributeGroups",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeGroups_LastModified",
+                table: "ProductAttributeGroups",
+                column: "LastModified");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeGroups_LastModifiedBy",
+                table: "ProductAttributeGroups",
+                column: "LastModifiedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeGroups_Status",
+                table: "ProductAttributeGroups",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeOptions_Created",
+                table: "ProductAttributeOptions",
+                column: "Created");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeOptions_CreatedBy",
+                table: "ProductAttributeOptions",
+                column: "CreatedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeOptions_LastModified",
+                table: "ProductAttributeOptions",
+                column: "LastModified");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeOptions_LastModifiedBy",
+                table: "ProductAttributeOptions",
+                column: "LastModifiedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeOptions_ProductAttributeId",
+                table: "ProductAttributeOptions",
+                column: "ProductAttributeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributeOptions_Status",
+                table: "ProductAttributeOptions",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ProductAttributes_AttributeCode",
+                table: "ProductAttributes",
                 column: "AttributeCode",
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_AttributeGroupId",
-                table: "ProductAttribute",
+                name: "IX_ProductAttributes_AttributeGroupId",
+                table: "ProductAttributes",
                 column: "AttributeGroupId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_Created",
-                table: "ProductAttribute",
+                name: "IX_ProductAttributes_Created",
+                table: "ProductAttributes",
                 column: "Created");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_CreatedBy",
-                table: "ProductAttribute",
+                name: "IX_ProductAttributes_CreatedBy",
+                table: "ProductAttributes",
                 column: "CreatedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_LastModified",
-                table: "ProductAttribute",
+                name: "IX_ProductAttributes_LastModified",
+                table: "ProductAttributes",
                 column: "LastModified");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_LastModifiedBy",
-                table: "ProductAttribute",
+                name: "IX_ProductAttributes_LastModifiedBy",
+                table: "ProductAttributes",
                 column: "LastModifiedBy");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductAttribute_Status",
-                table: "ProductAttribute",
-                column: "Status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeGroup_Created",
-                table: "ProductAttributeGroup",
-                column: "Created");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeGroup_CreatedBy",
-                table: "ProductAttributeGroup",
-                column: "CreatedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeGroup_LastModified",
-                table: "ProductAttributeGroup",
-                column: "LastModified");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeGroup_LastModifiedBy",
-                table: "ProductAttributeGroup",
-                column: "LastModifiedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeGroup_Status",
-                table: "ProductAttributeGroup",
-                column: "Status");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeOption_Created",
-                table: "ProductAttributeOption",
-                column: "Created");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeOption_CreatedBy",
-                table: "ProductAttributeOption",
-                column: "CreatedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeOption_LastModified",
-                table: "ProductAttributeOption",
-                column: "LastModified");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeOption_LastModifiedBy",
-                table: "ProductAttributeOption",
-                column: "LastModifiedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeOption_ProductAttributeId",
-                table: "ProductAttributeOption",
-                column: "ProductAttributeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductAttributeOption_Status",
-                table: "ProductAttributeOption",
+                name: "IX_ProductAttributes_Status",
+                table: "ProductAttributes",
                 column: "Status");
 
             migrationBuilder.CreateIndex(
@@ -621,19 +620,19 @@ namespace Qingfa.eShop.Infrastructure.Migrations
                 name: "Categories");
 
             migrationBuilder.DropTable(
-                name: "ProductAttributeOption");
+                name: "ProductAttributeOptions");
 
             migrationBuilder.DropTable(
                 name: "ProductVariant");
 
             migrationBuilder.DropTable(
-                name: "ProductAttribute");
+                name: "ProductAttributes");
 
             migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
-                name: "ProductAttributeGroup");
+                name: "ProductAttributeGroups");
 
             migrationBuilder.DropTable(
                 name: "Brands");

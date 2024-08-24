@@ -78,5 +78,11 @@
             var result = Result.PreconditionFailed(condition);
             return new ResultValue<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
         }
+
+        public static ResultValue<T> InvalidArgument(string argumentName, string reason)
+        {
+            var errorMessage = $"Invalid argument: {argumentName}. Reason: {reason}";
+            return new ResultValue<T>(false, default, new[] { errorMessage }, errorCode: 400); 
+        }
     }
 }

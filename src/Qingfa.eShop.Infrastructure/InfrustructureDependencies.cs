@@ -11,6 +11,7 @@ using QingFa.EShop.Application.Features.CategoryManagements.Services;
 using QingFa.EShop.Infrastructure.Services;
 using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes;
+using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 
 namespace QingFa.EShop.Infrastructure
 {
@@ -38,6 +39,8 @@ namespace QingFa.EShop.Infrastructure
             services.AddScoped<ICategoryService, CategoryService>();
 
             services.AddScoped<IProductAttributeGroupRepository, ProductAttributeGroupRepository>();
+            services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+            services.AddScoped<IProductAttributeOptionRepository, ProductAttributeOptionRepository>();
 
             // Register unit of work
             services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<EShopDbContext>());

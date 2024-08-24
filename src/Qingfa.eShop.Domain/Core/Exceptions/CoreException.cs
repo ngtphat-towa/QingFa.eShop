@@ -139,5 +139,9 @@
 
             return new CoreException($"Entity '{entityName}' was not found.", statusCode, errorCode, title, details, innerException);
         }
+        public static CoreException DuplicateItem(string itemName, string message)
+        {
+            return new CoreException($"Duplicate item: {itemName}. {message}");
+        }
     }
 }
