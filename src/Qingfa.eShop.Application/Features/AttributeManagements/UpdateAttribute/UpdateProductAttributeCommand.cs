@@ -9,7 +9,7 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.UpdateAttribute
 {
-    public record UpdateProductAttributeCommand : RequestType<Guid>, IRequest<ResultValue<Guid>>
+    public record UpdateProductAttributeCommand : RequestType<Guid>, IRequest<Result<Guid>>
     {
         public string Name { get; init; } = string.Empty;
         public string AttributeCode { get; init; } = string.Empty;
@@ -22,7 +22,7 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.UpdateAttribute
         public Guid AttributeGroupId { get; init; }
     }
 
-    internal class UpdateProductAttributeCommandHandler : IRequestHandler<UpdateProductAttributeCommand, ResultValue<Guid>>
+    internal class UpdateProductAttributeCommandHandler : IRequestHandler<UpdateProductAttributeCommand, Result<Guid>>
     {
         private readonly IProductAttributeRepository _attributeRepository;
         private readonly IProductAttributeGroupRepository _attributeGroupRepository;
@@ -38,24 +38,24 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.UpdateAttribute
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<ResultValue<Guid>> Handle(UpdateProductAttributeCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(UpdateProductAttributeCommand request, CancellationToken cancellationToken)
         {
             // Validate request parameters
             if (string.IsNullOrWhiteSpace(request.Name))
-                return ResultValue<Guid>.InvalidArgument(nameof(request.Name), "Name cannot be null or empty.");
+                return Result<Guid>.InvalidArgument(nameof(request.Name), "Name cannot be null or empty.");
 
             if (string.IsNullOrWhiteSpace(request.AttributeCode))
-                return ResultValue<Guid>.InvalidArgument(nameof(request.AttributeCode), "Attribute code cannot be null or empty.");
+                return Result<Guid>.InvalidArgument(nameof(request.AttributeCode), "Attribute code cannot be null or empty.");
 
             // Check if the attribute exists
             var existingAttribute = await _attributeRepository.GetByIdAsync(request.Id, cancellationToken);
             if (existingAttribute == null)
-                return ResultValue<Guid>.NotFound(nameof(ProductAttribute), $"No product attribute found with ID: {request.Id}");
+                return Result<Guid>.NotFound(nameof(ProductAttribute), $"No product attribute found with ID: {request.Id}");
 
             // Check if the attribute group exists
             var attributeGroupExists = await _attributeGroupRepository.GetByIdAsync(request.AttributeGroupId, cancellationToken);
             if (attributeGroupExists == null)
-                return ResultValue<Guid>.NotFound(nameof(ProductAttributeGroup), $"No attribute group found with ID: {request.AttributeGroupId}");
+                return Result<Guid>.NotFound(nameof(ProductAttributeGroup), $"No attribute group found with ID: {request.AttributeGroupId}");
 
             try
             {
@@ -78,12 +78,12 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.UpdateAttribute
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(existingAttribute.Id);
+                return Result<Guid>.Success(existingAttribute.Id);
             }
             catch (Exception ex)
             {
                 // Return an unexpected error result
-                return ResultValue<Guid>.UnexpectedError(ex);
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
     }

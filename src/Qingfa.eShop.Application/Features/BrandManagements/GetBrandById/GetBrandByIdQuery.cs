@@ -8,12 +8,12 @@ using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.GetBrandById
 {
-    public class GetBrandByIdQuery : IRequest<ResultValue<BrandResponse>>
+    public class GetBrandByIdQuery : IRequest<Result<BrandResponse>>
     {
         public Guid Id { get; set; }
     }
 
-    internal class GetBrandByIdQueryHandler : IRequestHandler<GetBrandByIdQuery, ResultValue<BrandResponse>>
+    internal class GetBrandByIdQueryHandler : IRequestHandler<GetBrandByIdQuery, Result<BrandResponse>>
     {
         private readonly IBrandRepository _repository;
 
@@ -22,21 +22,21 @@ namespace QingFa.EShop.Application.Features.BrandManagements.GetBrandById
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<ResultValue<BrandResponse>> Handle(GetBrandByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<BrandResponse>> Handle(GetBrandByIdQuery request, CancellationToken cancellationToken)
         {
             if (request.Id == Guid.Empty)
             {
-                return ResultValue<BrandResponse>.InvalidOperation("GetBrandByIdQuery", "Invalid ID provided.");
+                return Result<BrandResponse>.InvalidOperation("GetBrandByIdQuery", "Invalid ID provided.");
             }
             var brand = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (brand == null)
             {
-                return ResultValue<BrandResponse>.NotFound("Brand", request.Id.ToString());
+                return Result<BrandResponse>.NotFound("Brand", request.Id.ToString());
             }
 
             var response = brand.Adapt<BrandResponse>();
-            return ResultValue<BrandResponse>.Success(response);
+            return Result<BrandResponse>.Success(response);
         }
     }
 }

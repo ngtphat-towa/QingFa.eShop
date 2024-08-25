@@ -7,26 +7,26 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttributeGroup
 {
-    public record CreateAttributeGroupCommand : IRequest<ResultValue<Guid>>
+    public record CreateAttributeGroupCommand : IRequest<Result<Guid>>
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
     }
     internal class CreateAttributeGroupCommandHandler(
         IProductAttributeGroupRepository attributeGroupRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<CreateAttributeGroupCommand, ResultValue<Guid>>
+        IUnitOfWork unitOfWork) : IRequestHandler<CreateAttributeGroupCommand, Result<Guid>>
     {
         private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw CoreException.NullArgument(nameof(attributeGroupRepository));
         private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
 
-        public async Task<ResultValue<Guid>> Handle(CreateAttributeGroupCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateAttributeGroupCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 var attributeGroupExists = await _attributeGroupRepository.ExistsByNameAsync(request.Name, cancellationToken);
                 if (attributeGroupExists)
                 {
-                    return ResultValue<Guid>.Conflict(nameof(ProductAttributeGroup), "An attribute group with this name already exists.");
+                    return Result<Guid>.Conflict(nameof(ProductAttributeGroup), "An attribute group with this name already exists.");
                 }
 
                 var attributeGroup = ProductAttributeGroup.Create(request.Name, request.Description);
@@ -35,11 +35,11 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttr
 
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(attributeGroup.Id);
+                return Result<Guid>.Success(attributeGroup.Id);
             }
             catch (Exception ex)
             {
-                return ResultValue<Guid>.UnexpectedError(ex);
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
     }

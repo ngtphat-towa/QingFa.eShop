@@ -6,7 +6,7 @@ using Ardalis.GuardClauses;
 
 namespace QingFa.EShop.Application.ExampleMetas.Create
 {
-    public class CreateExampleMetaCommandHandler : IRequestHandler<CreateExampleMetaCommand, ResultValue<Guid>>
+    public class CreateExampleMetaCommandHandler : IRequestHandler<CreateExampleMetaCommand, Result<Guid>>
     {
         private readonly IExampleMetaRepository _repository;
         private readonly IUnitOfWork _unitOfWork;
@@ -17,7 +17,7 @@ namespace QingFa.EShop.Application.ExampleMetas.Create
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ResultValue<Guid>> Handle(CreateExampleMetaCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateExampleMetaCommand request, CancellationToken cancellationToken)
         {
             Guard.Against.NullOrEmpty(request.Name, nameof(request.Name));
             Guard.Against.NullOrEmpty(request.CreatedBy, nameof(request.CreatedBy));
@@ -26,7 +26,7 @@ namespace QingFa.EShop.Application.ExampleMetas.Create
             await _repository.AddAsync(exampleMeta, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return ResultValue<Guid>.Success(exampleMeta.Id); // Return the ID of the created entity
+            return Result<Guid>.Success(exampleMeta.Id); // Return the ID of the created entity
         }
     }
 }

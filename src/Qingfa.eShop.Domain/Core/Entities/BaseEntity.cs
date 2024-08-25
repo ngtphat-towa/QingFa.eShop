@@ -1,7 +1,7 @@
-﻿using QingFa.EShop.Domain.Core.Events;
-
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations.Schema;
+
+using QingFa.EShop.Domain.Core.Events;
 
 namespace QingFa.EShop.Domain.Core.Entities
 {
@@ -9,7 +9,7 @@ namespace QingFa.EShop.Domain.Core.Entities
     /// Represents a base entity with a unique identifier and domain event handling.
     /// </summary>
     /// <typeparam name="IKey">The type of the entity's unique identifier.</typeparam>
-    public abstract class BaseEntity<IKey>
+    public abstract class BaseEntity<IKey> : IEquatable<BaseEntity<IKey>>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BaseEntity{IKey}"/> class with the specified identifier.
@@ -25,6 +25,7 @@ namespace QingFa.EShop.Domain.Core.Entities
         /// </summary>
         protected BaseEntity()
         {
+            // Default value to avoid using an uninitialized Id
             Id = default!;
         }
 
@@ -67,6 +68,55 @@ namespace QingFa.EShop.Domain.Core.Entities
         public void ClearDomainEvents()
         {
             _domainEvents.Clear();
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="BaseEntity{IKey}"/> is equal to the current <see cref="BaseEntity{IKey}"/>.
+        /// </summary>
+        /// <param name="other">The <see cref="BaseEntity{IKey}"/> to compare with the current <see cref="BaseEntity{IKey}"/>.</param>
+        /// <returns>true if the specified <see cref="BaseEntity{IKey}"/> is equal to the current <see cref="BaseEntity{IKey}"/>; otherwise, false.</returns>
+        public bool Equals(BaseEntity<IKey>? other)
+        {
+            if (other is null)
+            {
+                return false;
+            }
+
+            if (GetType() != other.GetType())
+            {
+                return false;
+            }
+
+            return EqualityComparer<IKey>.Default.Equals(Id, other.Id);
+        }
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current <see cref="BaseEntity{IKey}"/>.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current <see cref="BaseEntity{IKey}"/>.</param>
+        /// <returns>true if the specified object is equal to the current <see cref="BaseEntity{IKey}"/>; otherwise, false.</returns>
+        public override bool Equals(object? obj)
+        {
+            return Equals(obj as BaseEntity<IKey>);
+        }
+
+        /// <summary>
+        /// Serves as a hash function for the <see cref="BaseEntity{IKey}"/> type.
+        /// </summary>
+        /// <returns>A hash code for the current <see cref="BaseEntity{IKey}"/>.</returns>
+        public override int GetHashCode()
+        {
+            return Id?.GetHashCode() ?? 0; // Return 0 if Id is null
+        }
+
+        public static bool operator ==(BaseEntity<IKey>? left, BaseEntity<IKey>? right)
+        {
+            return EqualityComparer<BaseEntity<IKey>>.Default.Equals(left, right);
+        }
+
+        public static bool operator !=(BaseEntity<IKey>? left, BaseEntity<IKey>? right)
+        {
+            return !(left == right);
         }
     }
 }

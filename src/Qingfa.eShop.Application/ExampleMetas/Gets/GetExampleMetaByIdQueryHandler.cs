@@ -7,7 +7,7 @@ using QingFa.EShop.Application.Core.Models;
 
 namespace QingFa.EShop.Application.ExampleMetas.Gets
 {
-    public class GetExampleMetaByIdQueryHandler : IRequestHandler<GetExampleMetaByIdQuery, ResultValue<ExampleMetaResponse>>
+    public class GetExampleMetaByIdQueryHandler : IRequestHandler<GetExampleMetaByIdQuery, Result<ExampleMetaResponse>>
     {
         private readonly IExampleMetaRepository _repository;
 
@@ -16,18 +16,18 @@ namespace QingFa.EShop.Application.ExampleMetas.Gets
             _repository = repository;
         }
 
-        public async Task<ResultValue<ExampleMetaResponse>> Handle(GetExampleMetaByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ExampleMetaResponse>> Handle(GetExampleMetaByIdQuery request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request.Id, nameof(request.Id));
 
             var exampleMeta = await _repository.GetByIdAsync(request.Id, cancellationToken);
             if (exampleMeta == null)
             {
-                return ResultValue<ExampleMetaResponse>.NotFound("ExampleMeta");
+                return Result<ExampleMetaResponse>.NotFound("ExampleMeta");
             }
 
             var response = exampleMeta.Adapt<ExampleMetaResponse>();
-            return ResultValue<ExampleMetaResponse>.Success(response);
+            return Result<ExampleMetaResponse>.Success(response);
         }
     }
 }

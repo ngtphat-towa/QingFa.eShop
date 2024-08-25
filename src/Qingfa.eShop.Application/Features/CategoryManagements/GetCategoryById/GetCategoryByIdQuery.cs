@@ -11,8 +11,8 @@ using QingFa.EShop.Domain.Core.Exceptions;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.GetCategoryById
 {
-    public record GetCategoryByIdQuery : RequestType<Guid>, IRequest<ResultValue<CategoryResponse>>;
-    public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery, ResultValue<CategoryResponse>>
+    public record GetCategoryByIdQuery : RequestType<Guid>, IRequest<Result<CategoryResponse>>;
+    public class GetCategoryByIdQueryHandler : IRequestHandler<GetCategoryByIdQuery, Result<CategoryResponse>>
     {
         private readonly ICategoryRepository _repository;
 
@@ -21,22 +21,22 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.GetCategoryById
             _repository = repository ?? throw CoreException.NullArgument(nameof(repository));
         }
 
-        public async Task<ResultValue<CategoryResponse>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<CategoryResponse>> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
         {
             if (ValidatorExtension.IsValidGuid(request.Id))
             {
-                return ResultValue<CategoryResponse>.InvalidOperation("GetCategoryByIdQuery", "Invalid ID provided.");
+                return Result<CategoryResponse>.InvalidOperation("GetCategoryByIdQuery", "Invalid ID provided.");
             }
 
             var category = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (category == null)
             {
-                return ResultValue<CategoryResponse>.NotFound("Category", request.Id.ToString());
+                return Result<CategoryResponse>.NotFound("Category", request.Id.ToString());
             }
 
             var response = category.Adapt<CategoryResponse>();
-            return ResultValue<CategoryResponse>.Success(response);
+            return Result<CategoryResponse>.Success(response);
         }
     }
 }

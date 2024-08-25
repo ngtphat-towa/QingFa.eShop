@@ -10,7 +10,7 @@ using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
 {
-    public class CreateBrandCommand : IRequest<ResultValue<Guid>>
+    public class CreateBrandCommand : IRequest<Result<Guid>>
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
@@ -19,7 +19,7 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
         public EntityStatus? Status { get; set; }
     }
 
-    public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, ResultValue<Guid>>
+    public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, Result<Guid>>
     {
         private readonly IBrandRepository _brandRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -30,14 +30,14 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<ResultValue<Guid>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 // Check if a brand with the same name already exists
                 if (await _brandRepository.ExistsByNameAsync(request.Name, cancellationToken))
                 {
-                    return ResultValue<Guid>.Conflict(nameof(Brand), "A brand with this name already exists.");
+                    return Result<Guid>.Conflict(nameof(Brand), "A brand with this name already exists.");
                 }
 
                 var seoMeta = SeoMeta.Create(
@@ -54,12 +54,12 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
                 await _brandRepository.AddAsync(brand, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(brand.Id);
+                return Result<Guid>.Success(brand.Id);
             }
             catch (Exception ex)
             {
                 // Handle unexpected exceptions
-                return ResultValue<Guid>.UnexpectedError(ex);
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
     }

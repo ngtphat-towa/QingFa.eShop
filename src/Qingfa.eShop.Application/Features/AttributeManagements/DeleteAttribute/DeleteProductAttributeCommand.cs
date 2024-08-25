@@ -7,9 +7,9 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.DeleteAttribute
 {
-    public record DeleteProductAttributeCommand(Guid Id) : IRequest<ResultValue<Guid>>;
+    public record DeleteProductAttributeCommand(Guid Id) : IRequest<Result<Guid>>;
 
-    internal class DeleteProductAttributeCommandHandler : IRequestHandler<DeleteProductAttributeCommand, ResultValue<Guid>>
+    internal class DeleteProductAttributeCommandHandler : IRequestHandler<DeleteProductAttributeCommand, Result<Guid>>
     {
         private readonly IProductAttributeRepository _attributeRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -22,7 +22,7 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.DeleteAttribute
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
         }
 
-        public async Task<ResultValue<Guid>> Handle(DeleteProductAttributeCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(DeleteProductAttributeCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -30,13 +30,13 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.DeleteAttribute
                 var existingAttribute = await _attributeRepository.GetByIdAsync(request.Id, cancellationToken);
                 if (existingAttribute == null)
                 {
-                    return ResultValue<Guid>.NotFound(nameof(ProductAttribute), $"No product attribute found with ID: {request.Id}");
+                    return Result<Guid>.NotFound(nameof(ProductAttribute), $"No product attribute found with ID: {request.Id}");
                 }
 
                 // Check if the attribute is in use
                 if (await _attributeRepository.IsInUseAsync(request.Id, cancellationToken))
                 {
-                    return ResultValue<Guid>.Conflict(nameof(ProductAttribute), "The attribute cannot be deleted because it is in use.");
+                    return Result<Guid>.Conflict(nameof(ProductAttribute), "The attribute cannot be deleted because it is in use.");
                 }
 
                 // Delete the product attribute
@@ -46,12 +46,12 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.DeleteAttribute
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                 // Return the ID of the deleted attribute
-                return ResultValue<Guid>.Success(existingAttribute.Id);
+                return Result<Guid>.Success(existingAttribute.Id);
             }
             catch (Exception ex)
             {
                 // Return an unexpected error result
-                return ResultValue<Guid>.UnexpectedError(ex);
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
     }

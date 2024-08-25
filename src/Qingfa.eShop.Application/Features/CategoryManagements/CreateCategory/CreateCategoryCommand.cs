@@ -10,7 +10,7 @@ using QingFa.EShop.Domain.Common.ValueObjects;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
 {
-    public record CreateCategoryCommand : IRequest<ResultValue<Guid>>
+    public record CreateCategoryCommand : IRequest<Result<Guid>>
     {
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
@@ -20,7 +20,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
         public EntityStatus? Status { get; set; }
     }
 
-    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, ResultValue<Guid>>
+    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<Guid>>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly IUnitOfWork _unitOfWork;
@@ -31,7 +31,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
             _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
         }
 
-        public async Task<ResultValue<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {
             try
             {
@@ -41,14 +41,14 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
                     var parentCategory = await _categoryRepository.GetByIdAsync(request.ParentCategoryId.Value, cancellationToken);
                     if (parentCategory == null)
                     {
-                        return ResultValue<Guid>.NotFound(nameof(Category), "The specified parent category does not exist.");
+                        return Result<Guid>.NotFound(nameof(Category), "The specified parent category does not exist.");
                     }
 
                     // Check for cyclic dependency
                     var hasCyclicDependency = await IsCyclicDependency(parentCategory.Id, request.Name, cancellationToken);
                     if (hasCyclicDependency)
                     {
-                        return ResultValue<Guid>.Conflict(nameof(Category), "Adding this category would create a cyclic dependency.");
+                        return Result<Guid>.Conflict(nameof(Category), "Adding this category would create a cyclic dependency.");
                     }
                 }
 
@@ -56,7 +56,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
                 var categoryExists = await _categoryRepository.ExistsByNameAsync(request.Name, request.ParentCategoryId, cancellationToken);
                 if (categoryExists)
                 {
-                    return ResultValue<Guid>.Conflict(nameof(Category), "A category with this name already exists under the specified parent category.");
+                    return Result<Guid>.Conflict(nameof(Category), "A category with this name already exists under the specified parent category.");
                 }
 
                 // Convert SeoMetaTransfer to SeoMeta if provided
@@ -83,12 +83,12 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
                 // Commit the transaction
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(category.Id);
+                return Result<Guid>.Success(category.Id);
             }
             catch (Exception ex)
             {
                 // Handle unexpected exceptions
-                return ResultValue<Guid>.UnexpectedError(ex);
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
 

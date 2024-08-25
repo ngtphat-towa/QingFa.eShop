@@ -11,13 +11,13 @@ using QingFa.EShop.Domain.Core.Exceptions;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.GetSubcategories
 {
-    public class GetSubcategoriesQuery : IRequest<ResultValue<IReadOnlyList<BasicResponse<Guid>>>>
+    public class GetSubcategoriesQuery : IRequest<Result<IReadOnlyList<BasicResponse<Guid>>>>
     {
         public Guid ParentCategoryId { get; init; }
     }
 
     public class GetSubcategoriesQueryHandler
-        : IRequestHandler<GetSubcategoriesQuery, ResultValue<IReadOnlyList<BasicResponse<Guid>>>>
+        : IRequestHandler<GetSubcategoriesQuery, Result<IReadOnlyList<BasicResponse<Guid>>>>
     {
         private readonly IApplicationDbContext _dbContext;
 
@@ -26,7 +26,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.GetSubcategories
             _dbContext = dbContext ?? throw CoreException.NullArgument(nameof(dbContext));
         }
 
-        public async Task<ResultValue<IReadOnlyList<BasicResponse<Guid>>>> Handle(GetSubcategoriesQuery request, CancellationToken cancellationToken)
+        public async Task<Result<IReadOnlyList<BasicResponse<Guid>>>> Handle(GetSubcategoriesQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -38,12 +38,12 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.GetSubcategories
                 // Map the entities to response models
                 var response = subcategories.Adapt<IReadOnlyList<BasicResponse<Guid>>>();
 
-                return ResultValue<IReadOnlyList<BasicResponse<Guid>>>.Success(response);
+                return Result<IReadOnlyList<BasicResponse<Guid>>>.Success(response);
             }
             catch (Exception ex)
             {
                 // Handle exceptions
-                return ResultValue<IReadOnlyList<BasicResponse<Guid>>>.UnexpectedError(ex);
+                return Result<IReadOnlyList<BasicResponse<Guid>>>.UnexpectedError(ex);
             }
         }
     }

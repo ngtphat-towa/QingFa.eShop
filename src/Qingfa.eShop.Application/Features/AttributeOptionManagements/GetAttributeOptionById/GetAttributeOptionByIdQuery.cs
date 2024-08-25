@@ -9,9 +9,9 @@ using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 
 namespace QingFa.EShop.Application.Features.AttributeOptionManagements.GetAttributeOptionById
 {
-    public record GetAttributeOptionByIdQuery(Guid Id) : IRequest<ResultValue<AttributeOptionResponse>>;
+    public record GetAttributeOptionByIdQuery(Guid Id) : IRequest<Result<AttributeOptionResponse>>;
 
-     internal class GetAttributeOptionByIdQueryHandler : IRequestHandler<GetAttributeOptionByIdQuery, ResultValue<AttributeOptionResponse>>
+     internal class GetAttributeOptionByIdQueryHandler : IRequestHandler<GetAttributeOptionByIdQuery, Result<AttributeOptionResponse>>
     {
         private readonly IProductAttributeOptionRepository _attributeOptionRepository;
 
@@ -20,7 +20,7 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.GetAttrib
             _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
         }
 
-        public async Task<ResultValue<AttributeOptionResponse>> Handle(GetAttributeOptionByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<AttributeOptionResponse>> Handle(GetAttributeOptionByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -28,16 +28,16 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.GetAttrib
 
                 if (option == null)
                 {
-                    return ResultValue<AttributeOptionResponse>.NotFound(nameof(ProductAttributeOption), $"AttributeOption with ID {request.Id} not found.");
+                    return Result<AttributeOptionResponse>.NotFound(nameof(ProductAttributeOption), $"AttributeOption with ID {request.Id} not found.");
                 }
 
                 var response = option.Adapt<AttributeOptionResponse>();
 
-                return ResultValue<AttributeOptionResponse>.Success(response);
+                return Result<AttributeOptionResponse>.Success(response);
             }
             catch (Exception ex)
             {
-                return ResultValue<AttributeOptionResponse>.UnexpectedError(ex);
+                return Result<AttributeOptionResponse>.UnexpectedError(ex);
             }
         }
     }
