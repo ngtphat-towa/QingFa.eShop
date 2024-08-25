@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using MediatR;
+
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
@@ -9,6 +11,7 @@ using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Metas;
+using QingFa.EShop.Infrastructure.Interceptors;
 using QingFa.EShop.Infrastructure.Persistence.Configurations;
 using QingFa.EShop.Infrastructure.Persistence.Configurations.Attributes;
 
@@ -17,12 +20,23 @@ namespace QingFa.EShop.Infrastructure.Persistence
     internal class EShopDbContext : DbContext, IUnitOfWork, IApplicationDbContext
     {
         private readonly ILogger<EShopDbContext> _logger;
+        private readonly IMediator _mediator;
+        private readonly ICurrentUser _user;
+        private readonly TimeProvider _dateTime;
         private IDbContextTransaction? _currentTransaction;
 
-        public EShopDbContext(DbContextOptions<EShopDbContext> options, ILogger<EShopDbContext> logger)
+        public EShopDbContext(
+            DbContextOptions<EShopDbContext> options,
+            ILogger<EShopDbContext> logger,
+            IMediator mediator,
+            ICurrentUser user,
+            TimeProvider dateTime)
             : base(options)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
+            _user = user ?? throw new ArgumentNullException(nameof(user));
+            _dateTime = dateTime ?? throw new ArgumentNullException(nameof(dateTime));
         }
 
         // Define DbSet properties for your entities
@@ -30,11 +44,22 @@ namespace QingFa.EShop.Infrastructure.Persistence
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
-
         public DbSet<ProductAttributeGroup> ProductAttributeGroups { get; set; }
         public DbSet<ProductAttributeOption> ProductAttributeOptions { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductVariantAttribute> ProductVariantAttributes { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder
+                    .AddInterceptors(new DispatchDomainEventsInterceptor(_mediator))
+                    .AddInterceptors(new AuditableEntityInterceptor(_user, _dateTime));
+            }
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

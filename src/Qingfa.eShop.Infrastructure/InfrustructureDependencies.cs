@@ -42,6 +42,9 @@ namespace QingFa.EShop.Infrastructure
             services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
             services.AddScoped<IProductAttributeOptionRepository, ProductAttributeOptionRepository>();
 
+            // Third-party services
+            services.AddScoped<IEmailService, EmailService>();
+
             // Register unit of work
             services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<EShopDbContext>());
 
