@@ -7,9 +7,13 @@ using QingFa.EShop.Infrastructure.Persistence;
 
 namespace QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes
 {
-    internal class ProductAttributeRepository(EShopDbContext context) : GenericRepository<ProductAttribute, Guid>(context), IProductAttributeRepository
+    internal class ProductAttributeRepository(EShopDbContext context) 
+        : GenericRepository<ProductAttribute, Guid>(context), IProductAttributeRepository
     {
-        public async Task<bool> ExistsByNameAsync(string name, Guid? attributeGroupId, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsByNameAsync(
+            string name,
+            Guid? attributeGroupId,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

@@ -24,14 +24,10 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.ListAttributes
         public string? SearchTerm { get; set; }
     }
 
-    internal class ListProductAttributesQueryHandler : IRequestHandler<ListProductAttributesQuery, PaginatedList<ProductAttributeResponse>>
+    internal class ListProductAttributesQueryHandler(IProductAttributeRepository repository) 
+        : IRequestHandler<ListProductAttributesQuery, PaginatedList<ProductAttributeResponse>>
     {
-        private readonly IProductAttributeRepository _repository;
-
-        public ListProductAttributesQueryHandler(IProductAttributeRepository repository)
-        {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        }
+        private readonly IProductAttributeRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
         public async Task<PaginatedList<ProductAttributeResponse>> Handle(ListProductAttributesQuery request, CancellationToken cancellationToken)
         {

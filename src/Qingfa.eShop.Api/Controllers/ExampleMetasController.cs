@@ -43,8 +43,7 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(query);
-
-            return Ok(result);
+            return HandleResult(result);
         }
 
         [HttpGet("{id}")]
@@ -55,12 +54,6 @@ namespace QingFa.EShop.API.Controllers
         {
             var query = new GetExampleMetaByIdQuery { Id = id };
             var result = await _mediator.Send(query);
-
-            if (result.Succeeded)
-            {
-                return Ok(result.Value);
-            }
-
             return HandleResult(result);
         }
 
@@ -77,7 +70,6 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(command);
-
             if (result.Succeeded)
             {
                 return CreatedAtAction(
@@ -105,9 +97,6 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded) return NoContent();
-
             return HandleResult(result);
         }
 
@@ -119,9 +108,6 @@ namespace QingFa.EShop.API.Controllers
         {
             var command = new DeleteExampleMetaCommand { Id = id };
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded) return NoContent();
-
             return HandleResult(result);
         }
     }

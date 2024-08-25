@@ -1,26 +1,18 @@
 ﻿using Mapster;
 
-using MediatR;
-
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.BrandManagements.Models;
+using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.GetBrandById
 {
-    public class GetBrandByIdQuery : IRequest<Result<BrandResponse>>
-    {
-        public Guid Id { get; set; }
-    }
+    public record GetBrandByIdQuery : RequestType<Guid>, IQuery<BrandResponse>;
 
-    internal class GetBrandByIdQueryHandler : IRequestHandler<GetBrandByIdQuery, Result<BrandResponse>>
+    internal class GetBrandByIdQueryHandler(IBrandRepository repository) : IQueryHandler<GetBrandByIdQuery, BrandResponse>
     {
-        private readonly IBrandRepository _repository;
-
-        public GetBrandByIdQueryHandler(IBrandRepository repository)
-        {
-            _repository = repository ?? throw new ArgumentNullException(nameof(repository));
-        }
+        private readonly IBrandRepository _repository = repository ?? throw new ArgumentNullException(nameof(repository));
 
         public async Task<Result<BrandResponse>> Handle(GetBrandByIdQuery request, CancellationToken cancellationToken)
         {

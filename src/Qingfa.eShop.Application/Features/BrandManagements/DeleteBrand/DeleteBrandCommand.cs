@@ -1,5 +1,4 @@
-﻿using MediatR;
-
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities;
@@ -8,18 +7,12 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.DeleteBrand
 {
-    public sealed record DeleteBrandCommand : RequestType<Guid>, IRequest<Result>;
+    public sealed record DeleteBrandCommand : RequestType<Guid>, ICommand;
 
-    public class DeleteBrandCommandHandler : IRequestHandler<DeleteBrandCommand, Result>
+    internal class DeleteBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork) : ICommandHandler<DeleteBrandCommand>
     {
-        private readonly IBrandRepository _brandRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public DeleteBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork)
-        {
-            _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly IBrandRepository _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result> Handle(DeleteBrandCommand request, CancellationToken cancellationToken)
         {

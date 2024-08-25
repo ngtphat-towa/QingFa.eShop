@@ -19,8 +19,7 @@ namespace QingFa.EShop.Application
             services.AddMediatR(config =>
             {
                 config.RegisterServicesFromAssemblies(assembly);
-                // Register pipeline behaviors
-                config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
+                // Register pipeline 
                 config.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
                 // Add other behaviors if needed
             });

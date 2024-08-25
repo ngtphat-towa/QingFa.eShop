@@ -17,21 +17,14 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.UpdateAtt
         public Guid ProductAttributeId { get; init; }
     }
 
-    internal class UpdateProductAttributeOptionCommandHandler : IRequestHandler<UpdateAttributeOptionCommand, Result<Guid>>
+    internal class UpdateProductAttributeOptionCommandHandler(
+        IProductAttributeOptionRepository attributeOptionRepository,
+        IProductAttributeRepository attributeRepository,
+        IUnitOfWork unitOfWork) : IRequestHandler<UpdateAttributeOptionCommand, Result<Guid>>
     {
-        private readonly IProductAttributeOptionRepository _attributeOptionRepository;
-        private readonly IProductAttributeRepository _attributeRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public UpdateProductAttributeOptionCommandHandler(
-            IProductAttributeOptionRepository attributeOptionRepository,
-            IProductAttributeRepository attributeRepository,
-            IUnitOfWork unitOfWork)
-        {
-            _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly IProductAttributeOptionRepository _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
+        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result<Guid>> Handle(UpdateAttributeOptionCommand request, CancellationToken cancellationToken)
         {

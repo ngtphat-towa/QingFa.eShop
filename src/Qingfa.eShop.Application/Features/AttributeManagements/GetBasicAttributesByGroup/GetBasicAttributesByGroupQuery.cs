@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using QingFa.EShop.Application.Features.AttributeManagements.Models;
-using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 using Mapster;
+using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.GetBasicAttributesByGroup
 {
@@ -13,14 +13,10 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.GetBasicAttribu
         public bool SortDescending { get; init; } = false;
     }
 
-    internal class GetBasicAttributesByGroupQueryHandler : IRequestHandler<GetBasicAttributesByGroupQuery, List<BasicProductAttributeResponse>>
+    internal class GetBasicAttributesByGroupQueryHandler(IProductAttributeRepository attributeRepository) 
+        : IRequestHandler<GetBasicAttributesByGroupQuery, List<BasicProductAttributeResponse>>
     {
-        private readonly IProductAttributeRepository _attributeRepository;
-
-        public GetBasicAttributesByGroupQueryHandler(IProductAttributeRepository attributeRepository)
-        {
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-        }
+        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
 
         public async Task<List<BasicProductAttributeResponse>> Handle(GetBasicAttributesByGroupQuery request, CancellationToken cancellationToken)
         {

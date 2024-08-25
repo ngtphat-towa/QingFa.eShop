@@ -1,12 +1,12 @@
 ﻿using Ardalis.GuardClauses;
-using MediatR;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Metas;
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.ExampleMetas.Delete
 {
-    public class DeleteExampleMetaCommandHandler : IRequestHandler<DeleteExampleMetaCommand, Result>
+    public class DeleteExampleMetaCommandHandler : ICommandHandler<DeleteExampleMetaCommand>
     {
         private readonly IExampleMetaRepository _repository;
         private readonly IUnitOfWork _unitOfWork;

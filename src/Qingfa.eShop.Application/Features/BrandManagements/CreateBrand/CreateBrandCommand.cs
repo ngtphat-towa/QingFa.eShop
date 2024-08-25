@@ -1,16 +1,15 @@
-﻿using MediatR;
-
-using QingFa.EShop.Application.Core.Models;
+﻿using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Enums;
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
 {
-    public class CreateBrandCommand : IRequest<Result<Guid>>
+    public class CreateBrandCommand : ICommand<Guid>
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
@@ -19,16 +18,10 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
         public EntityStatus? Status { get; set; }
     }
 
-    public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, Result<Guid>>
+    internal class CreateBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreateBrandCommand, Guid>
     {
-        private readonly IBrandRepository _brandRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CreateBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork)
-        {
-            _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly IBrandRepository _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result<Guid>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {

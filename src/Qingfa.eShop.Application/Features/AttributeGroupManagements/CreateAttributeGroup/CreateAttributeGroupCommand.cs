@@ -1,4 +1,4 @@
-﻿using MediatR;
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Catalogs.Repositories;
@@ -7,14 +7,14 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttributeGroup
 {
-    public record CreateAttributeGroupCommand : IRequest<Result<Guid>>
+    public record CreateAttributeGroupCommand : ICommand<Guid>
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
     }
     internal class CreateAttributeGroupCommandHandler(
         IProductAttributeGroupRepository attributeGroupRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<CreateAttributeGroupCommand, Result<Guid>>
+        IUnitOfWork unitOfWork) : ICommandHandler<CreateAttributeGroupCommand, Guid>
     {
         private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw CoreException.NullArgument(nameof(attributeGroupRepository));
         private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));

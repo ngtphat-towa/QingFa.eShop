@@ -11,14 +11,10 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.GetAttributeByI
 {
     public record GetProductAttributeByIdQuery(Guid Id) : IRequest<Result<ProductAttributeResponse>>;
 
-    public class GetProductAttributeByIdQueryHandler : IRequestHandler<GetProductAttributeByIdQuery, Result<ProductAttributeResponse>>
+    internal class GetProductAttributeByIdQueryHandler(IProductAttributeRepository attributeRepository)
+        : IRequestHandler<GetProductAttributeByIdQuery, Result<ProductAttributeResponse>>
     {
-        private readonly IProductAttributeRepository _attributeRepository;
-
-        public GetProductAttributeByIdQueryHandler(IProductAttributeRepository attributeRepository)
-        {
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-        }
+        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
 
         public async Task<Result<ProductAttributeResponse>> Handle(GetProductAttributeByIdQuery request, CancellationToken cancellationToken)
         {

@@ -20,16 +20,11 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
         public EntityStatus? Status { get; set; }
     }
 
-    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<Guid>>
+    internal class CreateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork) 
+        : IRequestHandler<CreateCategoryCommand, Result<Guid>>
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CreateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
-        {
-            _categoryRepository = categoryRepository ?? throw CoreException.NullArgument(nameof(categoryRepository));
-            _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
-        }
+        private readonly ICategoryRepository _categoryRepository = categoryRepository ?? throw CoreException.NullArgument(nameof(categoryRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
 
         public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {

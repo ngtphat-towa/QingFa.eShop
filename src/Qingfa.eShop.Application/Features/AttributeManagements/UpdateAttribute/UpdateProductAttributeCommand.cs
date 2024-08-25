@@ -22,21 +22,14 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.UpdateAttribute
         public Guid AttributeGroupId { get; init; }
     }
 
-    internal class UpdateProductAttributeCommandHandler : IRequestHandler<UpdateProductAttributeCommand, Result<Guid>>
+    internal class UpdateProductAttributeCommandHandler(
+        IProductAttributeRepository attributeRepository,
+        IProductAttributeGroupRepository attributeGroupRepository,
+        IUnitOfWork unitOfWork) : IRequestHandler<UpdateProductAttributeCommand, Result<Guid>>
     {
-        private readonly IProductAttributeRepository _attributeRepository;
-        private readonly IProductAttributeGroupRepository _attributeGroupRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public UpdateProductAttributeCommandHandler(
-            IProductAttributeRepository attributeRepository,
-            IProductAttributeGroupRepository attributeGroupRepository,
-            IUnitOfWork unitOfWork)
-        {
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-            _attributeGroupRepository = attributeGroupRepository ?? throw new ArgumentNullException(nameof(attributeGroupRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
+        private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw new ArgumentNullException(nameof(attributeGroupRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result<Guid>> Handle(UpdateProductAttributeCommand request, CancellationToken cancellationToken)
         {

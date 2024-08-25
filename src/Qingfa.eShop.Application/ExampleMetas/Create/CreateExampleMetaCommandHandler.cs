@@ -1,12 +1,12 @@
-﻿using MediatR;
-using QingFa.EShop.Domain.Core.Repositories;
+﻿using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Metas;
 using Ardalis.GuardClauses;
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.ExampleMetas.Create
 {
-    public class CreateExampleMetaCommandHandler : IRequestHandler<CreateExampleMetaCommand, Result<Guid>>
+    public class CreateExampleMetaCommandHandler : ICommandHandler<CreateExampleMetaCommand, Guid>
     {
         private readonly IExampleMetaRepository _repository;
         private readonly IUnitOfWork _unitOfWork;

@@ -1,5 +1,4 @@
-﻿using MediatR;
-
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
@@ -9,10 +8,10 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.DeleteAttributeGroup
 {
-    public record DeleteAttributeGroupCommand : RequestType<Guid>, IRequest<Result>;
+    public record DeleteAttributeGroupCommand : RequestType<Guid>, ICommand;
     internal class DeleteAttributeGroupCommandHandler(
         IProductAttributeGroupRepository productAttributeGroupRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<DeleteAttributeGroupCommand, Result>
+        IUnitOfWork unitOfWork) : ICommand<DeleteAttributeGroupCommand>
     {
         private readonly IProductAttributeGroupRepository _productAttributeGroupRepository = productAttributeGroupRepository
                                ?? throw CoreException.NullArgument(nameof(productAttributeGroupRepository));

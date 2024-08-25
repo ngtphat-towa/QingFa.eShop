@@ -9,18 +9,12 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.DeleteAtt
 {
     public record DeleteAttributeOptionCommand(Guid Id) : IRequest<Result>;
 
-    internal class DeleteAttributeOptionCommandHandler : IRequestHandler<DeleteAttributeOptionCommand, Result>
+    internal class DeleteAttributeOptionCommandHandler(
+        IProductAttributeOptionRepository attributeOptionRepository,
+        IUnitOfWork unitOfWork) : IRequestHandler<DeleteAttributeOptionCommand, Result>
     {
-        private readonly IProductAttributeOptionRepository _attributeOptionRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public DeleteAttributeOptionCommandHandler(
-            IProductAttributeOptionRepository attributeOptionRepository,
-            IUnitOfWork unitOfWork)
-        {
-            _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly IProductAttributeOptionRepository _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result> Handle(DeleteAttributeOptionCommand request, CancellationToken cancellationToken)
         {

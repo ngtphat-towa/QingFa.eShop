@@ -1,19 +1,18 @@
 ﻿using Mapster;
 
-using MediatR;
-
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.AttributeGroupManagements.Models;
+using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.GetBrandById
 {
-    public record GetAttributeGroupById : IRequest<Result<AttributeGroupResponse>>
+    public record GetAttributeGroupById : RequestType<Guid>, IQuery<AttributeGroupResponse>
     {
-        public Guid Id { get; set; }
     }
 
-    internal class GetAttributeGroupByIdQueryHandler : IRequestHandler<GetAttributeGroupById, Result<AttributeGroupResponse>>
+    internal class GetAttributeGroupByIdQueryHandler : IQueryHandler<GetAttributeGroupById, AttributeGroupResponse>
     {
         private readonly IProductAttributeGroupRepository _repository;
 

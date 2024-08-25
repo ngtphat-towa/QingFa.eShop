@@ -6,16 +6,17 @@ using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Exceptions;
 using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.AssignSubcategories
 {
-    public record AssignSubcategoriesCommand : IRequest<Result>
+    public record AssignSubcategoriesCommand : ICommand
     {
         public Guid ParentCategoryId { get; init; }
         public List<Guid> SubcategoryIds { get; init; } = new List<Guid>();
     }
 
-    public class AssignSubcategoriesCommandHandler(
+    internal class AssignSubcategoriesCommandHandler(
         IApplicationDbContext dbContext,
         IUnitOfWork unitOfWork,
         ILogger<AssignSubcategoriesCommandHandler> logger) : IRequestHandler<AssignSubcategoriesCommand, Result>

@@ -1,5 +1,4 @@
-﻿using MediatR;
-
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
@@ -7,7 +6,7 @@ using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeOptionManagements.CreateAttributeOption
 {
-    public record CreateAttributeOptionCommand : IRequest<Result<Guid>>
+    public record CreateAttributeOptionCommand : ICommand<Guid>
     {
         public string OptionValue { get; init; } = string.Empty;
         public string Description { get; init; } = string.Empty;
@@ -16,21 +15,14 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.CreateAtt
         public Guid? ProductAttributeId { get; init; }
     }
 
-    internal class CreateAttributeOptionCommandHandler : IRequestHandler<CreateAttributeOptionCommand, Result<Guid>>
+    internal class CreateAttributeOptionCommandHandler(
+        IProductAttributeOptionRepository attributeOptionRepository,
+        IProductAttributeRepository attributeRepository,
+        IUnitOfWork unitOfWork) : ICommandHandler<CreateAttributeOptionCommand, Guid>
     {
-        private readonly IProductAttributeOptionRepository _attributeOptionRepository;
-        private readonly IProductAttributeRepository _attributeRepository;
-        private readonly IUnitOfWork _unitOfWork;
-
-        public CreateAttributeOptionCommandHandler(
-            IProductAttributeOptionRepository attributeOptionRepository,
-            IProductAttributeRepository attributeRepository,
-            IUnitOfWork unitOfWork)
-        {
-            _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
-        }
+        private readonly IProductAttributeOptionRepository _attributeOptionRepository = attributeOptionRepository ?? throw new ArgumentNullException(nameof(attributeOptionRepository));
+        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
+        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
 
         public async Task<Result<Guid>> Handle(CreateAttributeOptionCommand request, CancellationToken cancellationToken)
         {
