@@ -1,6 +1,8 @@
-﻿using Microsoft.OpenApi.Models;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.OpenApi.Models;
 
 using QingFa.EShop.Api.Filters;
+using QingFa.EShop.Api.OptionsSetup;
 using QingFa.EShop.Api.Services;
 using QingFa.EShop.Application.Core.Interfaces;
 
@@ -10,6 +12,12 @@ namespace QingFa.EShop.Api
     {
         public static IServiceCollection AddPresentation(this IServiceCollection services)
         {
+            services.ConfigureOptions<JwtOptionsSetup>();
+            services.ConfigureOptions<JwtBearerOptionsSetup>();
+
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer();
+
             // Add controllers
             services.AddControllers();
 
@@ -25,11 +33,8 @@ namespace QingFa.EShop.Api
                 // Enable annotations if you are using attributes in your controller actions
                 c.EnableAnnotations();
                 c.SchemaFilter<EnumSchemaFilter>();
-                //c.SchemaFilter<EnumListSchemaFilter>();
-                //c.DocumentFilter<EnumDocumentFilter>();
 
             });
-
             return services;
         }
     }

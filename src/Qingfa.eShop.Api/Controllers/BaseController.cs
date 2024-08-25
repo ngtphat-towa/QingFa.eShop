@@ -12,12 +12,7 @@ namespace QingFa.EShop.API.Controllers
     {
         protected IActionResult HandleResult<T>(Result<T> result)
         {
-            if (result.Succeeded)
-            {
-                return Ok(result.Value);
-            }
-
-            return HandleResult(result as Result); // Delegate to existing HandleResult
+            return result.Succeeded ? Ok(result.Value) : HandleResult(result as Result);
         }
 
         protected IActionResult HandleResult(Result result)
