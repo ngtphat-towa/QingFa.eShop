@@ -1,4 +1,4 @@
-﻿namespace QingFa.EShop.Infrastructure.Authentication.Settings
+﻿namespace QingFa.EShop.Infrastructure.Identity.Settings
 {
     public class JwtOptions
     {
@@ -6,7 +6,7 @@
 
         public string Audience { get; init; } = default!;
 
-        public string SecretKey { get; init; } = default!;
+        public string Key { get; init; } = default!;
 
         public int AccessTokenExpirationInMinutes { get; set; } = 15;
 

@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 
-using QingFa.EShop.Infrastructure.Authentication.Settings;
+using QingFa.EShop.Infrastructure.Identity.Settings;
 
 namespace QingFa.EShop.Api.OptionsSetup;
 

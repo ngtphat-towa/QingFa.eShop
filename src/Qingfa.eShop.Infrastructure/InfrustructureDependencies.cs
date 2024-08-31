@@ -29,7 +29,8 @@ namespace QingFa.EShop.Infrastructure
             });
 
             // Register IApplicationDbContext to use EShopDbContext
-            services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<EShopDbContext>());
+            services.AddScoped<IApplicationDbContext, AppDbContext>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
 
             // Register repositories
             services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
@@ -44,9 +45,6 @@ namespace QingFa.EShop.Infrastructure
 
             // Third-party services
             services.AddScoped<IEmailService, EmailService>();
-
-            // Register unit of work
-            services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<EShopDbContext>());
 
             // Optional: Add logging for debugging and monitoring
             services.AddLogging();

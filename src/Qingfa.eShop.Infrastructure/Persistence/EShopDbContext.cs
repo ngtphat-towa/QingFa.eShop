@@ -1,29 +1,31 @@
 ﻿using MediatR;
 
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Logging;
 
 using QingFa.EShop.Application.Core.Interfaces;
-using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
+using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Entities;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Metas;
+using QingFa.EShop.Infrastructure.Identity.Entities;
+using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
 using QingFa.EShop.Infrastructure.Interceptors;
-using QingFa.EShop.Infrastructure.Persistence.Configurations;
 using QingFa.EShop.Infrastructure.Persistence.Configurations.Attributes;
+using QingFa.EShop.Infrastructure.Persistence.Configurations.Identities;
+using QingFa.EShop.Infrastructure.Persistence.Configurations;
 
 namespace QingFa.EShop.Infrastructure.Persistence
 {
-    internal class EShopDbContext : DbContext, IUnitOfWork, IApplicationDbContext
+    internal class EShopDbContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
     {
         private readonly ILogger<EShopDbContext> _logger;
         private readonly IMediator _mediator;
         private readonly ICurrentUser _user;
         private readonly TimeProvider _dateTime;
-        private IDbContextTransaction? _currentTransaction;
 
         public EShopDbContext(
             DbContextOptions<EShopDbContext> options,
@@ -65,7 +67,7 @@ namespace QingFa.EShop.Infrastructure.Persistence
         {
             base.OnModelCreating(modelBuilder);
 
-            // Apply configurations
+            // Apply configurations for catalog entities
             modelBuilder.ApplyConfiguration(new ProductConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryConfiguration());
             modelBuilder.ApplyConfiguration(new CategoryProductConfiguration());
@@ -76,6 +78,13 @@ namespace QingFa.EShop.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ProductVariantConfiguration());
             modelBuilder.ApplyConfiguration(new ProductVariantAttributeConfiguration());
             modelBuilder.ApplyConfiguration(new ProductAttributeOptionConfiguration());
+
+            // Apply configurations for identity entities
+            modelBuilder.ApplyConfiguration(new PermissionConfiguration());
+            modelBuilder.ApplyConfiguration(new RoleConfiguration());
+            modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
+            modelBuilder.ApplyConfiguration(new AppUserConfiguration());
+            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
 
             // Apply index configurations for audit entities
             ConfigureIndexesForAuditEntities(modelBuilder);
@@ -115,107 +124,6 @@ namespace QingFa.EShop.Infrastructure.Persistence
             };
 
             return auditProperties.Contains(propertyName);
-        }
-
-        // IUnitOfWork implementation
-        public new async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                _logger.LogInformation("Saving changes to the database.");
-                var changes = await base.SaveChangesAsync(cancellationToken);
-                _logger.LogInformation("Changes saved successfully. Number of entities affected: {NumberOfEntities}", changes);
-                return changes;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while saving changes.");
-                throw;
-            }
-        }
-
-        // Transaction management
-        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
-        {
-            if (_currentTransaction != null)
-            {
-                throw new InvalidOperationException("A transaction is already in progress.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Beginning a new transaction.");
-                _currentTransaction = await Database.BeginTransactionAsync(cancellationToken);
-                _logger.LogInformation("Transaction started successfully.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while starting the transaction.");
-                throw;
-            }
-        }
-
-        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
-        {
-            if (_currentTransaction == null)
-            {
-                throw new InvalidOperationException("No transaction is in progress.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Committing the transaction.");
-                await _currentTransaction.CommitAsync(cancellationToken);
-                _logger.LogInformation("Transaction committed successfully.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while committing the transaction.");
-                throw;
-            }
-            finally
-            {
-                _currentTransaction.Dispose();
-                _currentTransaction = null;
-            }
-        }
-
-        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
-        {
-            if (_currentTransaction == null)
-            {
-                throw new InvalidOperationException("No transaction is in progress.");
-            }
-
-            try
-            {
-                _logger.LogInformation("Rolling back the transaction.");
-                await _currentTransaction.RollbackAsync(cancellationToken);
-                _logger.LogInformation("Transaction rolled back successfully.");
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while rolling back the transaction.");
-                throw;
-            }
-            finally
-            {
-                _currentTransaction.Dispose();
-                _currentTransaction = null;
-            }
-        }
-
-        // Optional: Log database commands
-        public override int SaveChanges(bool acceptAllChangesOnSuccess)
-        {
-            _logger.LogInformation("Saving changes with acceptAllChangesOnSuccess: {AcceptAllChangesOnSuccess}", acceptAllChangesOnSuccess);
-            return base.SaveChanges(acceptAllChangesOnSuccess);
-        }
-
-        public override void Dispose()
-        {
-            _logger.LogInformation("Disposing the DbContext.");
-            base.Dispose();
         }
     }
 

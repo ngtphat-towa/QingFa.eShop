@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
+    <Folder Include="Identity\Enums\" />
+    <Folder Include="Identity\Policies\" />
   </ItemGroup>
 
   <PropertyGroup>

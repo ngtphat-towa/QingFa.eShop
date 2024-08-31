@@ -1,7 +1,5 @@
 ﻿//using Gatherly.Domain.Entities;
 
-using MediatR;
-
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
