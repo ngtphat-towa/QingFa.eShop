@@ -8,17 +8,17 @@ using QingFa.EShop.Infrastructure.Identity.Settings;
 
 namespace QingFa.EShop.Api.OptionsSetup
 {
-    public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions) 
+    public class JwtBearerOptionsSetup(IOptions<JwtSettings> jwtOptions) 
         : IPostConfigureOptions<JwtBearerOptions>
     {
-        private readonly JwtOptions _jwtOptions = jwtOptions.Value;
+        private readonly JwtSettings _jwtOptions = jwtOptions.Value;
 
         public void PostConfigure(string? name, JwtBearerOptions options)
         {
             options.TokenValidationParameters.ValidIssuer = _jwtOptions.Issuer;
             options.TokenValidationParameters.ValidAudience = _jwtOptions.Audience;
             options.TokenValidationParameters.IssuerSigningKey =
-                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Key));
+                new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.Secret));
         }
     }
 }
