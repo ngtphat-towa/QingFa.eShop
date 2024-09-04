@@ -1,0 +1,55 @@
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using QingFa.EShop.Application.Core.Interfaces;
+using QingFa.EShop.Application.Features.CategoryManagements.Services;
+using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
+using QingFa.EShop.Domain.Catalogs.Repositories;
+using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Domain.Metas;
+using QingFa.EShop.Infrastructure.Persistence.Data;
+using QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes;
+using QingFa.EShop.Infrastructure.Repositories.Catalogs;
+using QingFa.EShop.Infrastructure.Repositories.Common;
+using QingFa.EShop.Infrastructure.Repositories;
+using QingFa.EShop.Infrastructure.Services;
+using Microsoft.EntityFrameworkCore;
+
+namespace QingFa.EShop.Infrastructure.Persistence
+{
+    internal static class PersistenceDependencies
+    {
+        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        {
+            // Retrieve the connection string from configuration
+            var connectionString = configuration.GetConnectionString("DefaultConnection");
+
+            // Register DbContext with the connection string
+            services.AddDbContext<EShopDbContext>(options =>
+            {
+                options.UseSqlite(connectionString).EnableSensitiveDataLogging();
+            });
+
+            // Register IApplicationDbContext to use EShopDbContext
+            services.AddScoped<IApplicationDbContext, AppDbContext>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Register repositories
+            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+            services.AddScoped<IExampleMetaRepository, ExampleMetaRepository>();
+            services.AddScoped<IBrandRepository, BrandRepository>();
+            services.AddScoped<ICategoryRepository, CategoryRepository>();
+            services.AddScoped<ICategoryService, CategoryService>();
+
+            services.AddScoped<IProductAttributeGroupRepository, ProductAttributeGroupRepository>();
+            services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+            services.AddScoped<IProductAttributeOptionRepository, ProductAttributeOptionRepository>();
+
+            // Third-party services
+            services.AddScoped<IEmailService, EmailService>();
+
+            services.AddDistributedMemoryCache();
+
+            return services;
+        }
+    }
+}

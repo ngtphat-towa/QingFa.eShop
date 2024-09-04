@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
 using Microsoft.AspNetCore.Identity;
 
-namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Identities
+namespace QingFa.EShop.Infrastructure.Identity.Configurations
 {
     internal class RoleConfiguration : IEntityTypeConfiguration<Role>
     {

@@ -1,47 +1,38 @@
-﻿using MediatR;
-
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-
+using MediatR;
 using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Domain.Metas;
-using QingFa.EShop.Infrastructure.Identity.Entities;
-using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
 using QingFa.EShop.Infrastructure.Interceptors;
 using QingFa.EShop.Infrastructure.Persistence.Configurations.Attributes;
-using QingFa.EShop.Infrastructure.Persistence.Configurations.Identities;
 using QingFa.EShop.Infrastructure.Persistence.Configurations;
 
-namespace QingFa.EShop.Infrastructure.Persistence
+namespace QingFa.EShop.Infrastructure.Persistence.Data
 {
-    internal class EShopDbContext : IdentityDbContext<AppUser, Role, Guid, IdentityUserClaim<Guid>, IdentityUserRole<Guid>, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
+    public class EShopDbContext : DbContext
     {
-        private readonly ILogger<EShopDbContext> _logger;
-        private readonly IMediator _mediator;
-        private readonly ICurrentUser _user;
-        private readonly TimeProvider _dateTime;
+        private readonly ILogger<EShopDbContext>? _logger;
+        private readonly IMediator? _mediator;
+        private readonly ICurrentUser? _user;
+        private readonly TimeProvider? _dateTime;
 
         public EShopDbContext(
             DbContextOptions<EShopDbContext> options,
-            ILogger<EShopDbContext> logger,
-            IMediator mediator,
-            ICurrentUser user,
-            TimeProvider dateTime)
+            ILogger<EShopDbContext>? logger = null,
+            IMediator? mediator = null,
+            ICurrentUser? user = null,
+            TimeProvider? dateTime = null)
             : base(options)
         {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
-            _user = user ?? throw new ArgumentNullException(nameof(user));
-            _dateTime = dateTime ?? throw new ArgumentNullException(nameof(dateTime));
+            _logger = logger;
+            _mediator = mediator;
+            _user = user;
+            _dateTime = dateTime;
         }
 
-        // Define DbSet properties for your entities
         public DbSet<ExampleMeta> ExampleMetas { get; set; }
         public DbSet<Brand> Brands { get; set; }
         public DbSet<Product> Products { get; set; }
@@ -53,13 +44,18 @@ namespace QingFa.EShop.Infrastructure.Persistence
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            base.OnConfiguring(optionsBuilder);
-
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder
-                    .AddInterceptors(new DispatchDomainEventsInterceptor(_mediator))
-                    .AddInterceptors(new AuditableEntityInterceptor(_user, _dateTime));
+                // Null checks for dependencies
+                if (_mediator != null)
+                {
+                    optionsBuilder.AddInterceptors(new DispatchDomainEventsInterceptor(_mediator));
+                }
+
+                if (_user != null && _dateTime != null)
+                {
+                    optionsBuilder.AddInterceptors(new AuditableEntityInterceptor(_user, _dateTime));
+                }
             }
         }
 
@@ -78,13 +74,6 @@ namespace QingFa.EShop.Infrastructure.Persistence
             modelBuilder.ApplyConfiguration(new ProductVariantConfiguration());
             modelBuilder.ApplyConfiguration(new ProductVariantAttributeConfiguration());
             modelBuilder.ApplyConfiguration(new ProductAttributeOptionConfiguration());
-
-            // Apply configurations for identity entities
-            modelBuilder.ApplyConfiguration(new PermissionConfiguration());
-            modelBuilder.ApplyConfiguration(new RoleConfiguration());
-            modelBuilder.ApplyConfiguration(new RolePermissionConfiguration());
-            modelBuilder.ApplyConfiguration(new AppUserConfiguration());
-            modelBuilder.ApplyConfiguration(new RefreshTokenConfiguration());
 
             // Apply index configurations for audit entities
             ConfigureIndexesForAuditEntities(modelBuilder);
@@ -124,27 +113,6 @@ namespace QingFa.EShop.Infrastructure.Persistence
             };
 
             return auditProperties.Contains(propertyName);
-        }
-    }
-
-    public static class EntityTypeHelper
-    {
-        public static IEnumerable<Type> GetDerivedEntityTypes(IModel model, Type baseType)
-        {
-            return model.GetEntityTypes()
-                .Where(e => baseType.IsAssignableFrom(e.ClrType))
-                .Select(e => e.ClrType)
-                .ToList();
-        }
-
-        public static string CreateIndexName(string tableName, string columnName)
-        {
-            return $"IX_{tableName}_{columnName}";
-        }
-
-        public static string? GetTableName(IEntityType entityType)
-        {
-            return entityType.GetTableName();
         }
     }
 }

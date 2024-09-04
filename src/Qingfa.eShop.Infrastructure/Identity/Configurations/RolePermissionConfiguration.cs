@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
 
-namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Identities
+namespace QingFa.EShop.Infrastructure.Identity.Configurations
 {
     internal class RolePermissionConfiguration : IEntityTypeConfiguration<RolePermission>
     {

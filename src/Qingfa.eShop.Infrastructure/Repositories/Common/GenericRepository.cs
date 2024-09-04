@@ -7,7 +7,7 @@ using QingFa.EShop.Domain.Core.Exceptions;
 using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Core.Specifications;
 
-namespace QingFa.EShop.Infrastructure.Repositories
+namespace QingFa.EShop.Infrastructure.Repositories.Common
 {
     /// <summary>
     /// A generic repository for performing CRUD operations on entities.

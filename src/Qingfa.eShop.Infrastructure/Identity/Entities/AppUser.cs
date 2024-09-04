@@ -11,8 +11,8 @@ namespace QingFa.EShop.Infrastructure.Identity.Entities
     {
         public string FirstName { get; set; } = string.Empty;
         public string LastName { get; set; } = string.Empty;
-        public Address ShippingAddress { get; set; } = Address.Empty;
-        public Address BillingAddress { get; set; } = Address.Empty;
+        public Address? ShippingAddress { get; set; } = Address.Empty;
+        public Address? BillingAddress { get; set; } = Address.Empty;
         public bool IsVerified => EmailConfirmed || PhoneNumberConfirmed;
         public int FailedLoginAttempts { get; set; }
         public string? PasswordResetToken { get; set; }

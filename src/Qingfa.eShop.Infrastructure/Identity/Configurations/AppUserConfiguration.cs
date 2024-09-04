@@ -4,7 +4,7 @@ using QingFa.EShop.Infrastructure.Identity.Entities;
 using QingFa.EShop.Domain.Common.ValueObjects;
 using Microsoft.AspNetCore.Identity;
 
-namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Identities
+namespace QingFa.EShop.Infrastructure.Identity.Configurations
 {
     internal class AppUserConfiguration : IEntityTypeConfiguration<AppUser>
     {
@@ -20,13 +20,13 @@ namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Identities
 
             builder.Property(u => u.ShippingAddress)
                 .HasConversion(
-                    address => address.ToString(),
+                    address => address!.ToString(),
                     str => Address.FromString(str))
                 .IsRequired();
 
             builder.Property(u => u.BillingAddress)
                 .HasConversion(
-                    address => address.ToString(),
+                    address => address!.ToString(),
                     str => Address.FromString(str))
                 .IsRequired();
 

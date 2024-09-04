@@ -5,7 +5,7 @@ using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Metas;
 
-namespace QingFa.EShop.Infrastructure.Persistence
+namespace QingFa.EShop.Infrastructure.Persistence.Data
 {
     internal class AppDbContext : IApplicationDbContext
     {

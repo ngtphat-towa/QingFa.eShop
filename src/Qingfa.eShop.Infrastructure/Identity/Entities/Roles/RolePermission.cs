@@ -1,5 +1,4 @@
-﻿using System;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 using QingFa.EShop.Domain.Core.Entities;
 using QingFa.EShop.Infrastructure.Identity.Entities.Permissions;
@@ -8,7 +7,7 @@ namespace QingFa.EShop.Infrastructure.Identity.Entities.Roles
 {
     public class RolePermission : AuditEntity
     {
-        private RolePermission(): base(default!) { }
+        public RolePermission() : base(Guid.Empty) { }
 
         public RolePermission(Guid id, Guid roleId, Guid permissionId)
             : base(id)

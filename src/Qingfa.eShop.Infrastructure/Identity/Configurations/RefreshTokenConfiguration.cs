@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using QingFa.EShop.Infrastructure.Identity.Entities;
 
-namespace QingFa.EShop.Infrastructure.Persistence.Configurations.Identities
+namespace QingFa.EShop.Infrastructure.Identity.Configurations
 {
     internal class RefreshTokenConfiguration : IEntityTypeConfiguration<RefreshToken>
     {

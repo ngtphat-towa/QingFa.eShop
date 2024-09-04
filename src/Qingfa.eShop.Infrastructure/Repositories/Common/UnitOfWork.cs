@@ -2,8 +2,9 @@
 using Microsoft.Extensions.Logging;
 
 using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Infrastructure.Persistence.Data;
 
-namespace QingFa.EShop.Infrastructure.Persistence
+namespace QingFa.EShop.Infrastructure.Repositories.Common
 {
     internal class UnitOfWork : IUnitOfWork
     {
