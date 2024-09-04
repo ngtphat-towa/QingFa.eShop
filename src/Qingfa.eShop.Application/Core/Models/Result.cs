@@ -44,6 +44,11 @@
             return Failure(errors, 400, "Validation Failed");
         }
 
+        public static Result ValidationFailure(string error)
+        {
+            return Failure(error, 400, "Validation Failed");
+        }
+
         public static Result Unauthorized(string action = "perform this action")
         {
             return Failure($"You are not authorized to {action}.", 401, "Unauthorized");
@@ -77,6 +82,18 @@
         public static Result PreconditionFailed(string condition)
         {
             return Failure($"Precondition failed: {condition}", 412, "Precondition Failed");
+        }
+
+        // New implementation for UnexpectedError with string message
+        public static Result UnexpectedError(string message)
+        {
+            return new Result(false, new[] { message }, 500, "Internal Server Error");
+        }
+
+        // New implementation for ValidationFailure with string errorCode and errorMessage
+        public static Result ValidationFailure(string errorCode, string errorMessage)
+        {
+            return new Result(false, new[] { errorMessage }, 400, errorCode);
         }
     }
 
@@ -114,6 +131,12 @@
         public static new Result<T> ValidationFailure(IEnumerable<string> errors)
         {
             var result = Result.ValidationFailure(errors);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> ValidationFailure(string error)
+        {
+            var result = Result.ValidationFailure(error);
             return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
         }
 
@@ -163,6 +186,18 @@
         {
             var errorMessage = $"Invalid argument: {argumentName}. Reason: {reason}";
             return new Result<T>(false, default, new[] { errorMessage }, 400);
+        }
+
+        // Implemented UnexpectedError with string argument
+        public static new Result<T> UnexpectedError(string message)
+        {
+            return new Result<T>(false, default, new[] { message }, 500, "Internal Server Error");
+        }
+
+        // Implemented ValidationFailure with two string arguments
+        public static new Result<T> ValidationFailure(string errorCode, string errorMessage)
+        {
+            return new Result<T>(false, default, new[] { errorMessage }, 400, errorCode);
         }
     }
 }

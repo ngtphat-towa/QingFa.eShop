@@ -23,7 +23,6 @@
 
   <ItemGroup>
     <Folder Include="Features\Common\Enums\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <PropertyGroup>
