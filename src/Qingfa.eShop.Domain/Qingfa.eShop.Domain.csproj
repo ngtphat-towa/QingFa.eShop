@@ -9,12 +9,15 @@
   <ItemGroup>
     <Compile Remove="Abtractions\**" />
     <Compile Remove="Domain\**" />
+    <Compile Remove="Identity\**" />
     <Compile Remove="Products\**" />
     <EmbeddedResource Remove="Abtractions\**" />
     <EmbeddedResource Remove="Domain\**" />
+    <EmbeddedResource Remove="Identity\**" />
     <EmbeddedResource Remove="Products\**" />
     <None Remove="Abtractions\**" />
     <None Remove="Domain\**" />
+    <None Remove="Identity\**" />
     <None Remove="Products\**" />
   </ItemGroup>
 
