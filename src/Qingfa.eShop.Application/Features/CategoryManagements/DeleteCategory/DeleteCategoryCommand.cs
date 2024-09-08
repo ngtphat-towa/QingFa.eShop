@@ -1,10 +1,9 @@
 ﻿using MediatR;
-
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
-using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Application.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.DeleteCategory
 {
@@ -12,38 +11,41 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.DeleteCategory
 
     public class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand, Result>
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbProvider;
 
-        public DeleteCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
+        public DeleteCategoryCommandHandler(IApplicationDbProvider dbProvider)
         {
-            _categoryRepository = categoryRepository ?? throw CoreException.NullArgument(nameof(categoryRepository));
-            _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
+            _dbProvider = dbProvider ?? throw CoreException.NullArgument(nameof(dbProvider));
         }
 
         public async Task<Result> Handle(DeleteCategoryCommand request, CancellationToken cancellationToken)
         {
             try
             {
+                // Use IApplicationDbProvider to get the DbSet<Category>
+                var categorySet = _dbProvider.Categories;
+
                 // Check if the category exists
-                var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken);
+                var category = await categorySet
+                    .Include(c => c.ChildCategories)
+                    .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+
                 if (category == null)
                 {
                     return Result.NotFound("Category", "The specified category does not exist.");
                 }
 
                 // Check if the category has child categories
-                var childCategories = await _categoryRepository.GetChildCategoriesAsync(request.Id, cancellationToken);
-                if (childCategories.Count > 0)
+                if (category.ChildCategories.Any())
                 {
-                    return Result.InvalidOperation("Delete category", "Category cannot be deleted because it has child categories.");
+                    return Result.InvalidOperation("DeleteCategory", "Category cannot be deleted because it has child categories.");
                 }
 
-                // Delete the category
-                await _categoryRepository.DeleteAsync(category, cancellationToken);
+                // Remove the category
+                categorySet.Remove(category);
 
                 // Commit the transaction
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();
             }

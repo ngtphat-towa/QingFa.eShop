@@ -1,9 +1,9 @@
 ﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
-using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Application.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttributeGroup
 {
@@ -12,18 +12,19 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttr
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
     }
+
     internal class CreateAttributeGroupCommandHandler(
-        IProductAttributeGroupRepository attributeGroupRepository,
-        IUnitOfWork unitOfWork) : ICommandHandler<CreateAttributeGroupCommand, Guid>
+        IApplicationDbProvider dbContext) : ICommandHandler<CreateAttributeGroupCommand, Guid>
     {
-        private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw CoreException.NullArgument(nameof(attributeGroupRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbContext = dbContext ?? throw CoreException.NullArgument(nameof(dbContext));
 
         public async Task<Result<Guid>> Handle(CreateAttributeGroupCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var attributeGroupExists = await _attributeGroupRepository.ExistsByNameAsync(request.Name, cancellationToken);
+                var attributeGroupExists = await _dbContext.ProductAttributeGroups
+                    .AnyAsync(ag => ag.GroupName == request.Name, cancellationToken);
+
                 if (attributeGroupExists)
                 {
                     return Result<Guid>.Conflict(nameof(ProductAttributeGroup), "An attribute group with this name already exists.");
@@ -31,9 +32,8 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.CreateAttr
 
                 var attributeGroup = ProductAttributeGroup.Create(request.Name, request.Description);
 
-                await _attributeGroupRepository.AddAsync(attributeGroup, cancellationToken);
-
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbContext.ProductAttributeGroups.AddAsync(attributeGroup, cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
                 return Result<Guid>.Success(attributeGroup.Id);
             }

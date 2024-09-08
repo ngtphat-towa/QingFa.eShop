@@ -1,20 +1,23 @@
-﻿using QingFa.EShop.Domain.Core.Repositories;
+﻿using Ardalis.GuardClauses;
+
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Metas;
-using Ardalis.GuardClauses;
-using QingFa.EShop.Application.Core.Abstractions.Messaging;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace QingFa.EShop.Application.ExampleMetas.Create
 {
     public class CreateExampleMetaCommandHandler : ICommandHandler<CreateExampleMetaCommand, Guid>
     {
-        private readonly IExampleMetaRepository _repository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbContext;
 
-        public CreateExampleMetaCommandHandler(IExampleMetaRepository repository, IUnitOfWork unitOfWork)
+        public CreateExampleMetaCommandHandler(IApplicationDbProvider dbContext)
         {
-            _repository = repository;
-            _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
         }
 
         public async Task<Result<Guid>> Handle(CreateExampleMetaCommand request, CancellationToken cancellationToken)
@@ -23,10 +26,11 @@ namespace QingFa.EShop.Application.ExampleMetas.Create
             Guard.Against.NullOrEmpty(request.CreatedBy, nameof(request.CreatedBy));
 
             var exampleMeta = new ExampleMeta(Guid.NewGuid(), request.Name, DateTimeOffset.UtcNow, request.CreatedBy);
-            await _repository.AddAsync(exampleMeta, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return Result<Guid>.Success(exampleMeta.Id); // Return the ID of the created entity
+            await _dbContext.ExampleMetas.AddAsync(exampleMeta, cancellationToken);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+
+            return Result<Guid>.Success(exampleMeta.Id);
         }
     }
 }

@@ -95,6 +95,12 @@
         {
             return new Result(false, new[] { errorMessage }, 400, errorCode);
         }
+        public static Result InvalidArgument(string argumentName, string reason)
+        {
+            var errorMessage = $"Invalid argument: {argumentName}. Reason: {reason}";
+            return new Result(false, new[] { errorMessage }, 400);
+        }
+
     }
 
     public class Result<T> : Result
@@ -182,7 +188,7 @@
             return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
         }
 
-        public static Result<T> InvalidArgument(string argumentName, string reason)
+        public static new Result<T> InvalidArgument(string argumentName, string reason)
         {
             var errorMessage = $"Invalid argument: {argumentName}. Reason: {reason}";
             return new Result<T>(false, default, new[] { errorMessage }, 400);

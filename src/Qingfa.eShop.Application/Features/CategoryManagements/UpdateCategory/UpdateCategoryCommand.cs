@@ -1,34 +1,51 @@
 ﻿using MediatR;
-
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using QingFa.EShop.Application.Core.Models;
-using QingFa.EShop.Application.Features.Common.Requests;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.Repositories;
+using QingFa.EShop.Domain.Core.Exceptions;
 using QingFa.EShop.Domain.Core.Enums;
-using QingFa.EShop.Domain.Core.Repositories;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
 {
-    public record UpdateCategoryCommand : RequestType<Guid>, IRequest<Result>
+    public record UpdateCategoryCommand : IRequest<Result>
     {
-        public string Name { get; set; } = default!;
-        public string? Description { get; set; }
-        public string? ImageUrl { get; set; }
-        public Guid? ParentCategoryId { get; set; }
-        public EntityStatus? Status { get; set; }
+        public Guid Id { get; set; }
+        public string Name { get; init; } = default!;
+        public string? Description { get; init; }
+        public string? ImageUrl { get; init; }
+        public Guid? ParentCategoryId { get; init; }
+        public EntityStatus? Status { get; init; }
     }
 
-    public class UpdateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork) : IRequestHandler<UpdateCategoryCommand, Result>
+    internal class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Result>
     {
-        private readonly ICategoryRepository _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<UpdateCategoryCommandHandler> _logger;
+
+        public UpdateCategoryCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<UpdateCategoryCommandHandler> logger)
+        {
+            _dbProvider = dbProvider ?? throw CoreException.NullArgument(nameof(dbProvider));
+            _logger = logger ?? throw CoreException.NullArgument(nameof(logger));
+        }
 
         public async Task<Result> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                // Check if the category exists
-                var category = await _categoryRepository.GetByIdAsync(request.Id, cancellationToken);
+                // Retrieve the category to be updated
+                var category = await _dbProvider.Categories
+                    .Include(c => c.ChildCategories)
+                    .FirstOrDefaultAsync(c => c.Id == request.Id, cancellationToken);
+
                 if (category == null)
                 {
                     return Result.NotFound(nameof(Category), "The specified category does not exist.");
@@ -37,27 +54,37 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
                 // Check if the parent category exists if ParentCategoryId is provided
                 if (request.ParentCategoryId.HasValue)
                 {
-                    var parentCategoryExists = await _categoryRepository.GetByIdAsync(request.ParentCategoryId.Value, cancellationToken);
-                    if (parentCategoryExists == null)
+                    var parentCategory = await _dbProvider.Categories
+                        .Include(c => c.ChildCategories)
+                        .FirstOrDefaultAsync(c => c.Id == request.ParentCategoryId.Value, cancellationToken);
+
+                    if (parentCategory == null)
                     {
                         return Result.NotFound(nameof(Category), "The specified parent category does not exist.");
                     }
 
                     // Check for cyclic dependency
-                    if (IsCyclicDependency(request.Id, request.ParentCategoryId.Value, cancellationToken))
+                    var hasCyclicDependency = await IsCyclicDependencyAsync(request.Id, request.ParentCategoryId.Value, cancellationToken);
+                    if (hasCyclicDependency)
                     {
                         return Result.Conflict(nameof(Category), "Assigning this parent category would create a cyclic dependency.");
                     }
                 }
 
-                // Check if a category with the same name exists under the same parent category
-                var categoryExists = await _categoryRepository.ExistsByNameAsync(request.Name, request.ParentCategoryId, cancellationToken);
+                // Check if a category with the same name already exists
+                var categoryExists = await _dbProvider.Categories
+                    .AsNoTracking()
+                    .AnyAsync(c => EF.Functions.Like(c.Name, $"%{request.Name}%") &&
+                                   (c.ParentCategoryId == request.ParentCategoryId ||
+                                    (request.ParentCategoryId == null && c.ParentCategoryId == null)),
+                               cancellationToken);
+
                 if (categoryExists)
                 {
                     return Result.Conflict(nameof(Category), "A category with this name already exists under the specified parent category.");
                 }
 
-                // Update the category
+                // Update the category properties
                 category.Update(
                     request.Name,
                     request.Description,
@@ -65,25 +92,25 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
                     request.ParentCategoryId
                 );
 
-                // Check if the status is valid
+                // Update the status if provided
                 if (request.Status.HasValue)
                 {
                     category.SetStatus(request.Status.Value);
                 }
 
                 // Commit the transaction
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();
             }
             catch (Exception ex)
             {
-                // Handle unexpected exceptions
+                _logger.LogError(ex, "An error occurred while updating the category.");
                 return Result.UnexpectedError(ex);
             }
         }
 
-        private bool IsCyclicDependency(Guid categoryId, Guid newParentId, CancellationToken cancellationToken)
+        private async Task<bool> IsCyclicDependencyAsync(Guid categoryId, Guid newParentId, CancellationToken cancellationToken)
         {
             var visited = new HashSet<Guid>();
             var stack = new Stack<Guid>();
@@ -97,7 +124,10 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.UpdateCategory
                     return true;
                 }
 
-                var currentCategory = _categoryRepository.GetByIdAsync(currentId, cancellationToken).Result;
+                var currentCategory = await _dbProvider.Categories
+                    .Include(c => c.ChildCategories)
+                    .FirstOrDefaultAsync(c => c.Id == currentId, cancellationToken);
+
                 if (currentCategory == null)
                 {
                     continue;

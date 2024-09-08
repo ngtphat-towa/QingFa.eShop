@@ -1,10 +1,9 @@
 ﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
-using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Enums;
-using QingFa.EShop.Domain.Core.Repositories;
 
 using ICommand = QingFa.EShop.Application.Core.Abstractions.Messaging.ICommand;
 
@@ -16,16 +15,18 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttr
         public string Description { get; set; } = default!;
         public EntityStatus? Status { get; set; } = default!;
     }
-    internal class UpdateAttributeGroupCommandHandler(IProductAttributeGroupRepository attributeGroupRepository, IUnitOfWork unitOfWork) : ICommandHandler<UpdateAttributeGroupCommand>
+    internal class UpdateAttributeGroupCommandHandler(
+        IApplicationDbProvider applicationDbProvider) : ICommandHandler<UpdateAttributeGroupCommand>
     {
-        private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw new ArgumentNullException(nameof(attributeGroupRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _applicationDbProvider = applicationDbProvider
+            ?? throw new ArgumentNullException(nameof(applicationDbProvider));
 
         public async Task<Result> Handle(UpdateAttributeGroupCommand request, CancellationToken cancellationToken)
         {
             try
             {
-                var attributeGroup = await _attributeGroupRepository.GetByIdAsync(request.Id, cancellationToken);
+                var attributeGroup = await _applicationDbProvider.ProductAttributeGroups
+                  .FindAsync(new object[] { request.Id }, cancellationToken);
                 if (attributeGroup == null)
                 {
                     return Result.NotFound(nameof(ProductAttributeGroup), request.Id.ToString());
@@ -34,10 +35,13 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.UpdateAttr
                 // Update properties
                 attributeGroup.Update(request.Name,request.Description);
 
-                attributeGroup.SetStatus(request.Status);
+                if (request.Status.HasValue)
+                {
+                    attributeGroup.SetStatus(request.Status.Value);
+                }
 
-                await _attributeGroupRepository.UpdateAsync(attributeGroup, cancellationToken);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                // Save changes
+                await _applicationDbProvider.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();
             }

@@ -1,34 +1,32 @@
 ﻿using Ardalis.GuardClauses;
-using QingFa.EShop.Domain.Core.Repositories;
-using QingFa.EShop.Application.Core.Models;
-using QingFa.EShop.Domain.Metas;
+
 using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
+using QingFa.EShop.Application.Core.Models;
 
 namespace QingFa.EShop.Application.ExampleMetas.Delete
 {
     public class DeleteExampleMetaCommandHandler : ICommandHandler<DeleteExampleMetaCommand>
     {
-        private readonly IExampleMetaRepository _repository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbContext;
 
-        public DeleteExampleMetaCommandHandler(IExampleMetaRepository repository, IUnitOfWork unitOfWork)
+        public DeleteExampleMetaCommandHandler(IApplicationDbProvider dbContext)
         {
-            _repository = repository;
-            _unitOfWork = unitOfWork;
+            _dbContext = dbContext;
         }
 
         public async Task<Result> Handle(DeleteExampleMetaCommand request, CancellationToken cancellationToken)
         {
             Guard.Against.Null(request.Id, nameof(request.Id));
 
-            var exampleMeta = await _repository.GetByIdAsync(request.Id, cancellationToken);
+            var exampleMeta = await _dbContext.ExampleMetas.FindAsync(new object[] { request.Id }, cancellationToken);
             if (exampleMeta == null)
             {
                 return Result.Failure(new[] { $"ExampleMeta with ID {request.Id} not found." });
             }
 
-            await _repository.DeleteAsync(exampleMeta, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            _dbContext.ExampleMetas.Remove(exampleMeta);
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

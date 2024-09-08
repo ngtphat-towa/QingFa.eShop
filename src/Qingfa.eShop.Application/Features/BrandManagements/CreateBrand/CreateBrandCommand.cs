@@ -1,11 +1,13 @@
-﻿using QingFa.EShop.Application.Core.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
+using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Enums;
-using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
 {
@@ -18,21 +20,35 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
         public EntityStatus? Status { get; set; }
     }
 
-    internal class CreateBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork) : ICommandHandler<CreateBrandCommand, Guid>
+    internal class CreateBrandCommandHandler : ICommandHandler<CreateBrandCommand, Guid>
     {
-        private readonly IBrandRepository _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<CreateBrandCommandHandler> _logger;
+
+        public CreateBrandCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<CreateBrandCommandHandler> logger)
+        {
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public async Task<Result<Guid>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Handling CreateBrandCommand with Name: {Name}", request.Name);
+
             try
             {
                 // Check if a brand with the same name already exists
-                if (await _brandRepository.ExistsByNameAsync(request.Name, cancellationToken))
+                var brandExists = await _dbProvider.Brands
+                    .AnyAsync(b => b.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase), cancellationToken);
+
+                if (brandExists)
                 {
                     return Result<Guid>.Conflict(nameof(Brand), "A brand with this name already exists.");
                 }
 
+                // Create the SEO metadata
                 var seoMeta = SeoMeta.Create(
                     request.SeoMeta.Title ?? string.Empty,
                     request.SeoMeta.Description ?? string.Empty,
@@ -40,18 +56,26 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
                     request.SeoMeta.CanonicalUrl,
                     request.SeoMeta.Robots);
 
+                // Create the new brand
                 var brand = Brand.Create(request.Name, request.Description, seoMeta, request.LogoUrl);
 
-                brand.SetStatus(request.Status);
+                // Set the status if provided
+                if (request.Status.HasValue)
+                {
+                    brand.SetStatus(request.Status.Value);
+                }
 
-                await _brandRepository.AddAsync(brand, cancellationToken);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                // Add the brand to the context
+                await _dbProvider.Brands.AddAsync(brand, cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Successfully created brand with ID: {Id}", brand.Id);
 
                 return Result<Guid>.Success(brand.Id);
             }
             catch (Exception ex)
             {
-                // Handle unexpected exceptions
+                _logger.LogError(ex, "An error occurred while creating the brand with Name: {Name}", request.Name);
                 return Result<Guid>.UnexpectedError(ex);
             }
         }

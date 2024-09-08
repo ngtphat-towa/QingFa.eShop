@@ -19,9 +19,9 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.GetSubcategories
     public class GetSubcategoriesQueryHandler
         : IRequestHandler<GetSubcategoriesQuery, Result<IReadOnlyList<BasicResponse<Guid>>>>
     {
-        private readonly IApplicationDbContext _dbContext;
+        private readonly IApplicationDbProvider _dbContext;
 
-        public GetSubcategoriesQueryHandler(IApplicationDbContext dbContext)
+        public GetSubcategoriesQueryHandler(IApplicationDbProvider dbContext)
         {
             _dbContext = dbContext ?? throw CoreException.NullArgument(nameof(dbContext));
         }

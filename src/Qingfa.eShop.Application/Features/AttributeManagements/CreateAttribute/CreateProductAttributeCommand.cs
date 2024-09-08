@@ -1,10 +1,12 @@
 ﻿using MediatR;
-
+using Microsoft.Extensions.Logging;
 using QingFa.EShop.Application.Core.Models;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
-using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
-using QingFa.EShop.Domain.Core.Repositories;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
 {
@@ -21,14 +23,18 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
         public Guid AttributeGroupId { get; set; }
     }
 
-    internal class CreateProductAttributeCommandHandler(
-        IProductAttributeRepository attributeRepository,
-        IProductAttributeGroupRepository attributeGroupRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<CreateProductAttributeCommand, Result<Guid>>
+    internal class CreateProductAttributeCommandHandler : IRequestHandler<CreateProductAttributeCommand, Result<Guid>>
     {
-        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-        private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw new ArgumentNullException(nameof(attributeGroupRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<CreateProductAttributeCommandHandler> _logger;
+
+        public CreateProductAttributeCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<CreateProductAttributeCommandHandler> logger)
+        {
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
 
         public async Task<Result<Guid>> Handle(CreateProductAttributeCommand request, CancellationToken cancellationToken)
         {
@@ -39,15 +45,22 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
             if (string.IsNullOrWhiteSpace(request.AttributeCode))
                 return Result<Guid>.InvalidArgument(nameof(request.AttributeCode), "Attribute code cannot be null or empty.");
 
+            _logger.LogInformation("Handling CreateProductAttributeCommand with Name: {Name}, AttributeCode: {AttributeCode}, AttributeGroupId: {AttributeGroupId}",
+                                    request.Name,
+                                    request.AttributeCode,
+                                    request.AttributeGroupId);
+
             // Check if the attribute group exists
-            var groupExists = await _attributeGroupRepository.GetByIdAsync(request.AttributeGroupId, cancellationToken);
-            if (groupExists == null)
+            var groupExists = await _dbProvider.ProductAttributeGroups
+                .AnyAsync(g => g.Id == request.AttributeGroupId, cancellationToken);
+            if (!groupExists)
             {
                 return Result<Guid>.NotFound(nameof(ProductAttributeGroup), "Attribute group not found.");
             }
 
             // Check if an attribute with the same name exists in the specified attribute group
-            var attributeExists = await _attributeRepository.ExistsByNameAsync(request.Name, request.AttributeGroupId, cancellationToken);
+            var attributeExists = await _dbProvider.ProductAttributes
+                .AnyAsync(a => a.Name == request.Name && a.AttributeGroupId == request.AttributeGroupId, cancellationToken);
             if (attributeExists)
             {
                 return Result<Guid>.Conflict(nameof(ProductAttribute), "An attribute with this name already exists in the specified attribute group.");
@@ -67,14 +80,16 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
                     request.SortOrder,
                     request.AttributeGroupId);
 
-                await _attributeRepository.AddAsync(attribute, cancellationToken);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.ProductAttributes.AddAsync(attribute, cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Created new product attribute with ID: {AttributeId}", attribute.Id);
 
                 return Result<Guid>.Success(attribute.Id);
             }
             catch (Exception ex)
             {
-                // Return an unexpected error result
+                _logger.LogError(ex, "An error occurred while creating a new product attribute.");
                 return Result<Guid>.UnexpectedError(ex);
             }
         }

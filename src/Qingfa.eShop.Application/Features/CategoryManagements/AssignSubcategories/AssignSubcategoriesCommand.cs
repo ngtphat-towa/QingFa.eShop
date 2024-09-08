@@ -5,7 +5,6 @@ using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.AssignSubcategories
@@ -17,12 +16,10 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.AssignSubcategor
     }
 
     internal class AssignSubcategoriesCommandHandler(
-        IApplicationDbContext dbContext,
-        IUnitOfWork unitOfWork,
+        IApplicationDbProvider dbContext,
         ILogger<AssignSubcategoriesCommandHandler> logger) : IRequestHandler<AssignSubcategoriesCommand, Result>
     {
-        private readonly IApplicationDbContext _dbContext = dbContext ?? throw CoreException.NullArgument(nameof(dbContext));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbContext = dbContext ?? throw CoreException.NullArgument(nameof(dbContext));
         private readonly ILogger<AssignSubcategoriesCommandHandler> _logger = logger;
 
         public async Task<Result> Handle(AssignSubcategoriesCommand request, CancellationToken cancellationToken)
@@ -101,7 +98,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.AssignSubcategor
 
                 _logger.LogInformation("Updating parent category.");
                 _dbContext.Categories.Update(parentCategory);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbContext.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();
             }
