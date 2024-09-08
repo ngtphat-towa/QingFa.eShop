@@ -177,7 +177,7 @@ namespace QingFa.EShop.Infrastructure.Repositories.Common
         /// <param name="fieldName">The name of the field to check. Defaults to "Name".</param>
         /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         /// <returns>True if an entity with the specified field value exists; otherwise, false.</returns>
-        public async Task<bool> ExistsByFieldAsync(object value, CancellationToken cancellationToken = default, string? fieldName = "Name")
+        public async Task<bool> ExistsByFieldAsync(string fieldName = "Name", object? value= default, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(fieldName))
                 throw CoreException.NullOrEmptyArgument(nameof(fieldName));

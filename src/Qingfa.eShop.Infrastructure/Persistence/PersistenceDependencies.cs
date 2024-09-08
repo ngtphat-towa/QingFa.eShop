@@ -14,42 +14,50 @@ using QingFa.EShop.Infrastructure.Repositories;
 using QingFa.EShop.Infrastructure.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace QingFa.EShop.Infrastructure.Persistence
+internal static class PersistenceDependencies
 {
-    internal static class PersistenceDependencies
+    public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
+        var connectionString = GetConnectionString(configuration);
+
+        services.AddDbContext<EShopDbContext>(options =>
         {
-            // Retrieve the connection string from configuration
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
+            options.UseSqlite(connectionString).EnableSensitiveDataLogging();
+        });
 
-            // Register DbContext with the connection string
-            services.AddDbContext<EShopDbContext>(options =>
-            {
-                options.UseSqlite(connectionString).EnableSensitiveDataLogging();
-            });
+        RegisterRepositories(services);
+        RegisterThirdPartyServices(services);
 
-            // Register IApplicationDbContext to use EShopDbContext
-            services.AddScoped<IApplicationDbContext, AppDbContext>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+        return services;
+    }
 
-            // Register repositories
-            services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
-            services.AddScoped<IExampleMetaRepository, ExampleMetaRepository>();
-            services.AddScoped<IBrandRepository, BrandRepository>();
-            services.AddScoped<ICategoryRepository, CategoryRepository>();
-            services.AddScoped<ICategoryService, CategoryService>();
+    private static string GetConnectionString(IConfiguration configuration)
+    {
+        return configuration.GetConnectionString("DefaultConnection")!;
+    }
 
-            services.AddScoped<IProductAttributeGroupRepository, ProductAttributeGroupRepository>();
-            services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
-            services.AddScoped<IProductAttributeOptionRepository, ProductAttributeOptionRepository>();
+    private static void RegisterRepositories(IServiceCollection services)
+    {
+        // Register IApplicationDbProvider to use EShopDbContext
+        services.AddScoped<IApplicationDbProvider, EShopDbContext>();
 
-            // Third-party services
-            services.AddScoped<IEmailService, EmailService>();
+        // Register repositories
+        services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
+        services.AddScoped<IExampleMetaRepository, ExampleMetaRepository>();
+        services.AddScoped<IBrandRepository, BrandRepository>();
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<ICategoryService, CategoryService>();
 
-            services.AddDistributedMemoryCache();
+        services.AddScoped<IProductAttributeGroupRepository, ProductAttributeGroupRepository>();
+        services.AddScoped<IProductAttributeRepository, ProductAttributeRepository>();
+        services.AddScoped<IProductAttributeOptionRepository, ProductAttributeOptionRepository>();
+    }
 
-            return services;
-        }
+    private static void RegisterThirdPartyServices(IServiceCollection services)
+    {
+        // Register third-party services
+        services.AddScoped<IEmailService, EmailService>();
+
+        services.AddDistributedMemoryCache();
     }
 }

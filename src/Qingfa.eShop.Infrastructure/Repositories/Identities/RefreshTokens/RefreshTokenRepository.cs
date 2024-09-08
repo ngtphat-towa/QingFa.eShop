@@ -23,5 +23,41 @@ namespace QingFa.EShop.Infrastructure.Repositories.Identities.RefreshTokens
         {
             return await _context.Set<RefreshToken>().Where(predicate).ToListAsync();
         }
+
+        public new async Task AddAsync(RefreshToken entity, CancellationToken cancellationToken = default)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            await _context.Set<RefreshToken>().AddAsync(entity, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public new async Task UpdateAsync(RefreshToken entity, CancellationToken cancellationToken = default)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            var existingEntity = await _context.Set<RefreshToken>().FindAsync(new object[] { entity.Id }, cancellationToken);
+            if (existingEntity == null)
+            {
+                throw new InvalidOperationException("RefreshToken does not exist.");
+            }
+
+            _context.Entry(existingEntity).CurrentValues.SetValues(entity);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
+        public new async Task DeleteAsync(RefreshToken entity, CancellationToken cancellationToken = default)
+        {
+            if (entity == null) throw new ArgumentNullException(nameof(entity));
+
+            var existingEntity = await _context.Set<RefreshToken>().FindAsync(new object[] { entity.Id }, cancellationToken);
+            if (existingEntity == null)
+            {
+                throw new InvalidOperationException("RefreshToken does not exist.");
+            }
+
+            _context.Set<RefreshToken>().Remove(existingEntity);
+            await _context.SaveChangesAsync(cancellationToken);
+        }
     }
 }

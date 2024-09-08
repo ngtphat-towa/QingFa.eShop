@@ -9,15 +9,17 @@ using QingFa.EShop.Domain.Metas;
 using QingFa.EShop.Infrastructure.Interceptors;
 using QingFa.EShop.Infrastructure.Persistence.Configurations.Attributes;
 using QingFa.EShop.Infrastructure.Persistence.Configurations;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace QingFa.EShop.Infrastructure.Persistence.Data
 {
-    public class EShopDbContext : DbContext
+    public class EShopDbContext : DbContext, IApplicationDbProvider
     {
         private readonly ILogger<EShopDbContext>? _logger;
         private readonly IMediator? _mediator;
         private readonly ICurrentUser? _user;
         private readonly TimeProvider? _dateTime;
+        private IDbContextTransaction? _currentTransaction;
 
         public EShopDbContext(
             DbContextOptions<EShopDbContext> options,
@@ -41,6 +43,76 @@ namespace QingFa.EShop.Infrastructure.Persistence.Data
         public DbSet<ProductAttributeOption> ProductAttributeOptions { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<ProductVariantAttribute> ProductVariantAttributes { get; set; }
+
+        public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_currentTransaction != null)
+            {
+                throw new InvalidOperationException("A transaction is already in progress.");
+            }
+
+            try
+            {
+                _logger?.LogInformation("Beginning a new transaction.");
+                _currentTransaction = await Database.BeginTransactionAsync(cancellationToken);
+                _logger?.LogInformation("Transaction started successfully for both contexts.");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "An error occurred while starting the transaction.");
+                throw;
+            }
+        }
+
+        public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_currentTransaction == null)
+            {
+                throw new InvalidOperationException("No transaction is in progress.");
+            }
+
+            try
+            {
+                _logger?.LogInformation("Committing the transaction.");
+                await _currentTransaction.CommitAsync(cancellationToken);
+                _logger?.LogInformation("Transaction committed successfully for both contexts.");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "An error occurred while committing the transaction.");
+                throw;
+            }
+            finally
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
+        }
+
+        public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+        {
+            if (_currentTransaction == null)
+            {
+                throw new InvalidOperationException("No transaction is in progress.");
+            }
+
+            try
+            {
+                _logger?.LogInformation("Rolling back the transaction.");
+                await _currentTransaction.RollbackAsync(cancellationToken);
+                _logger?.LogInformation("Transaction rolled back successfully for both contexts.");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "An error occurred while rolling back the transaction.");
+                throw;
+            }
+            finally
+            {
+                await _currentTransaction.DisposeAsync();
+                _currentTransaction = null;
+            }
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -113,6 +185,30 @@ namespace QingFa.EShop.Infrastructure.Persistence.Data
             };
 
             return auditProperties.Contains(propertyName);
+        }
+
+        public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                _logger?.LogInformation("Saving changes to the database.");
+                int totalChanges = 0;
+
+                if (ChangeTracker.HasChanges())
+                {
+                    var dbContextChanges = await base.SaveChangesAsync(cancellationToken);
+                    totalChanges += dbContextChanges;
+                    _logger?.LogInformation("Changes saved successfully in EShopDbContext. Number of entities affected: {NumberOfEntities}", dbContextChanges);
+                }
+
+                _logger?.LogInformation("Total changes saved successfully. Number of entities affected: {NumberOfEntities}", totalChanges);
+                return totalChanges;
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogError(ex, "An error occurred while saving changes.");
+                throw;
+            }
         }
     }
 }
