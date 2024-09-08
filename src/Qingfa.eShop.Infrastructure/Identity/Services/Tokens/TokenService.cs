@@ -4,9 +4,9 @@ using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Infrastructure.Identity.Entities;
 using QingFa.EShop.Infrastructure.Identity.Settings;
 using Microsoft.Extensions.Logging;
+using QingFa.EShop.Domain.Identities.Entities;
 
 namespace QingFa.EShop.Infrastructure.Identity.Services.Tokens
 {
@@ -52,11 +52,11 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.Tokens
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error generating token for user {UserId}", user.Id);
-                throw; // or handle as appropriate
+                throw; 
             }
         }
 
-        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token)
+        public ClaimsPrincipal GetPrincipalFromToken(string token)
         {
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
             var handler = new JwtSecurityTokenHandler();
@@ -79,17 +79,17 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.Tokens
             catch (SecurityTokenExpiredException ex)
             {
                 _logger.LogWarning(ex, "Token expired");
-                throw; // or handle as appropriate
+                throw; 
             }
             catch (SecurityTokenInvalidSignatureException ex)
             {
                 _logger.LogWarning(ex, "Invalid token signature");
-                throw; // or handle as appropriate
+                throw; 
             }
             catch (SecurityTokenInvalidIssuerException ex)
             {
                 _logger.LogWarning(ex, "Invalid token issuer");
-                throw; // or handle as appropriate
+                throw; 
             }
         }
     }

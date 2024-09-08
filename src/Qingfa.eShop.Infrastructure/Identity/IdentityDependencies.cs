@@ -1,13 +1,12 @@
 ﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
-using QingFa.EShop.Infrastructure.Identity.Entities;
-using QingFa.EShop.Infrastructure.Identity.Settings;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
+using QingFa.EShop.Infrastructure.Identity.Settings;
 using QingFa.EShop.Infrastructure.Identity.Services.Tokens;
 using QingFa.EShop.Application.Features.AccountManagements.Services;
 using QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens;
@@ -15,13 +14,12 @@ using QingFa.EShop.Infrastructure.Repositories.Identities.RefreshTokens;
 using QingFa.EShop.Infrastructure.Identity.Services.Accounts;
 using QingFa.EShop.Infrastructure.Identity.Services.Emails;
 using System.Net.Mail;
-using Microsoft.Extensions.Options;
-using Microsoft.AspNetCore.Http;
-using System.Net;
 using System.Security.Claims;
 using System.Text.Json;
-using QingFa.EShop.Domain.Core.Enums;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using QingFa.EShop.Domain.Core.Enums;
+using QingFa.EShop.Domain.Identities.Entities;
 
 namespace QingFa.EShop.Infrastructure.Identity
 {
@@ -113,29 +111,27 @@ namespace QingFa.EShop.Infrastructure.Identity
                 ValidIssuer = jwtSettings.Issuer,
                 ValidAudience = jwtSettings.Audience,
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret)),
-                ClockSkew = TimeSpan.Zero,
-                RequireExpirationTime = true,
-                ValidateTokenReplay = true
+                ClockSkew = TimeSpan.Zero
             };
 
             options.Events = new JwtBearerEvents
             {
                 OnAuthenticationFailed = context =>
                 {
-                    return WriteProblemDetailsResponse(context.Response, StatusCodes.Status401Unauthorized, 
+                    return WriteProblemDetailsResponse(context.Response, StatusCodes.Status401Unauthorized,
                         "Authentication Failed", "An error occurred while processing your authentication.");
                 },
 
                 OnChallenge = context =>
                 {
                     context.HandleResponse();
-                    return WriteProblemDetailsResponse(context.Response, StatusCodes.Status401Unauthorized, 
+                    return WriteProblemDetailsResponse(context.Response, StatusCodes.Status401Unauthorized,
                         "Unauthorized", "You are not authorized to access this resource.");
                 },
 
                 OnForbidden = context =>
                 {
-                    return WriteProblemDetailsResponse(context.Response, StatusCodes.Status403Forbidden, 
+                    return WriteProblemDetailsResponse(context.Response, StatusCodes.Status403Forbidden,
                         "Forbidden", "You are forbidden to access this resource.");
                 },
 
@@ -189,21 +185,6 @@ namespace QingFa.EShop.Infrastructure.Identity
             };
 
             return response.WriteAsync(JsonSerializer.Serialize(problemDetails, options));
-        }
-
-        private static string? GetRefreshToken(HttpRequest request)
-        {
-            var authHeader = request.Headers["Authorization"].FirstOrDefault();
-            if (!string.IsNullOrEmpty(authHeader) && authHeader.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
-            {
-                var tokens = authHeader.Split(' ');
-                if (tokens.Length == 2)
-                {
-                    return tokens[1];
-                }
-            }
-
-            return request.Cookies["RefreshToken"];
         }
     }
 }

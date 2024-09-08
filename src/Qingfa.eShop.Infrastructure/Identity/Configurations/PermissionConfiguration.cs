@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 using QingFa.EShop.Domain.Catalogs.Enums;
 using QingFa.EShop.Domain.Common.Enums;
-using QingFa.EShop.Infrastructure.Identity.Entities.Permissions;
+using QingFa.EShop.Domain.Identities.Entities;
 
 namespace QingFa.EShop.Infrastructure.Identity.Configurations
 {

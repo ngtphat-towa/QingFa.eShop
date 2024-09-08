@@ -2,10 +2,9 @@
 using Microsoft.EntityFrameworkCore;
 using QingFa.EShop.Domain.Common.Enums;
 using QingFa.EShop.Domain.Core.Enums;
-using QingFa.EShop.Infrastructure.Identity.Entities.Permissions;
 using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
-using QingFa.EShop.Infrastructure.Identity.Entities;
 using QingFa.EShop.Domain.Catalogs.Enums;
+using QingFa.EShop.Domain.Identities.Entities;
 
 namespace QingFa.EShop.Infrastructure.Identity
 {

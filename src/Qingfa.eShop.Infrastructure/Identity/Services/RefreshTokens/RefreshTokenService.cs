@@ -3,6 +3,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
 using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Domain.Identities.Entities;
 using QingFa.EShop.Infrastructure.Identity.Entities;
 using QingFa.EShop.Infrastructure.Identity.Settings;
 using QingFa.EShop.Infrastructure.Repositories.Identities.RefreshTokens;
@@ -16,28 +17,26 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
     internal class RefreshTokenService : IRefreshTokenService
     {
         private readonly IRefreshTokenRepository _refreshTokenRepository;
-        private readonly IUnitOfWork _unitOfWork;
         private readonly JwtSettings _jwtSettings;
         private readonly ILogger<RefreshTokenService> _logger;
 
         public RefreshTokenService(
             IRefreshTokenRepository refreshTokenRepository,
-            IUnitOfWork unitOfWork,
             IOptions<JwtSettings> jwtSettings,
             ILogger<RefreshTokenService> logger)
         {
             _refreshTokenRepository = refreshTokenRepository;
-            _unitOfWork = unitOfWork;
             _jwtSettings = jwtSettings.Value;
             _logger = logger;
         }
 
-        private string GenerateJwtToken(string refreshTokenGuid, DateTime expiresAt)
+        private string GenerateJwtToken(string refreshTokenGuid, Guid userId, DateTime expiresAt)
         {
             var claims = new[]
             {
-            new Claim(ClaimTypes.NameIdentifier, refreshTokenGuid)
-        };
+                new Claim(ClaimTypes.NameIdentifier, refreshTokenGuid),
+                new Claim(ClaimTypes.Name, userId.ToString())
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -53,6 +52,7 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+
         public async Task<string> GenerateRefreshTokenAsync(AppUser user)
         {
             try
@@ -60,7 +60,7 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
                 var refreshTokenGuid = Guid.NewGuid().ToString();
                 var expiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
 
-                var jwtToken = GenerateJwtToken(refreshTokenGuid, expiresAt);
+                var jwtToken = GenerateJwtToken(refreshTokenGuid, user.Id, expiresAt);
 
                 await _refreshTokenRepository.AddAsync(new RefreshToken
                 {
@@ -69,7 +69,6 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
                     CreatedAt = DateTime.UtcNow,
                     ExpiresAt = expiresAt
                 });
-                await _unitOfWork.SaveChangesAsync();
 
                 _logger.LogInformation("Generated new refresh token for user {UserId}", user.Id);
                 return jwtToken;
@@ -137,7 +136,6 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
 
                 tokenEntity.RevokedAt = DateTime.UtcNow;
                 await _refreshTokenRepository.UpdateAsync(tokenEntity);
-                await _unitOfWork.SaveChangesAsync();
                 _logger.LogInformation("Revoked refresh token {Token}", refreshTokenGuid);
                 return true;
             }
@@ -158,7 +156,6 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
                     token.RevokedAt = DateTime.UtcNow;
                     await _refreshTokenRepository.UpdateAsync(token);
                 }
-                await _unitOfWork.SaveChangesAsync();
                 _logger.LogInformation("Revoked all refresh tokens for user {UserId}", userId);
                 return true;
             }
@@ -193,7 +190,7 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
 
                 var newRefreshTokenGuid = Guid.NewGuid().ToString();
                 var newExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpirationInDays);
-                var newJwtToken = GenerateJwtToken(newRefreshTokenGuid, newExpiresAt);
+                var newJwtToken = GenerateJwtToken(newRefreshTokenGuid, user.Id, newExpiresAt);
 
                 storedToken.RevokedAt = DateTime.UtcNow;
                 await _refreshTokenRepository.UpdateAsync(storedToken);
@@ -204,7 +201,6 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens
                     CreatedAt = DateTime.UtcNow,
                     ExpiresAt = newExpiresAt
                 });
-                await _unitOfWork.SaveChangesAsync();
                 _logger.LogInformation("Rotated refresh token for user {UserId}", user.Id);
                 return newJwtToken;
             }

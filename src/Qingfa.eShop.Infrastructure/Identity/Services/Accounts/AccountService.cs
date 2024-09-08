@@ -15,7 +15,6 @@ using QingFa.EShop.Application.Features.AccountManagements.ResetPassword;
 using QingFa.EShop.Application.Features.AccountManagements.LogInAccount;
 using QingFa.EShop.Application.Features.AccountManagements.ResendConfirmationEmail;
 using QingFa.EShop.Application.Features.AccountManagements.Models;
-using QingFa.EShop.Infrastructure.Identity.Entities;
 using QingFa.EShop.Infrastructure.Identity.Services.RefreshTokens;
 using QingFa.EShop.Infrastructure.Identity.Services.Tokens;
 using QingFa.EShop.Infrastructure.Identity.Settings;
@@ -31,6 +30,7 @@ using QingFa.EShop.Infrastructure.Identity.Entities.Roles;
 using QingFa.EShop.Infrastructure.Identity.Services.Emails;
 using Microsoft.Extensions.Caching.Distributed;
 using System.Net;
+using QingFa.EShop.Domain.Identities.Entities;
 
 namespace QingFa.EShop.Infrastructure.Identity.Services.Accounts
 {
@@ -217,26 +217,36 @@ namespace QingFa.EShop.Infrastructure.Identity.Services.Accounts
 
             try
             {
-                var principal = _tokenService.GetPrincipalFromExpiredToken(request.RefreshToken);
-                var userId = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null)
+                // Extract the principal and claims from the provided refresh token
+                var principal = _tokenService.GetPrincipalFromToken(request.RefreshToken);
+                var refreshTokenGuid = principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+                var userIdClaim = principal?.FindFirstValue(ClaimTypes.Name);
+
+                if (string.IsNullOrEmpty(refreshTokenGuid) || string.IsNullOrEmpty(userIdClaim))
                 {
-                    return Result<TokenResponse>.InvalidOperation("Refresh token", AccountServiceMessages.InvalidToken);
+                    return Result<TokenResponse>.NotFound("Refresh token", AccountServiceMessages.InvalidToken);
                 }
 
-                var user = await _userManager.FindByIdAsync(userId);
+                var userId = Guid.Parse(userIdClaim);
+
+                // Find the user associated with the refresh token
+                var user = await _userManager.FindByIdAsync(userId.ToString());
                 if (user == null)
                 {
                     return Result<TokenResponse>.NotFound("User", AccountServiceMessages.UserNotFound);
                 }
 
+                // Validate the provided refresh token
                 if (!await _refreshTokenService.ValidateRefreshTokenAsync(user, request.RefreshToken))
                 {
                     await _refreshTokenService.RevokeRefreshTokenAsync(request.RefreshToken);
                     return Result<TokenResponse>.InvalidOperation("Refresh token", AccountServiceMessages.InvalidToken);
                 }
 
+                // Generate a new access token
                 var newAccessToken = await _tokenService.GenerateTokenAsync(user);
+
+                // Rotate the refresh token
                 var newRefreshToken = await _refreshTokenService.RotateRefreshTokenAsync(user, request.RefreshToken);
 
                 if (newRefreshToken == null)

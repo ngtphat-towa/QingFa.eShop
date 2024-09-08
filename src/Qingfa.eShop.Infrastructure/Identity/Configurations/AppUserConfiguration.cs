@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using QingFa.EShop.Infrastructure.Identity.Entities;
 using QingFa.EShop.Domain.Common.ValueObjects;
 using Microsoft.AspNetCore.Identity;
+using QingFa.EShop.Domain.Identities.Entities;
 
 namespace QingFa.EShop.Infrastructure.Identity.Configurations
 {

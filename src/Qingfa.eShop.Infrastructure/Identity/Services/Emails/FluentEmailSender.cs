@@ -1,7 +1,5 @@
 ﻿using FluentEmail.Core;
 
-
-
 namespace QingFa.EShop.Infrastructure.Identity.Services.Emails
 {
     internal class FluentEmailSender : IEmailSender
