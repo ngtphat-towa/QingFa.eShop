@@ -106,7 +106,7 @@ namespace QingFa.EShop.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var command = new DeleteBrandCommand { Id = id };
+            var command = new DeleteBrandCommand(Id: id);
             var result = await _mediator.Send(command);
             return HandleResult(result);
         }

@@ -169,10 +169,10 @@ namespace QingFa.EShop.Api.Controllers
         public async Task<IActionResult> AssignOptions(Guid id, [FromBody] AssignAttributeOptionsRequest request)
         {
             var command = new AssignAttributeOptionsCommand
-            {
-                ProductAttributeId = id,
-                AttributeOptionIds = request.AttributeOptionIds
-            };
+            (
+                ProductAttributeId: id,
+                AttributeOptionIds: request.AttributeOptionIds
+            );
 
             var result = await _mediator.Send(command);
 
