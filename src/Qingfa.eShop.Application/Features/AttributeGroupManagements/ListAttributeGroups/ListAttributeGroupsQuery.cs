@@ -1,13 +1,15 @@
-﻿using Mapster;
+﻿using Ardalis.GuardClauses;
 
-using MediatR;
+using Mapster;
+
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.AttributeGroupManagements.Models;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttributeGroups
 {
-    public record ListAttributeGroupsQuery : IRequest<PaginatedList<AttributeGroupResponse>>
+    public record ListAttributeGroupsQuery : IQuery<PaginatedList<AttributeGroupResponse>>
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
@@ -18,7 +20,7 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttrib
         public string SortField { get; set; } = "GroupName";
         public bool SortDescending { get; set; }
     }
-    public class ListAttributeGroupsQueryHandler : IRequestHandler<ListAttributeGroupsQuery, PaginatedList<AttributeGroupResponse>>
+    public class ListAttributeGroupsQueryHandler : IQueryHandler<ListAttributeGroupsQuery, PaginatedList<AttributeGroupResponse>>
     {
         private readonly IProductAttributeGroupRepository _repository;
 
@@ -27,10 +29,14 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttrib
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<PaginatedList<AttributeGroupResponse>> Handle(ListAttributeGroupsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedList<AttributeGroupResponse>>> Handle(ListAttributeGroupsQuery request, CancellationToken cancellationToken)
         {
             try
             {
+                // Validate request
+                Guard.Against.NegativeOrZero(request.PageNumber, nameof(request.PageNumber));
+                Guard.Against.NegativeOrZero(request.PageSize, nameof(request.PageSize));
+
                 // Create a specification based on the query parameters
                 var specification = new ProductAttributeGroupSpecification(
                     name: request.Name,
@@ -39,12 +45,13 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttrib
                     createdBy: request.CreatedBy
                 );
 
-                // Get total count of items without paging
+                // Get total count of items matching the specification
                 var totalCount = await _repository.CountBySpecificationAsync(specification, cancellationToken);
 
                 // Apply paging parameters to the specification
                 specification.ApplyPaging(request.PageNumber, request.PageSize);
 
+                // Apply sorting
                 if (request.SortDescending)
                 {
                     specification.ApplyOrderByDescending(request.SortField);
@@ -54,7 +61,7 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttrib
                     specification.ApplyOrderBy(request.SortField);
                 }
 
-                // Fetch the data
+                // Fetch the data with the specification
                 var attributeGroups = await _repository.FindBySpecificationAsync(specification, cancellationToken);
 
                 // Map entities to response DTOs
@@ -68,13 +75,12 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.ListAttrib
                     request.PageSize
                 );
 
-                return paginatedList;
+                return Result<PaginatedList<AttributeGroupResponse>>.Success(paginatedList);
             }
             catch (Exception ex)
             {
-                // Log exception or handle it as necessary
-                // For now, rethrow or return a failed result
-                throw new ApplicationException("An error occurred while processing your request.", ex);
+                // Log exception if necessary
+                return Result<PaginatedList<AttributeGroupResponse>>.UnexpectedError(ex);
             }
         }
     }

@@ -1,14 +1,16 @@
 ﻿using MediatR;
-
+using Microsoft.Extensions.Logging;
 using QingFa.EShop.Application.Core.Models;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
-using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
-using QingFa.EShop.Domain.Core.Repositories;
+using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
 {
-    public class CreateProductAttributeCommand : IRequest<ResultValue<Guid>>
+    public class CreateProductAttributeCommand : IRequest<Result<Guid>>
     {
         public string Name { get; set; } = default!;
         public string AttributeCode { get; set; } = default!;
@@ -21,36 +23,47 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
         public Guid AttributeGroupId { get; set; }
     }
 
-    internal class CreateProductAttributeCommandHandler(
-        IProductAttributeRepository attributeRepository,
-        IProductAttributeGroupRepository attributeGroupRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<CreateProductAttributeCommand, ResultValue<Guid>>
+    internal class CreateProductAttributeCommandHandler : IRequestHandler<CreateProductAttributeCommand, Result<Guid>>
     {
-        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-        private readonly IProductAttributeGroupRepository _attributeGroupRepository = attributeGroupRepository ?? throw new ArgumentNullException(nameof(attributeGroupRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<CreateProductAttributeCommandHandler> _logger;
 
-        public async Task<ResultValue<Guid>> Handle(CreateProductAttributeCommand request, CancellationToken cancellationToken)
+        public CreateProductAttributeCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<CreateProductAttributeCommandHandler> logger)
+        {
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        }
+
+        public async Task<Result<Guid>> Handle(CreateProductAttributeCommand request, CancellationToken cancellationToken)
         {
             // Validate request parameters
             if (string.IsNullOrWhiteSpace(request.Name))
-                return ResultValue<Guid>.InvalidArgument(nameof(request.Name), "Name cannot be null or empty.");
+                return Result<Guid>.InvalidArgument(nameof(request.Name), "Name cannot be null or empty.");
 
             if (string.IsNullOrWhiteSpace(request.AttributeCode))
-                return ResultValue<Guid>.InvalidArgument(nameof(request.AttributeCode), "Attribute code cannot be null or empty.");
+                return Result<Guid>.InvalidArgument(nameof(request.AttributeCode), "Attribute code cannot be null or empty.");
+
+            _logger.LogInformation("Handling CreateProductAttributeCommand with Name: {Name}, AttributeCode: {AttributeCode}, AttributeGroupId: {AttributeGroupId}",
+                                    request.Name,
+                                    request.AttributeCode,
+                                    request.AttributeGroupId);
 
             // Check if the attribute group exists
-            var groupExists = await _attributeGroupRepository.GetByIdAsync(request.AttributeGroupId, cancellationToken);
-            if (groupExists == null)
+            var groupExists = await _dbProvider.ProductAttributeGroups
+                .AnyAsync(g => g.Id == request.AttributeGroupId, cancellationToken);
+            if (!groupExists)
             {
-                return ResultValue<Guid>.NotFound(nameof(ProductAttributeGroup), "Attribute group not found.");
+                return Result<Guid>.NotFound(nameof(ProductAttributeGroup), "Attribute group not found.");
             }
 
             // Check if an attribute with the same name exists in the specified attribute group
-            var attributeExists = await _attributeRepository.ExistsByNameAsync(request.Name, request.AttributeGroupId, cancellationToken);
+            var attributeExists = await _dbProvider.ProductAttributes
+                .AnyAsync(a => a.Name == request.Name && a.AttributeGroupId == request.AttributeGroupId, cancellationToken);
             if (attributeExists)
             {
-                return ResultValue<Guid>.Conflict(nameof(ProductAttribute), "An attribute with this name already exists in the specified attribute group.");
+                return Result<Guid>.Conflict(nameof(ProductAttribute), "An attribute with this name already exists in the specified attribute group.");
             }
 
             try
@@ -67,15 +80,17 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.CreateAttribute
                     request.SortOrder,
                     request.AttributeGroupId);
 
-                await _attributeRepository.AddAsync(attribute, cancellationToken);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.ProductAttributes.AddAsync(attribute, cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(attribute.Id);
+                _logger.LogInformation("Created new product attribute with ID: {AttributeId}", attribute.Id);
+
+                return Result<Guid>.Success(attribute.Id);
             }
             catch (Exception ex)
             {
-                // Return an unexpected error result
-                return ResultValue<Guid>.UnexpectedError(ex);
+                _logger.LogError(ex, "An error occurred while creating a new product attribute.");
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
     }

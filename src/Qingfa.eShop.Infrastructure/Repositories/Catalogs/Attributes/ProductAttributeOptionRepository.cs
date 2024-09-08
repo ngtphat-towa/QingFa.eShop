@@ -2,17 +2,22 @@
 
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
-using QingFa.EShop.Infrastructure.Persistence;
+using QingFa.EShop.Infrastructure.Persistence.Data;
+using QingFa.EShop.Infrastructure.Repositories.Common;
 
 namespace QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes
 {
-    internal class ProductAttributeOptionRepository(EShopDbContext context) : GenericRepository<ProductAttributeOption, Guid>(context), IProductAttributeOptionRepository
+    internal class ProductAttributeOptionRepository(EShopDbContext context) 
+        : GenericRepository<ProductAttributeOption, Guid>(context), IProductAttributeOptionRepository
     {
 
         /// <summary>
         /// Checks if an option with the specified value exists within a given product attribute.
         /// </summary>
-        public async Task<bool> ExistsByOptionValueAsync(string optionValue, Guid? productAttributeId, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsByOptionValueAsync(
+            string optionValue,
+            Guid? productAttributeId,
+            CancellationToken cancellationToken = default)
         {
             return await _context.Set<ProductAttributeOption>()
                 .AnyAsync(o => o.OptionValue == optionValue &&
@@ -34,7 +39,9 @@ namespace QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes
         /// <summary>
         /// Retrieves options by their product attribute ID.
         /// </summary>
-        public async Task<IReadOnlyList<ProductAttributeOption>> GetByProductAttributeIdAsync(Guid productAttributeId, CancellationToken cancellationToken = default)
+        public async Task<IReadOnlyList<ProductAttributeOption>> GetByProductAttributeIdAsync(
+            Guid productAttributeId,
+            CancellationToken cancellationToken = default)
         {
             return await _context.Set<ProductAttributeOption>()
                 .Where(o => o.ProductAttributeId == productAttributeId)

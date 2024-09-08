@@ -1,5 +1,4 @@
 ﻿using QingFa.EShop.Application.Features.Common.Requests;
-using QingFa.EShop.Application.Features.Common.Responses;
 
 namespace QingFa.EShop.Application.Features.AttributeOptionManagements.Models
 {

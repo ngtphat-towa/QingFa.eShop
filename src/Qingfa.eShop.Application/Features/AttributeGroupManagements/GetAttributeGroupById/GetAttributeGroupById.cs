@@ -1,19 +1,18 @@
 ﻿using Mapster;
 
-using MediatR;
-
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.AttributeGroupManagements.Models;
+using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.GetBrandById
 {
-    public record GetAttributeGroupById : IRequest<ResultValue<AttributeGroupResponse>>
+    public record GetAttributeGroupById : RequestType<Guid>, IQuery<AttributeGroupResponse>
     {
-        public Guid Id { get; set; }
     }
 
-    internal class GetAttributeGroupByIdQueryHandler : IRequestHandler<GetAttributeGroupById, ResultValue<AttributeGroupResponse>>
+    internal class GetAttributeGroupByIdQueryHandler : IQueryHandler<GetAttributeGroupById, AttributeGroupResponse>
     {
         private readonly IProductAttributeGroupRepository _repository;
 
@@ -22,22 +21,22 @@ namespace QingFa.EShop.Application.Features.AttributeGroupManagements.GetBrandBy
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<ResultValue<AttributeGroupResponse>> Handle(GetAttributeGroupById request, CancellationToken cancellationToken)
+        public async Task<Result<AttributeGroupResponse>> Handle(GetAttributeGroupById request, CancellationToken cancellationToken)
         {
             if (request.Id == Guid.Empty)
             {
-                return ResultValue<AttributeGroupResponse>.InvalidOperation("GetAttributeGroupById", "Invalid ID provided.");
+                return Result<AttributeGroupResponse>.InvalidOperation("GetAttributeGroupById", "Invalid ID provided.");
             }
 
             var attributeGroup = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (attributeGroup == null)
             {
-                return ResultValue<AttributeGroupResponse>.NotFound("attribute group", request.Id.ToString());
+                return Result<AttributeGroupResponse>.NotFound("attribute group", request.Id.ToString());
             }
 
             var response = attributeGroup.Adapt<AttributeGroupResponse>();
-            return ResultValue<AttributeGroupResponse>.Success(response);
+            return Result<AttributeGroupResponse>.Success(response);
         }
     }
 }

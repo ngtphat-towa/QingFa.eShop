@@ -3,6 +3,8 @@ using QingFa.EShop.Api;
 using QingFa.EShop.Infrastructure;
 using QingFa.EShop.Api.Middleware;
 using QingFa.EShop.Application;
+using QingFa.EShop.Infrastructure.Identity;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -30,17 +32,21 @@ if (app.Environment.IsDevelopment())
     app.UseDeveloperExceptionPage();
 
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "QingFa eShop API v1");
-        //c.RoutePrefix = string.Empty; // Sets Swagger UI at the root
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<IdentityDataDbContext>();
+    IdentityDbContextSeeder.Seed(context);
+}
 
 app.Run();

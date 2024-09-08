@@ -1,10 +1,8 @@
-﻿using MediatR;
-
-using QingFa.EShop.Application.Core.Models;
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 
 namespace QingFa.EShop.Application.ExampleMetas.Create
 {
-    public class CreateExampleMetaCommand : IRequest<ResultValue<Guid>>
+    public class CreateExampleMetaCommand : ICommand<Guid>
     {
         public string Name { get; set; } = default!;
         public string CreatedBy { get; set; } = default!;

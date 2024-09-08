@@ -9,21 +9,26 @@
   <ItemGroup>
     <Compile Remove="Abtractions\**" />
     <Compile Remove="Domain\**" />
+    <Compile Remove="Identity\**" />
     <Compile Remove="Products\**" />
     <EmbeddedResource Remove="Abtractions\**" />
     <EmbeddedResource Remove="Domain\**" />
+    <EmbeddedResource Remove="Identity\**" />
     <EmbeddedResource Remove="Products\**" />
     <None Remove="Abtractions\**" />
     <None Remove="Domain\**" />
+    <None Remove="Identity\**" />
     <None Remove="Products\**" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MediatR" Version="12.4.0" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.8" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Catalogs\Services\" />
+    <Folder Include="Identities\Interfacces\" />
   </ItemGroup>
 
 </Project>

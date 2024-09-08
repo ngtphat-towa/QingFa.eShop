@@ -1,16 +1,17 @@
-﻿using MediatR;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Common.ValueObjects;
 using QingFa.EShop.Domain.Core.Enums;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
 {
-    public class CreateBrandCommand : IRequest<ResultValue<Guid>>
+    public class CreateBrandCommand : ICommand<Guid>
     {
         public string Name { get; set; } = default!;
         public string Description { get; set; } = default!;
@@ -19,27 +20,35 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
         public EntityStatus? Status { get; set; }
     }
 
-    public class CreateBrandCommandHandler : IRequestHandler<CreateBrandCommand, ResultValue<Guid>>
+    internal class CreateBrandCommandHandler : ICommandHandler<CreateBrandCommand, Guid>
     {
-        private readonly IBrandRepository _brandRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<CreateBrandCommandHandler> _logger;
 
-        public CreateBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork)
+        public CreateBrandCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<CreateBrandCommandHandler> logger)
         {
-            _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        public async Task<ResultValue<Guid>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateBrandCommand request, CancellationToken cancellationToken)
         {
+            _logger.LogInformation("Handling CreateBrandCommand with Name: {Name}", request.Name);
+
             try
             {
                 // Check if a brand with the same name already exists
-                if (await _brandRepository.ExistsByNameAsync(request.Name, cancellationToken))
+                var brandExists = await _dbProvider.Brands
+                    .AnyAsync(b => b.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase), cancellationToken);
+
+                if (brandExists)
                 {
-                    return ResultValue<Guid>.Conflict(nameof(Brand), "A brand with this name already exists.");
+                    return Result<Guid>.Conflict(nameof(Brand), "A brand with this name already exists.");
                 }
 
+                // Create the SEO metadata
                 var seoMeta = SeoMeta.Create(
                     request.SeoMeta.Title ?? string.Empty,
                     request.SeoMeta.Description ?? string.Empty,
@@ -47,19 +56,27 @@ namespace QingFa.EShop.Application.Features.BrandManagements.CreateBrand
                     request.SeoMeta.CanonicalUrl,
                     request.SeoMeta.Robots);
 
+                // Create the new brand
                 var brand = Brand.Create(request.Name, request.Description, seoMeta, request.LogoUrl);
 
-                brand.SetStatus(request.Status);
+                // Set the status if provided
+                if (request.Status.HasValue)
+                {
+                    brand.SetStatus(request.Status.Value);
+                }
 
-                await _brandRepository.AddAsync(brand, cancellationToken);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                // Add the brand to the context
+                await _dbProvider.Brands.AddAsync(brand, cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(brand.Id);
+                _logger.LogInformation("Successfully created brand with ID: {Id}", brand.Id);
+
+                return Result<Guid>.Success(brand.Id);
             }
             catch (Exception ex)
             {
-                // Handle unexpected exceptions
-                return ResultValue<Guid>.UnexpectedError(ex);
+                _logger.LogError(ex, "An error occurred while creating the brand with Name: {Name}", request.Name);
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
     }

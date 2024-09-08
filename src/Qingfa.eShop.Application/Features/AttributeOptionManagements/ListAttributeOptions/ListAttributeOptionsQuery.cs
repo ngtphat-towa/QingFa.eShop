@@ -1,14 +1,15 @@
-﻿using Mapster;
+﻿using Ardalis.GuardClauses;
 
-using MediatR;
+using Mapster;
 
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.AttributeOptionManagements.Models;
 using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 
 namespace QingFa.EShop.Application.Features.AttributeOptionManagements.ListAttributeOptions
 {
-    public record ListAttributeOptionsQuery : IRequest<PaginatedList<AttributeOptionResponse>>
+    public record ListAttributeOptionsQuery : IQuery<PaginatedList<AttributeOptionResponse>>
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
@@ -23,7 +24,7 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.ListAttri
         public string? SearchTerm { get; set; }
     }
 
-    internal class ListAttributeOptionsQueryHandler : IRequestHandler<ListAttributeOptionsQuery, PaginatedList<AttributeOptionResponse>>
+    internal class ListAttributeOptionsQueryHandler : IQueryHandler<ListAttributeOptionsQuery, PaginatedList<AttributeOptionResponse>>
     {
         private readonly IProductAttributeOptionRepository _repository;
 
@@ -32,10 +33,14 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.ListAttri
             _repository = repository ?? throw new ArgumentNullException(nameof(repository));
         }
 
-        public async Task<PaginatedList<AttributeOptionResponse>> Handle(ListAttributeOptionsQuery request, CancellationToken cancellationToken)
+        public async Task<Result<PaginatedList<AttributeOptionResponse>>> Handle(ListAttributeOptionsQuery request, CancellationToken cancellationToken)
         {
             try
             {
+                // Validate request
+                Guard.Against.NegativeOrZero(request.PageNumber, nameof(request.PageNumber));
+                Guard.Against.NegativeOrZero(request.PageSize, nameof(request.PageSize));
+
                 // Create a specification based on the query parameters
                 var specification = new ProductAttributeOptionSpecification(
                     ids: request.Ids,
@@ -47,7 +52,7 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.ListAttri
                     searchTerm: request.SearchTerm
                 );
 
-                // Get total count of items without paging
+                // Get total count of items matching the specification
                 var totalCount = await _repository.CountBySpecificationAsync(specification, cancellationToken);
 
                 // Apply paging parameters to the specification
@@ -63,7 +68,7 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.ListAttri
                     specification.ApplyOrderBy(request.SortField);
                 }
 
-                // Fetch the data
+                // Fetch the data with the specification
                 var options = await _repository.FindBySpecificationAsync(specification, cancellationToken);
 
                 // Map entities to response DTOs
@@ -77,11 +82,12 @@ namespace QingFa.EShop.Application.Features.AttributeOptionManagements.ListAttri
                     request.PageSize
                 );
 
-                return paginatedList;
+                return Result<PaginatedList<AttributeOptionResponse>>.Success(paginatedList);
             }
             catch (Exception ex)
             {
-                throw new ApplicationException("An error occurred while processing your request.", ex);
+                // Log exception if necessary
+                return Result<PaginatedList<AttributeOptionResponse>>.UnexpectedError(ex);
             }
         }
     }

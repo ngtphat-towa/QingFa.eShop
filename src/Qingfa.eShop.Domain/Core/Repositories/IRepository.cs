@@ -36,26 +36,26 @@ namespace QingFa.EShop.Domain.Core.Repositories
         /// <returns>The count of entities that match the criteria.</returns>
         Task<int> CountBySpecificationAsync(ISpecification<TEntity> specification, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Adds a new entity.
-        /// </summary>
-        /// <param name="entity">The entity to add.</param>
-        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-        Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
+        ///// <summary>
+        ///// Adds a new entity.
+        ///// </summary>
+        ///// <param name="entity">The entity to add.</param>
+        ///// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        //Task AddAsync(TEntity entity, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Updates an existing entity.
-        /// </summary>
-        /// <param name="entity">The entity to update.</param>
-        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-        Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
+        ///// <summary>
+        ///// Updates an existing entity.
+        ///// </summary>
+        ///// <param name="entity">The entity to update.</param>
+        ///// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        //Task UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
 
-        /// <summary>
-        /// Deletes an entity.
-        /// </summary>
-        /// <param name="entity">The entity to delete.</param>
-        /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
-        Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
+        ///// <summary>
+        ///// Deletes an entity.
+        ///// </summary>
+        ///// <param name="entity">The entity to delete.</param>
+        ///// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
+        //Task DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Checks if an entity exists by a specified field name and value.
@@ -65,6 +65,6 @@ namespace QingFa.EShop.Domain.Core.Repositories
         /// <param name="fieldName">The name of the field to check. Defaults to "Name".</param>
         /// <param name="cancellationToken">A token to monitor for cancellation requests.</param>
         /// <returns>True if an entity with the specified field value exists; otherwise, false.</returns>
-        Task<bool> ExistsByFieldAsync(object value, CancellationToken cancellationToken = default, string fieldName = "Name");
+        //Task<bool> ExistsByFieldAsync(object value, CancellationToken cancellationToken = default, string fieldName = "Name");
     }
 }

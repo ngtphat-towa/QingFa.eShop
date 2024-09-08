@@ -2,15 +2,16 @@
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.SeoInfo;
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Domain.Core.Repositories;
 using QingFa.EShop.Domain.Core.Enums;
 using QingFa.EShop.Domain.Common.ValueObjects;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using QingFa.EShop.Application.Core.Interfaces;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
 {
-    public record CreateCategoryCommand : IRequest<ResultValue<Guid>>
+    public record CreateCategoryCommand : IRequest<Result<Guid>>
     {
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
@@ -20,52 +21,63 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
         public EntityStatus? Status { get; set; }
     }
 
-    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, ResultValue<Guid>>
+    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Result<Guid>>
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<CreateCategoryCommandHandler> _logger;
 
-        public CreateCategoryCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
+        public CreateCategoryCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<CreateCategoryCommandHandler> logger)
         {
-            _categoryRepository = categoryRepository ?? throw CoreException.NullArgument(nameof(categoryRepository));
-            _unitOfWork = unitOfWork ?? throw CoreException.NullArgument(nameof(unitOfWork));
+            _dbProvider = dbProvider ?? throw CoreException.NullArgument(nameof(dbProvider));
+            _logger = logger ?? throw CoreException.NullArgument(nameof(logger));
         }
 
-        public async Task<ResultValue<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+        public async Task<Result<Guid>> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
         {
             try
             {
                 // Check if the parent category exists if ParentCategoryId is provided
                 if (request.ParentCategoryId.HasValue)
                 {
-                    var parentCategory = await _categoryRepository.GetByIdAsync(request.ParentCategoryId.Value, cancellationToken);
+                    var parentCategory = await _dbProvider.Categories
+                        .Include(c => c.ChildCategories)
+                        .FirstOrDefaultAsync(c => c.Id == request.ParentCategoryId.Value, cancellationToken);
+
                     if (parentCategory == null)
                     {
-                        return ResultValue<Guid>.NotFound(nameof(Category), "The specified parent category does not exist.");
+                        return Result<Guid>.NotFound(nameof(Category), "The specified parent category does not exist.");
                     }
 
                     // Check for cyclic dependency
                     var hasCyclicDependency = await IsCyclicDependency(parentCategory.Id, request.Name, cancellationToken);
                     if (hasCyclicDependency)
                     {
-                        return ResultValue<Guid>.Conflict(nameof(Category), "Adding this category would create a cyclic dependency.");
+                        return Result<Guid>.Conflict(nameof(Category), "Adding this category would create a cyclic dependency.");
                     }
                 }
 
                 // Check if a category with the same name already exists
-                var categoryExists = await _categoryRepository.ExistsByNameAsync(request.Name, request.ParentCategoryId, cancellationToken);
+                var categoryExists = await _dbProvider.Categories
+                    .AsNoTracking()
+                    .AnyAsync(c => EF.Functions.Like(c.Name, $"%{request.Name}%") &&
+                                   (c.ParentCategoryId == request.ParentCategoryId ||
+                                    (request.ParentCategoryId == null && c.ParentCategoryId == null)),
+                               cancellationToken);
+
                 if (categoryExists)
                 {
-                    return ResultValue<Guid>.Conflict(nameof(Category), "A category with this name already exists under the specified parent category.");
+                    return Result<Guid>.Conflict(nameof(Category), "A category with this name already exists under the specified parent category.");
                 }
 
                 // Convert SeoMetaTransfer to SeoMeta if provided
                 var seoMeta = SeoMeta.Create(
-                      request.SeoMeta.Title ?? string.Empty,
-                      request.SeoMeta.Description ?? string.Empty,
-                      request.SeoMeta.Keywords ?? string.Empty,
-                      request.SeoMeta.CanonicalUrl,
-                      request.SeoMeta.Robots);
+                    request.SeoMeta.Title ?? string.Empty,
+                    request.SeoMeta.Description ?? string.Empty,
+                    request.SeoMeta.Keywords ?? string.Empty,
+                    request.SeoMeta.CanonicalUrl,
+                    request.SeoMeta.Robots);
 
                 // Create the new category
                 var category = Category.Create(
@@ -77,47 +89,41 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.CreateCategory
 
                 category.SetStatus(request.Status);
 
-                // Add the category to the repository
-                await _categoryRepository.AddAsync(category, cancellationToken);
+                // Add the category to the DbSet
+                await _dbProvider.Categories.AddAsync(category, cancellationToken);
 
                 // Commit the transaction
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
-                return ResultValue<Guid>.Success(category.Id);
+                return Result<Guid>.Success(category.Id);
             }
             catch (Exception ex)
             {
-                // Handle unexpected exceptions
-                return ResultValue<Guid>.UnexpectedError(ex);
+                _logger.LogError(ex, "An error occurred while creating a category.");
+                return Result<Guid>.UnexpectedError(ex);
             }
         }
 
         private async Task<bool> IsCyclicDependency(Guid parentCategoryId, string newCategoryName, CancellationToken cancellationToken)
         {
-            // Get all categories including the new category's potential parent
-            var categories = await _categoryRepository.ListAllAsync(cancellationToken);
-            var categoryDict = categories.ToDictionary(c => c.Id);
+            var childCategories = await _dbProvider.Categories
+                .Include(c => c.ChildCategories)
+                .Where(c => c.Id == parentCategoryId)
+                .SelectMany(c => c.ChildCategories)
+                .ToListAsync(cancellationToken);
 
-            // Find the parent category
-            if (!categoryDict.TryGetValue(parentCategoryId, out var parentCategory))
-            {
-                return false;
-            }
-
-            // Check for cyclic dependency
-            return HasCyclicDependency(categoryDict, parentCategory, newCategoryName);
+            return HasCyclicDependency(childCategories, newCategoryName);
         }
 
-        private static bool HasCyclicDependency(Dictionary<Guid, Category> categoryDict, Category parentCategory, string newCategoryName)
+        private static bool HasCyclicDependency(IReadOnlyList<Category> childCategories, string newCategoryName)
         {
             var visited = new HashSet<Guid>();
-            var stack = new Stack<Category>();
-            stack.Push(parentCategory);
+            var stack = new Stack<Category>(childCategories);
 
             while (stack.Count > 0)
             {
                 var current = stack.Pop();
-                if (current.ChildCategories.Any(c => c.Name == newCategoryName))
+                if (current.Name == newCategoryName)
                 {
                     return true;
                 }

@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Net;
+﻿using System.Net;
+
+using Microsoft.AspNetCore.Mvc;
+
 using QingFa.EShop.Application.Core.Models;
 
 namespace QingFa.EShop.API.Controllers
@@ -8,6 +10,11 @@ namespace QingFa.EShop.API.Controllers
     [Route("api/[controller]")]
     public abstract class BaseController : ControllerBase
     {
+        protected IActionResult HandleResult<T>(Result<T> result)
+        {
+            return result.Succeeded ? Ok(result.Value) : HandleResult(result as Result);
+        }
+
         protected IActionResult HandleResult(Result result)
         {
             if (result.ErrorCode.HasValue)

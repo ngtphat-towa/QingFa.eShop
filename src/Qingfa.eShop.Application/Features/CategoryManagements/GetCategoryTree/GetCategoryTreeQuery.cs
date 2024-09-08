@@ -8,12 +8,12 @@ using QingFa.EShop.Domain.Catalogs.Repositories;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.GetCategoryTree
 {
-    public class GetCategoryTreeQuery : IRequest<ResultValue<TreeCategoryTransfer>>
+    public class GetCategoryTreeQuery : IRequest<Result<TreeCategoryTransfer>>
     {
         public Guid ParentCategoryId { get; set; }
     }
 
-    public class GetCategoryTreeQueryHandler : IRequestHandler<GetCategoryTreeQuery, ResultValue<TreeCategoryTransfer>>
+    public class GetCategoryTreeQueryHandler : IRequestHandler<GetCategoryTreeQuery, Result<TreeCategoryTransfer>>
     {
         private readonly ICategoryRepository _categoryRepository;
         private readonly ICategoryService _categoryTreeService;
@@ -24,7 +24,7 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.GetCategoryTree
             _categoryTreeService = categoryTreeService ?? throw new ArgumentNullException(nameof(categoryTreeService));
         }
 
-        public async Task<ResultValue<TreeCategoryTransfer>> Handle(GetCategoryTreeQuery request, CancellationToken cancellationToken)
+        public async Task<Result<TreeCategoryTransfer>> Handle(GetCategoryTreeQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -32,16 +32,16 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.GetCategoryTree
                 var parentCategory = await _categoryRepository.GetByIdAsync(request.ParentCategoryId, cancellationToken);
                 if (parentCategory == null)
                 {
-                    return ResultValue<TreeCategoryTransfer>.NotFound(nameof(Category), "The specified parent category does not exist.");
+                    return Result<TreeCategoryTransfer>.NotFound(nameof(Category), "The specified parent category does not exist.");
                 }
 
                 // Fetch the category tree
                 var categoryTree = await _categoryTreeService.GetCategoryTreeAsync(request.ParentCategoryId, cancellationToken);
-                return ResultValue<TreeCategoryTransfer>.Success(categoryTree);
+                return Result<TreeCategoryTransfer>.Success(categoryTree);
             }
             catch (Exception ex)
             {
-                return ResultValue<TreeCategoryTransfer>.UnexpectedError(ex);
+                return Result<TreeCategoryTransfer>.UnexpectedError(ex);
             }
         }
     }

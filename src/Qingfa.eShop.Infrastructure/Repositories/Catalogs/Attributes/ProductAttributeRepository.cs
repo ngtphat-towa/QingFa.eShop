@@ -3,13 +3,18 @@
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
 using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Infrastructure.Persistence;
+using QingFa.EShop.Infrastructure.Persistence.Data;
+using QingFa.EShop.Infrastructure.Repositories.Common;
 
 namespace QingFa.EShop.Infrastructure.Repositories.Catalogs.Attributes
 {
-    internal class ProductAttributeRepository(EShopDbContext context) : GenericRepository<ProductAttribute, Guid>(context), IProductAttributeRepository
+    internal class ProductAttributeRepository(EShopDbContext context) 
+        : GenericRepository<ProductAttribute, Guid>(context), IProductAttributeRepository
     {
-        public async Task<bool> ExistsByNameAsync(string name, Guid? attributeGroupId, CancellationToken cancellationToken = default)
+        public async Task<bool> ExistsByNameAsync(
+            string name,
+            Guid? attributeGroupId,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(name))
             {

@@ -48,8 +48,7 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(query);
-
-            return Ok(result);
+            return HandleResult(result);
         }
 
         [HttpGet("{id}")]
@@ -60,12 +59,6 @@ namespace QingFa.EShop.API.Controllers
         {
             var query = new GetBrandByIdQuery { Id = id };
             var result = await _mediator.Send(query);
-
-            if (result.Succeeded)
-            {
-                return Ok(result.Value);
-            }
-
             return HandleResult(result);
         }
 
@@ -84,16 +77,6 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded)
-            {
-                return CreatedAtAction(
-                    nameof(GetById),
-                    new { id = result.Value },
-                    result.Value
-                );
-            }
-
             return HandleResult(result);
         }
 
@@ -114,9 +97,6 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded) return NoContent();
-
             return HandleResult(result);
         }
 
@@ -126,11 +106,8 @@ namespace QingFa.EShop.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(Guid id)
         {
-            var command = new DeleteBrandCommand { Id = id };
+            var command = new DeleteBrandCommand(Id: id);
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded) return NoContent();
-
             return HandleResult(result);
         }
     }

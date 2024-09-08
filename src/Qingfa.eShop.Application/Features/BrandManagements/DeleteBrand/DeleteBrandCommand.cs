@@ -1,38 +1,58 @@
-﻿using MediatR;
+﻿using Microsoft.Extensions.Logging;
 
+using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Application.Core.Models;
-using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Core.Repositories;
+
+using System;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace QingFa.EShop.Application.Features.BrandManagements.DeleteBrand
 {
-    public sealed record DeleteBrandCommand : RequestType<Guid>, IRequest<Result>;
+    public sealed record DeleteBrandCommand(Guid Id) : ICommand;
 
-    public class DeleteBrandCommandHandler : IRequestHandler<DeleteBrandCommand, Result>
+    internal class DeleteBrandCommandHandler : ICommandHandler<DeleteBrandCommand>
     {
-        private readonly IBrandRepository _brandRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbProvider;
+        private readonly ILogger<DeleteBrandCommandHandler> _logger;
 
-        public DeleteBrandCommandHandler(IBrandRepository brandRepository, IUnitOfWork unitOfWork)
+        public DeleteBrandCommandHandler(
+            IApplicationDbProvider dbProvider,
+            ILogger<DeleteBrandCommandHandler> logger)
         {
-            _brandRepository = brandRepository ?? throw new ArgumentNullException(nameof(brandRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
         public async Task<Result> Handle(DeleteBrandCommand request, CancellationToken cancellationToken)
         {
-            var brand = await _brandRepository.GetByIdAsync(request.Id, cancellationToken);
-            if (brand == null)
+            _logger.LogInformation("Handling DeleteBrandCommand with ID: {Id}", request.Id);
+
+            try
             {
-                return Result.NotFound(nameof(Brand), "The brand you are trying to delete does not exist.");
+                // Check if the brand exists
+                var brand = await _dbProvider.Brands
+                    .FindAsync(new object[] { request.Id }, cancellationToken);
+
+                if (brand == null)
+                {
+                    return Result.NotFound(nameof(Brand), "The brand you are trying to delete does not exist.");
+                }
+
+                // Delete the brand
+                _dbProvider.Brands.Remove(brand);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
+
+                _logger.LogInformation("Successfully deleted brand with ID: {Id}", request.Id);
+                return Result.Success();
             }
-
-            await _brandRepository.DeleteAsync(brand, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-            return Result.Success();
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred while deleting the brand with ID: {Id}", request.Id);
+                return Result.UnexpectedError(ex);
+            }
         }
     }
 }

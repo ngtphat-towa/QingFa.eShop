@@ -1,0 +1,172 @@
+### Register a new user
+POST http://localhost:7090/api/account/register
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!",
+  "firstName": "Test",
+  "lastName": "User",
+  "phoneNumber": "1234567890",
+  "shippingAddress": {
+    "street": "123 Test St",
+    "city": "Test City",
+    "state": "TS",
+    "country": "Test Country",
+    "postalCode": "12345"
+  },
+  "billingAddress": {
+    "street": "123 Test St",
+    "city": "Test City",
+    "state": "TS",
+    "country": "Test Country",
+    "postalCode": "12345"
+  }
+}
+
+### Log in a user
+POST http://localhost:7090/api/account/login
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "password": "Password123!",
+  "rememberMe": true
+}
+
+### Refresh token
+POST http://localhost:7090/api/account/refresh-token
+Content-Type: application/json
+
+{
+  "refreshToken": "your-refresh-token"
+}
+
+### Confirm email
+POST http://localhost:7090/api/account/confirm-email
+Content-Type: application/json
+
+{
+  "userId": "user-id",
+  "token": "confirmation-token"
+}
+
+### Resend confirmation email
+POST http://localhost:7090/api/account/resend-confirmation-email
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com"
+}
+
+### Forgot password
+POST http://localhost:7090/api/account/forgot-password
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com"
+}
+
+### Reset password
+POST http://localhost:7090/api/account/reset-password
+Content-Type: application/json
+
+{
+  "email": "testuser@example.com",
+  "token": "reset-token",
+  "newPassword": "NewPassword123!"
+}
+
+### Enable 2FA
+POST http://localhost:7090/api/account/enable-2fa
+Content-Type: application/json
+
+{
+  "isEnabled": true
+}
+
+### Disable 2FA
+POST http://localhost:7090/api/account/disable-2fa
+Content-Type: application/json
+
+### Reset recovery codes
+POST http://localhost:7090/api/account/reset-recovery-codes
+Content-Type: application/json
+
+### External login
+POST http://localhost:7090/api/account/external-login
+Content-Type: application/json
+
+{
+  "loginProvider": "Google",
+  "providerKey": "provider-key",
+  "providerDisplayName": "Google"
+}
+
+### Get user info
+GET http://localhost:7090/api/account/user-info
+Content-Type: application/json
+
+### Update user info
+PUT http://localhost:7090/api/account/update-user-info
+Content-Type: application/json
+
+{
+  "userId": "user-id",
+  "firstName": "Updated",
+  "lastName": "User",
+  "email": "updateduser@example.com",
+  "phoneNumber": "0987654321",
+  "shippingAddress": {
+    "street": "456 Updated St",
+    "city": "Updated City",
+    "state": "US",
+    "country": "Updated Country",
+    "postalCode": "54321"
+  },
+  "billingAddress": {
+    "street": "456 Updated St",
+    "city": "Updated City",
+    "state": "US",
+    "country": "Updated Country",
+    "postalCode": "54321"
+  },
+  "profileImageUrl": "http://example.com/profile.jpg"
+}
+
+### Change password
+POST http://localhost:7090/api/account/change-password
+Content-Type: application/json
+
+{
+  "currentPassword": "Password123!",
+  "newPassword": "NewPassword123!"
+}
+
+### Update email
+POST http://localhost:7090/api/account/update-email
+Content-Type: application/json
+
+{
+  "newEmail": "newemail@example.com"
+}
+
+### Delete account
+DELETE http://localhost:7090/api/account/delete-account
+Content-Type: application/json
+
+### Ensure external account
+POST http://localhost:7090/api/account/ensure-external-account
+Content-Type: application/json
+
+{
+  "loginProvider": "Google",
+  "providerKey": "provider-key",
+  "providerDisplayName": "Google",
+  "email": "testuser@example.com",
+  "username": "testuser",
+  "firstName": "Test",
+  "lastName": "User",
+  "phoneNumber": "1234567890"
+}

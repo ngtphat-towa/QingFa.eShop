@@ -1,34 +1,36 @@
-﻿using MediatR;
-
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
+using QingFa.EShop.Application.Core.Interfaces;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.Common.Requests;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
-using QingFa.EShop.Domain.Catalogs.Repositories;
 using QingFa.EShop.Domain.Core.Exceptions;
-using QingFa.EShop.Domain.Core.Repositories;
 
 namespace QingFa.EShop.Application.Features.AttributeGroupManagements.DeleteAttributeGroup
 {
-    public record DeleteAttributeGroupCommand : RequestType<Guid>, IRequest<Result>;
+    public record DeleteAttributeGroupCommand : RequestType<Guid>, ICommand;
     internal class DeleteAttributeGroupCommandHandler(
-        IProductAttributeGroupRepository productAttributeGroupRepository,
-        IUnitOfWork unitOfWork) : IRequestHandler<DeleteAttributeGroupCommand, Result>
+       IApplicationDbProvider dbContext) : ICommand<DeleteAttributeGroupCommand>
     {
-        private readonly IProductAttributeGroupRepository _productAttributeGroupRepository = productAttributeGroupRepository
-                               ?? throw CoreException.NullArgument(nameof(productAttributeGroupRepository));
-        private readonly IUnitOfWork _unitOfWork = unitOfWork
-                ?? throw CoreException.NullArgument(nameof(unitOfWork));
+        private readonly IApplicationDbProvider _dbContext = dbContext
+            ?? throw CoreException.NullArgument(nameof(dbContext));
 
         public async Task<Result> Handle(DeleteAttributeGroupCommand request, CancellationToken cancellationToken)
         {
-            var brand = await _productAttributeGroupRepository.GetByIdAsync(request.Id, cancellationToken);
-            if (brand == null)
+            // Fetch the ProductAttributeGroup entity by ID
+            var attributeGroup = await _dbContext.ProductAttributeGroups
+                .FindAsync(new object[] { request.Id }, cancellationToken);
+
+            // Check if the entity exists
+            if (attributeGroup == null)
             {
                 return Result.NotFound(nameof(ProductAttributeGroup), "The attribute group you are trying to delete does not exist.");
             }
 
-            await _productAttributeGroupRepository.DeleteAsync(brand, cancellationToken);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            // Remove the entity from the context
+            _dbContext.ProductAttributeGroups.Remove(attributeGroup);
+
+            // Save changes
+            await _dbContext.SaveChangesAsync(cancellationToken);
 
             return Result.Success();
         }

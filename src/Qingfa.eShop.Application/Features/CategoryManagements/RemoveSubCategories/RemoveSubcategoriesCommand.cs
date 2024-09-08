@@ -2,25 +2,25 @@
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.Features.CategoryManagements.Models;
 using QingFa.EShop.Domain.Catalogs.Entities;
-using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Application.Core.Interfaces;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace QingFa.EShop.Application.Features.CategoryManagements.RemoveSubCategories
 {
     public record RemoveSubcategoriesCommand : IRequest<Result>
     {
         public Guid ParentCategoryId { get; init; }
-        public List<Guid> SubcategoryIds { get; init; } = [];
+        public List<Guid> SubcategoryIds { get; init; } = new();
     }
+
     public class RemoveSubcategoriesCommandHandler : IRequestHandler<RemoveSubcategoriesCommand, Result>
     {
-        private readonly ICategoryRepository _categoryRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbProvider;
 
-        public RemoveSubcategoriesCommandHandler(ICategoryRepository categoryRepository, IUnitOfWork unitOfWork)
+        public RemoveSubcategoriesCommandHandler(IApplicationDbProvider dbProvider)
         {
-            _categoryRepository = categoryRepository ?? throw new ArgumentNullException(nameof(categoryRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
         }
 
         public async Task<Result> Handle(RemoveSubcategoriesCommand request, CancellationToken cancellationToken)
@@ -28,18 +28,21 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.RemoveSubCategor
             try
             {
                 // Fetch the parent category
-                var parentCategory = await _categoryRepository.GetByIdAsync(request.ParentCategoryId, cancellationToken);
+                var parentCategory = await _dbProvider.Categories
+                    .Include(c => c.ChildCategories)
+                    .FirstOrDefaultAsync(c => c.Id == request.ParentCategoryId, cancellationToken);
+
                 if (parentCategory == null)
                 {
                     return Result.NotFound(nameof(Category), "The specified parent category does not exist.");
                 }
 
                 // Fetch the child categories that are to be removed
-                var childCategories = await _categoryRepository.FindBySpecificationAsync(
-                    new CategorySpecification(ids: request.SubcategoryIds), cancellationToken
-                );
-
                 var subcategoryIds = request.SubcategoryIds.ToHashSet();
+                var childCategories = await _dbProvider.Categories
+                    .Where(c => subcategoryIds.Contains(c.Id))
+                    .ToListAsync(cancellationToken);
+
                 var validChildCategories = childCategories.Where(c => subcategoryIds.Contains(c.Id)).ToList();
                 var invalidSubcategoryIds = subcategoryIds.Except(validChildCategories.Select(c => c.Id)).ToList();
 
@@ -51,18 +54,17 @@ namespace QingFa.EShop.Application.Features.CategoryManagements.RemoveSubCategor
                 // Remove child categories from the parent category
                 foreach (var childCategory in validChildCategories)
                 {
-                    // Ensure that the category is actually a child before attempting to remove it
                     if (parentCategory.ChildCategories.Any(c => c.Id == childCategory.Id))
                     {
-                        parentCategory.RemoveChildCategory(childCategory.Id);
+                        parentCategory.ChildCategories.Remove(childCategory);
                     }
                 }
 
-                // Update the parent category in the repository
-                await _categoryRepository.UpdateAsync(parentCategory, cancellationToken);
+                // Update the parent category in the database
+                _dbProvider.Categories.Update(parentCategory);
 
                 // Commit the transaction
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();
             }

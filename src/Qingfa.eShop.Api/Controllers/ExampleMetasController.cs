@@ -8,9 +8,11 @@ using QingFa.EShop.Application.ExampleMetas.Models;
 using Swashbuckle.AspNetCore.Annotations;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Api.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace QingFa.EShop.API.Controllers
 {
+    [Authorize]
     public class ExampleMetasController : BaseController
     {
         private readonly IMediator _mediator;
@@ -21,6 +23,7 @@ namespace QingFa.EShop.API.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         [SwaggerOperation(Summary = "Gets a paginated list of ExampleMetas with optional filtering and sorting.")]
         [ProducesResponseType(typeof(PaginatedList<ExampleMetaResponse>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -43,8 +46,7 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(query);
-
-            return Ok(result);
+            return HandleResult(result);
         }
 
         [HttpGet("{id}")]
@@ -55,12 +57,6 @@ namespace QingFa.EShop.API.Controllers
         {
             var query = new GetExampleMetaByIdQuery { Id = id };
             var result = await _mediator.Send(query);
-
-            if (result.Succeeded)
-            {
-                return Ok(result.Value);
-            }
-
             return HandleResult(result);
         }
 
@@ -77,7 +73,6 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(command);
-
             if (result.Succeeded)
             {
                 return CreatedAtAction(
@@ -105,9 +100,6 @@ namespace QingFa.EShop.API.Controllers
             };
 
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded) return NoContent();
-
             return HandleResult(result);
         }
 
@@ -119,9 +111,6 @@ namespace QingFa.EShop.API.Controllers
         {
             var command = new DeleteExampleMetaCommand { Id = id };
             var result = await _mediator.Send(command);
-
-            if (result.Succeeded) return NoContent();
-
             return HandleResult(result);
         }
     }

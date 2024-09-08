@@ -1,11 +1,10 @@
-﻿using MediatR;
-
+﻿using QingFa.EShop.Application.Core.Abstractions.Messaging;
 using QingFa.EShop.Application.Core.Models;
 using QingFa.EShop.Application.ExampleMetas.Models;
 
 namespace QingFa.EShop.Application.ExampleMetas.Gets
 {
-    public class ListExampleMetasQuery : IRequest<PaginatedList<ExampleMetaResponse>>
+    public class ListExampleMetasQuery : IQuery<PaginatedList<ExampleMetaResponse>>
     {
         public int PageNumber { get; set; }
         public int PageSize { get; set; }

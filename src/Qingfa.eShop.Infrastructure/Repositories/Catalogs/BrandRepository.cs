@@ -2,7 +2,8 @@
 
 using QingFa.EShop.Domain.Catalogs.Entities;
 using QingFa.EShop.Domain.Catalogs.Repositories;
-using QingFa.EShop.Infrastructure.Persistence;
+using QingFa.EShop.Infrastructure.Persistence.Data;
+using QingFa.EShop.Infrastructure.Repositories.Common;
 
 namespace QingFa.EShop.Infrastructure.Repositories.Catalogs
 {

@@ -44,6 +44,11 @@
             return Failure(errors, 400, "Validation Failed");
         }
 
+        public static Result ValidationFailure(string error)
+        {
+            return Failure(error, 400, "Validation Failed");
+        }
+
         public static Result Unauthorized(string action = "perform this action")
         {
             return Failure($"You are not authorized to {action}.", 401, "Unauthorized");
@@ -77,6 +82,128 @@
         public static Result PreconditionFailed(string condition)
         {
             return Failure($"Precondition failed: {condition}", 412, "Precondition Failed");
+        }
+
+        // New implementation for UnexpectedError with string message
+        public static Result UnexpectedError(string message)
+        {
+            return new Result(false, new[] { message }, 500, "Internal Server Error");
+        }
+
+        // New implementation for ValidationFailure with string errorCode and errorMessage
+        public static Result ValidationFailure(string errorCode, string errorMessage)
+        {
+            return new Result(false, new[] { errorMessage }, 400, errorCode);
+        }
+        public static Result InvalidArgument(string argumentName, string reason)
+        {
+            var errorMessage = $"Invalid argument: {argumentName}. Reason: {reason}";
+            return new Result(false, new[] { errorMessage }, 400);
+        }
+
+    }
+
+    public class Result<T> : Result
+    {
+        public T? Value { get; }
+
+        private Result(bool succeeded, T? value, IEnumerable<string> errors, int? errorCode = null, string? errorMessage = null)
+            : base(succeeded, errors, errorCode, errorMessage)
+        {
+            Value = value;
+        }
+
+        public static Result<T> Success(T value)
+        {
+            return new Result<T>(true, value, Array.Empty<string>());
+        }
+
+        public static new Result<T> Failure(IEnumerable<string> errors, int? errorCode = null, string? errorMessage = null)
+        {
+            return new Result<T>(false, default, errors, errorCode, errorMessage);
+        }
+
+        public static new Result<T> Failure(string error, int? errorCode = null, string? errorMessage = null)
+        {
+            return Failure(new[] { error }, errorCode, errorMessage);
+        }
+
+        public static new Result<T> NotFound(string entityName, string reason = "")
+        {
+            var result = Result.NotFound(entityName, reason);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> ValidationFailure(IEnumerable<string> errors)
+        {
+            var result = Result.ValidationFailure(errors);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> ValidationFailure(string error)
+        {
+            var result = Result.ValidationFailure(error);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> Unauthorized(string action = "perform this action")
+        {
+            var result = Result.Unauthorized(action);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> Conflict(string entityName, string reason)
+        {
+            var result = Result.Conflict(entityName, reason);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> RateLimited(string message = "Too many requests")
+        {
+            var result = Result.RateLimited(message);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> UnexpectedError(Exception ex)
+        {
+            var result = Result.UnexpectedError(ex);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> InvalidOperation(string operation, string reason)
+        {
+            var result = Result.InvalidOperation(operation, reason);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> ResourceLocked(string resourceName, string reason)
+        {
+            var result = Result.ResourceLocked(resourceName, reason);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> PreconditionFailed(string condition)
+        {
+            var result = Result.PreconditionFailed(condition);
+            return new Result<T>(false, default, result.Errors, result.ErrorCode, result.ErrorMessage);
+        }
+
+        public static new Result<T> InvalidArgument(string argumentName, string reason)
+        {
+            var errorMessage = $"Invalid argument: {argumentName}. Reason: {reason}";
+            return new Result<T>(false, default, new[] { errorMessage }, 400);
+        }
+
+        // Implemented UnexpectedError with string argument
+        public static new Result<T> UnexpectedError(string message)
+        {
+            return new Result<T>(false, default, new[] { message }, 500, "Internal Server Error");
+        }
+
+        // Implemented ValidationFailure with two string arguments
+        public static new Result<T> ValidationFailure(string errorCode, string errorMessage)
+        {
+            return new Result<T>(false, default, new[] { errorMessage }, 400, errorCode);
         }
     }
 }

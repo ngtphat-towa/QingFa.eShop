@@ -9,18 +9,14 @@ using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.GetAttributeById
 {
-    public record GetProductAttributeByIdQuery(Guid Id) : IRequest<ResultValue<ProductAttributeResponse>>;
+    public record GetProductAttributeByIdQuery(Guid Id) : IRequest<Result<ProductAttributeResponse>>;
 
-    public class GetProductAttributeByIdQueryHandler : IRequestHandler<GetProductAttributeByIdQuery, ResultValue<ProductAttributeResponse>>
+    internal class GetProductAttributeByIdQueryHandler(IProductAttributeRepository attributeRepository)
+        : IRequestHandler<GetProductAttributeByIdQuery, Result<ProductAttributeResponse>>
     {
-        private readonly IProductAttributeRepository _attributeRepository;
+        private readonly IProductAttributeRepository _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
 
-        public GetProductAttributeByIdQueryHandler(IProductAttributeRepository attributeRepository)
-        {
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-        }
-
-        public async Task<ResultValue<ProductAttributeResponse>> Handle(GetProductAttributeByIdQuery request, CancellationToken cancellationToken)
+        public async Task<Result<ProductAttributeResponse>> Handle(GetProductAttributeByIdQuery request, CancellationToken cancellationToken)
         {
             try
             {
@@ -29,19 +25,19 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.GetAttributeByI
                 if (attribute == null)
                 {
                     // Return a not found result if the attribute does not exist
-                    return ResultValue<ProductAttributeResponse>.NotFound(nameof(ProductAttribute), $"ProductAttribute with ID {request.Id} not found.");
+                    return Result<ProductAttributeResponse>.NotFound(nameof(ProductAttribute), $"ProductAttribute with ID {request.Id} not found.");
                 }
 
                 // Map the ProductAttribute to ProductAttributeResponse
                 var response = attribute.Adapt<ProductAttributeResponse>();
 
                 // Return a success result with the mapped response
-                return ResultValue<ProductAttributeResponse>.Success(response);
+                return Result<ProductAttributeResponse>.Success(response);
             }
             catch (Exception ex)
             {
                 // Handle and return any unexpected errors
-                return ResultValue<ProductAttributeResponse>.UnexpectedError(ex);
+                return Result<ProductAttributeResponse>.UnexpectedError(ex);
             }
         }
     }

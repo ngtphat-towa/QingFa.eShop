@@ -1,37 +1,29 @@
 ﻿using MediatR;
-
 using Microsoft.Extensions.Logging;
-
 using QingFa.EShop.Application.Core.Models;
-using QingFa.EShop.Application.Features.AttributeOptionManagements.Models;
 using QingFa.EShop.Domain.Catalogs.Entities.Attributes;
-using QingFa.EShop.Domain.Catalogs.Repositories.Attributes;
-using QingFa.EShop.Domain.Core.Repositories;
+using QingFa.EShop.Application.Core.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace QingFa.EShop.Application.Features.AttributeManagements.AssignAttributeOptions
 {
-    public record AssignAttributeOptionsCommand : IRequest<Result>
-    {
-        public Guid ProductAttributeId { get; init; }
-        public List<Guid> AttributeOptionIds { get; init; } = new List<Guid>();
-    }
+    public record AssignAttributeOptionsCommand(Guid ProductAttributeId, List<Guid> AttributeOptionIds) : IRequest<Result>;
 
     internal class AssignAttributeOptionsCommandHandler : IRequestHandler<AssignAttributeOptionsCommand, Result>
     {
-        private readonly IProductAttributeRepository _attributeRepository;
-        private readonly IProductAttributeOptionRepository _optionRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IApplicationDbProvider _dbProvider;
         private readonly ILogger<AssignAttributeOptionsCommandHandler> _logger;
 
         public AssignAttributeOptionsCommandHandler(
-            IProductAttributeRepository attributeRepository,
-            IProductAttributeOptionRepository optionRepository,
-            IUnitOfWork unitOfWork,
+            IApplicationDbProvider dbProvider,
             ILogger<AssignAttributeOptionsCommandHandler> logger)
         {
-            _attributeRepository = attributeRepository ?? throw new ArgumentNullException(nameof(attributeRepository));
-            _optionRepository = optionRepository ?? throw new ArgumentNullException(nameof(optionRepository));
-            _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _dbProvider = dbProvider ?? throw new ArgumentNullException(nameof(dbProvider));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
@@ -56,18 +48,20 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.AssignAttribute
             try
             {
                 // Fetch the product attribute
-                var attribute = await _attributeRepository.GetByIdAsync(request.ProductAttributeId, cancellationToken);
+                var attribute = await _dbProvider.ProductAttributes
+                    .Include(a => a.AttributeOptions)
+                    .FirstOrDefaultAsync(a => a.Id == request.ProductAttributeId, cancellationToken);
+
                 if (attribute == null)
                 {
                     _logger.LogWarning("Product attribute not found: {ProductAttributeId}", request.ProductAttributeId);
                     return Result.NotFound(nameof(ProductAttribute), "The specified product attribute does not exist.");
                 }
 
-                // Fetch the attribute options using specifications
-                var specification = new ProductAttributeOptionSpecification(
-                    ids: request.AttributeOptionIds
-                );
-                var options = await _optionRepository.FindBySpecificationAsync(specification, cancellationToken);
+                // Fetch the attribute options
+                var options = await _dbProvider.ProductAttributeOptions
+                    .Where(o => request.AttributeOptionIds.Contains(o.Id))
+                    .ToListAsync(cancellationToken);
 
                 var optionIds = new HashSet<Guid>(request.AttributeOptionIds);
                 var validOptions = options.Where(o => optionIds.Contains(o.Id)).ToList();
@@ -102,8 +96,7 @@ namespace QingFa.EShop.Application.Features.AttributeManagements.AssignAttribute
                 }
 
                 _logger.LogInformation("Updating product attribute.");
-                await _attributeRepository.UpdateAsync(attribute);
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _dbProvider.SaveChangesAsync(cancellationToken);
 
                 return Result.Success();
             }
